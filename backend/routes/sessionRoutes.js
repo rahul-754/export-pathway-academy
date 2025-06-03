@@ -7,15 +7,14 @@ import {
   getAllSessions,
   getSessionsByCourse
 } from '../controllers/sessionControllers.js';
-import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createSession);
-router.put('/:id', authMiddleware, updateSession);
-router.delete('/:id', authMiddleware, deleteSession);
-router.get('/:id', authMiddleware, getSessionById);
-router.get('/', authMiddleware, getAllSessions);
-router.get('/course/:courseId', authMiddleware, getSessionsByCourse);
+router.post('/',   createSession);
+router.put('/:id',   updateSession);
+router.delete('/:id',   deleteSession);
+router.get('/:id',   getSessionById);
+router.get('/',   getAllSessions);
+router.get('/course/:courseId',   getSessionsByCourse);
 
 export default router;

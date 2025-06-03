@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,17 +19,14 @@ import {
 import { Link } from 'react-router-dom';
 import AdminHeader from '@/components/AdminHeader';
 import CourseForm from '@/components/CourseForm';
+import { getCourses } from '@/Apis/Apis';
 
 const AdminDashboard = () => {
   const [courseFormOpen, setCourseFormOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
-
-  const [courses] = useState([
-    { id: 1, title: "Export Documentation", sessions: 8, enrolled: 45, status: "active" },
-    { id: 2, title: "International Trade Laws", sessions: 12, enrolled: 32, status: "active" },
-    { id: 3, title: "Customs Procedures", sessions: 6, enrolled: 28, status: "draft" }
-  ]);
-
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
+  console.log(courses)
   const [programs] = useState([
     { id: 1, title: "Export Fundamentals Program", startDate: "2024-07-15", enrolled: 15, status: "upcoming" },
     { id: 2, title: "Advanced Export Strategies", startDate: "2024-06-20", enrolled: 22, status: "active" }
@@ -56,6 +53,23 @@ const AdminDashboard = () => {
     setEditingCourse(null);
   };
 
+  useEffect(() => {
+  const fetchCourses = async () => {
+    try {
+      setLoadingCourses(true);
+      const data = await getCourses();
+      setCourses(data);
+    } catch (error) {
+      console.error(error);
+      // Optionally show toast/snackbar here
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
+
+  fetchCourses();
+}, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminHeader />
@@ -69,7 +83,7 @@ const AdminDashboard = () => {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">24</div>
+              <div className="text-2xl font-bold">{courses.totalCourses}</div>
               <p className="text-xs text-muted-foreground">+2 from last month</p>
             </CardContent>
           </Card>
@@ -127,7 +141,7 @@ const AdminDashboard = () => {
             </div>
             
             <div className="grid gap-4">
-              {courses.map((course) => (
+            {courses.courses && courses.courses.map((course) => (
                 <Card key={course.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">

@@ -7,17 +7,17 @@ import {
   getAllCourse,
 } from '../controllers/courseControllers.js';
 
-import authMiddleware  from '../middleware/authMiddleware.js';
+  
 
 const router = express.Router();
 
 
-router.post('/', authMiddleware,  createCourse);
-router.put('/:id', authMiddleware,  updateCourse);
-router.delete('/:id', authMiddleware,  deleteCourse);
+router.post('/',    createCourse);
+router.put('/:id',    updateCourse);
+router.delete('/:id',    deleteCourse);
 
 
-router.get('/:id', authMiddleware, getCourseById);
-router.get('/', authMiddleware, getAllCourse);
+router.get('/:id',   getCourseById);
+router.get('/',   getAllCourse);
 
 export default router;
