@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +12,7 @@ import SessionsPage from "./pages/SessionsPage";
 import ProgramsPage from "./pages/ProgramsPage";
 import BatchesPage from "./pages/BatchesPage";
 import CertificationPage from "./pages/CertificationPage";
+import CourseSessionsPage from "./pages/CourseSessionsPage";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
@@ -29,6 +29,7 @@ const App = () => {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/course/:courseId/sessions" element={<CourseSessionsPage />} />
             <Route path="/sessions" element={<SessionsPage />} />
             <Route path="/programs" element={<ProgramsPage />} />
             <Route path="/batches" element={<BatchesPage />} />
