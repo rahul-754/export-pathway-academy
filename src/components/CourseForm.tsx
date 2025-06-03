@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ interface CourseFormProps {
 
 const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEditing = false }) => {
   const [tagInput, setTagInput] = useState('');
-  
+  console.log(courseData)
   const form = useForm<CourseFormData>({
     defaultValues: {
       title: courseData?.title || '',
@@ -73,11 +73,34 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
       sessions: courseData?.sessions || [],
     },
   });
-
+  
   const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({
     control: form.control,
     name: 'sessions',
   });
+
+  useEffect(() => {
+  if (courseData) {
+    form.reset({
+      title: courseData.title || '',
+      instructor: courseData.instructor || '',
+      shortNote: courseData.shortNote || '',
+      description: courseData.description || '',
+      image: null,
+      videos: [],
+      tags: courseData.tags || [],
+      category: courseData.category || '',
+      published: courseData.published || false,
+      upcoming: courseData.upcoming || false,
+      featured: courseData.featured || false,
+      publishedOn: courseData.publishedOn ? new Date(courseData.publishedOn) : null,
+      courseType: courseData.courseType || 'free',
+      amount: courseData.amount || 0,
+      currency: courseData.currency || 'USD',
+      sessions: courseData.sessions || [],
+    });
+  }
+}, [courseData, form]);
 
   const courseType = form.watch('courseType');
   const tags = form.watch('tags');

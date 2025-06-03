@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,72 +16,32 @@ import {
   Play
 } from 'lucide-react';
 import UserHeader from '@/components/UserHeader';
+import { getCourses } from '@/Apis/Apis';
 
 const CoursesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
+  const [loadingCourses, setLoadingCourses] = useState(false);
 
-  const courses = [
-    {
-      id: 1,
-      title: "Export Documentation Essentials",
-      description: "Master the fundamentals of export documentation including commercial invoices, packing lists, and shipping documents.",
-      instructor: "Dr. Sarah Wilson",
-      duration: "6 weeks",
-      sessions: 8,
-      enrolled: 324,
-      rating: 4.8,
-      level: "Beginner",
-      category: "Documentation",
-      price: "$199",
-      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
-      sessions_list: [
-        { id: 1, title: "Introduction to Export Documentation", duration: "45 min", completed: false },
-        { id: 2, title: "Commercial Invoice Preparation", duration: "60 min", completed: false },
-        { id: 3, title: "Packing List Essentials", duration: "40 min", completed: false },
-        { id: 4, title: "Bills of Lading", duration: "55 min", completed: false }
-      ]
-    },
-    {
-      id: 2,
-      title: "International Trade Laws & Regulations",
-      description: "Comprehensive overview of international trade laws, WTO regulations, and compliance requirements.",
-      instructor: "Prof. Michael Chen",
-      duration: "8 weeks",
-      sessions: 12,
-      enrolled: 256,
-      rating: 4.9,
-      level: "Intermediate",
-      category: "Legal",
-      price: "$299",
-      thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
-      sessions_list: [
-        { id: 1, title: "WTO Fundamentals", duration: "50 min", completed: false },
-        { id: 2, title: "Trade Agreements", duration: "65 min", completed: false },
-        { id: 3, title: "Compliance Requirements", duration: "45 min", completed: false }
-      ]
-    },
-    {
-      id: 3,
-      title: "Digital Marketing for Export Business",
-      description: "Learn digital marketing strategies specifically designed for export businesses and international markets.",
-      instructor: "Emma Rodriguez",
-      duration: "4 weeks",
-      sessions: 6,
-      enrolled: 189,
-      rating: 4.7,
-      level: "Intermediate",
-      category: "Marketing",
-      price: "$149",
-      thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
-      sessions_list: [
-        { id: 1, title: "Export Market Research", duration: "40 min", completed: false },
-        { id: 2, title: "International SEO", duration: "55 min", completed: false }
-      ]
+  useEffect(() => {
+  const fetchCourses = async () => {
+    try {
+      setLoadingCourses(true);
+      const data = await getCourses();
+      setCourses(data);
+    } catch (error) {
+      console.error(error);
+      // Optionally show toast/snackbar here
+    } finally {
+      setLoadingCourses(false);
     }
-  ];
+  };
 
-  const filteredCourses = courses.filter(course => {
+  fetchCourses();
+}, []);
+
+  const filteredCourses = courses.courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || course.category.toLowerCase() === categoryFilter;
@@ -131,7 +91,7 @@ const CoursesPage = () => {
             <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-video bg-gray-200 relative">
                 <img 
-                  src={course.thumbnail} 
+                  src={course.courseImg} 
                   alt={course.title}
                   className="w-full h-full object-cover"
                 />

@@ -23,7 +23,7 @@ interface EnrolledCourse {
   totalSessions: number;
   nextSession: string;
   category: string;
-  thumbnail: string;
+  courseImg: string;
 }
 
 interface UpcomingProgram {
@@ -44,7 +44,8 @@ interface EnrolledUserViewProps {
   onCourseClick: (courseId: number) => void;
 }
 
-const EnrolledUserView = ({ onCourseClick }: EnrolledUserViewProps) => {
+const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
+  console.log(user)
   const enrolledCourses: EnrolledCourse[] = [
     { 
       id: 1, 
@@ -54,7 +55,7 @@ const EnrolledUserView = ({ onCourseClick }: EnrolledUserViewProps) => {
       totalSessions: 6,
       nextSession: "Letter of Credit Basics",
       category: "Basic",
-      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop"
+      courseImg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop"
     },
     { 
       id: 2, 
@@ -64,7 +65,7 @@ const EnrolledUserView = ({ onCourseClick }: EnrolledUserViewProps) => {
       totalSessions: 12,
       nextSession: "WTO Regulations",
       category: "Advanced",
-      thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop"
+      courseImg: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop"
     }
   ];
 
@@ -102,7 +103,7 @@ const EnrolledUserView = ({ onCourseClick }: EnrolledUserViewProps) => {
     <div className="container mx-auto px-4 py-6">
       {/* Welcome Section */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, John!</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user.name}</h2>
         <p className="text-gray-600">Continue your export learning journey</p>
       </div>
 
@@ -114,8 +115,8 @@ const EnrolledUserView = ({ onCourseClick }: EnrolledUserViewProps) => {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">2 in progress</p>
+            <div className="text-2xl font-bold">{user.enrolledCoursesCount}</div>
+            <p className="text-xs text-muted-foreground"></p>
           </CardContent>
         </Card>
         
@@ -169,7 +170,7 @@ const EnrolledUserView = ({ onCourseClick }: EnrolledUserViewProps) => {
                 <div key={course.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => onCourseClick(course.id)}>
                   <div className="flex gap-4">
                     <img 
-                      src={course.thumbnail} 
+                      src={course.courseImg} 
                       alt={course.title}
                       className="w-20 h-16 object-cover rounded"
                     />

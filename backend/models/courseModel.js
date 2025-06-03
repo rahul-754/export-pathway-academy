@@ -14,6 +14,9 @@ const courseSchema = new mongoose.Schema({
     enum: ['published', 'draft', 'archived'],
     default: 'draft',
   },
+  level: {
+    type: String
+  },
   pricing: {
     type: String,
     enum: ['free', 'paid course', 'paid certification'],

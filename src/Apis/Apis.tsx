@@ -135,9 +135,9 @@ export const loginUser = async (credentials) => {
   }
 };
 
-export const getCurrentUser = async () => {
+export const getUserById = async (UserId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/users/me`);
+    const response = await axios.get(`${BASE_URL}/users/${UserId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching current user:', error);

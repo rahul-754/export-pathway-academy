@@ -21,7 +21,7 @@ const SessionsPage = () => {
       duration: "45 min",
       description: "Learn the basics of export documentation and why it's crucial for international trade.",
       videoUrl: "https://example.com/video1",
-      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
+      courseImg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
       isCompleted: true,
       isEnrolled: true,
       category: "Documentation"
@@ -33,7 +33,7 @@ const SessionsPage = () => {
       duration: "60 min",
       description: "Step-by-step guide to creating accurate commercial invoices for international shipments.",
       videoUrl: "https://example.com/video2",
-      thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
+      courseImg: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
       isCompleted: false,
       isEnrolled: true,
       category: "Documentation"
@@ -45,7 +45,7 @@ const SessionsPage = () => {
       duration: "50 min",
       description: "Understanding World Trade Organization principles and their impact on international trade.",
       videoUrl: "https://example.com/video3",
-      thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
+      courseImg: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
       isCompleted: false,
       isEnrolled: false,
       category: "Legal"
@@ -57,7 +57,7 @@ const SessionsPage = () => {
       duration: "40 min",
       description: "Learn how to identify and analyze international markets for your export business.",
       videoUrl: "https://example.com/video4",
-      thumbnail: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=200&fit=crop",
+      courseImg: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=200&fit=crop",
       isCompleted: false,
       isEnrolled: true,
       category: "Marketing"
@@ -69,7 +69,7 @@ const SessionsPage = () => {
       duration: "55 min",
       description: "Navigate customs procedures and understand documentation requirements for different countries.",
       videoUrl: "https://example.com/video5",
-      thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop",
+      courseImg: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop",
       isCompleted: false,
       isEnrolled: false,
       category: "Documentation"
@@ -112,7 +112,7 @@ const SessionsPage = () => {
                   <Card key={session.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-video bg-gray-200 relative group">
                       <img 
-                        src={session.thumbnail} 
+                        src={session.courseImg} 
                         alt={session.title}
                         className="w-full h-full object-cover"
                       />
