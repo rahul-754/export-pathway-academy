@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,8 +18,12 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminHeader from '@/components/AdminHeader';
+import CourseForm from '@/components/CourseForm';
 
 const AdminDashboard = () => {
+  const [courseFormOpen, setCourseFormOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
+
   const [courses] = useState([
     { id: 1, title: "Export Documentation", sessions: 8, enrolled: 45, status: "active" },
     { id: 2, title: "International Trade Laws", sessions: 12, enrolled: 32, status: "active" },
@@ -37,6 +40,21 @@ const AdminDashboard = () => {
     { id: 2, name: "Sarah Johnson", email: "sarah@example.com", courses: 5, certified: 4, status: "active" },
     { id: 3, name: "Mike Chen", email: "mike@example.com", courses: 2, certified: 1, status: "active" }
   ]);
+
+  const handleNewCourse = () => {
+    setEditingCourse(null);
+    setCourseFormOpen(true);
+  };
+
+  const handleEditCourse = (course) => {
+    setEditingCourse(course);
+    setCourseFormOpen(true);
+  };
+
+  const handleCloseCourseForm = () => {
+    setCourseFormOpen(false);
+    setEditingCourse(null);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,7 +120,7 @@ const AdminDashboard = () => {
           <TabsContent value="courses" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Course Management</h3>
-              <Button>
+              <Button onClick={handleNewCourse}>
                 <Plus className="w-4 h-4 mr-2" />
                 New Course
               </Button>
@@ -123,7 +141,11 @@ const AdminDashboard = () => {
                         <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
                           {course.status}
                         </Badge>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditCourse(course)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button variant="outline" size="sm">
@@ -238,6 +260,14 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Course Form Dialog */}
+        <CourseForm
+          open={courseFormOpen}
+          onClose={handleCloseCourseForm}
+          courseData={editingCourse}
+          isEditing={!!editingCourse}
+        />
       </div>
     </div>
   );
