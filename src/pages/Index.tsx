@@ -103,7 +103,7 @@ const Index = () => {
             <div className="flex items-center space-x-2">
               <img src={logo} alt="Logo" className="h-10 w-auto object-cover" />
               <h1 className="text-2xl font-bold text-gray-900">
-                Terra Souring
+                TerraSouring
               </h1>
             </div>
             <div className="hidden md:flex items-center space-x-6 text-sm text-gray-600">
@@ -221,7 +221,7 @@ const Index = () => {
           <div className="flex items-center justify-center space-x-2 mb-4">
             <img src={logo} alt="Logo" className="h-10 w-auto object-cover" />
 
-            <span className="text-lg font-semibold">Terra Souring</span>
+            <span className="text-lg font-semibold">TerraSouring</span>
           </div>
           <p className="text-gray-400 text-sm">
             Empowering export professionals with knowledge and community
