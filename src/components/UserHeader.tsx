@@ -10,10 +10,14 @@ const UserHeader = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <GraduationCap className="h-8 w-8 text-blue-600" />
+            <img src="../../public/logo.png" alt="Logo"  style={{
+              width: 'auto',
+              height: '40px',
+              objectFit: 'cover'
+            }}/>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">My Learning</h1>
-              <p className="text-sm text-gray-500">Exporter Learning Hub</p>
+              <h1 className="text-xl font-bold text-gray-900">Terra Sourcing</h1>
+              <p className="text-sm text-gray-500">Learning Platform</p>
             </div>
           </div>
           <div className="flex items-center space-x-4">

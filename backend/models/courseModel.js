@@ -22,6 +22,7 @@ const courseSchema = new mongoose.Schema({
     enum: ['free', 'paid course', 'paid certification'],
     required: true,
   },
+  instructor: { type: String,  },
   sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Session' }],
   totalAmount: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },

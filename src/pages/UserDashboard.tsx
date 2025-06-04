@@ -1,35 +1,35 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import UserHeader from '@/components/UserHeader';
-import NewUserView from '@/components/NewUserView';
-import EnrolledUserView from '@/components/EnrolledUserView';
-import { getUserById } from '@/Apis/Apis';
-
-
-const USER_ID = '683ea3257b617b196caeb490';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import UserHeader from "@/components/UserHeader";
+import NewUserView from "@/components/NewUserView";
+import EnrolledUserView from "@/components/EnrolledUserView";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [isNewUser, setIsNewUser] = useState(false); // default value
+  const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const storedAuth = localStorage.getItem("TerraAuthData");
+    if (storedAuth) {
       try {
-        const userData = await getUserById(USER_ID);
-        console.log(userData)
-        setUser(userData);
-        setIsNewUser(userData.enrolledCourses?.length === 0); // or another logic
-      } catch (error) {
-        console.error('Failed to load user');
-      } finally {
-        setLoading(false);
-      }
-    };
+        const parsed = JSON.parse(storedAuth);
+        const userData = parsed.user;
 
-    fetchUser();
-  }, []);
+        setUser(userData);
+        const noCourses = userData.enrolledCourses?.length === 0;
+        const noSessions = userData.enrolledSessions?.length === 0;
+        setIsNewUser(noCourses && noSessions);
+      } catch (err) {
+        console.error("Invalid auth data in localStorage", err);
+      }
+    } else {
+      console.warn("No auth data found, redirecting to login");
+      navigate("/login");
+    }
+    setLoading(false);
+  }, [navigate]);
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/course/${courseId}/sessions`);
@@ -41,8 +41,7 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <UserHeader  />
-
+      <UserHeader />
       {isNewUser ? (
         <NewUserView user={user} onCourseClick={handleCourseClick} />
       ) : (

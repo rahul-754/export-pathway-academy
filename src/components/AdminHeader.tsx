@@ -9,10 +9,14 @@ const AdminHeader = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <GraduationCap className="h-8 w-8 text-purple-600" />
+            <img src="../../public/logo.png" alt="Logo" style={{
+              width: 'auto',
+              height: '40px',
+              objectFit: 'cover'
+            }}/>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-sm text-gray-500">Exporter Learning Hub</p>
+              <p className="text-sm text-gray-500">Terra Souring</p>
             </div>
           </div>
           <div className="flex items-center space-x-4">

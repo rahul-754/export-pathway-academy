@@ -26,7 +26,6 @@ const AdminDashboard = () => {
   const [editingCourse, setEditingCourse] = useState(null);
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
-  console.log(courses)
   const [programs] = useState([
     { id: 1, title: "Export Fundamentals Program", startDate: "2024-07-15", enrolled: 15, status: "upcoming" },
     { id: 2, title: "Advanced Export Strategies", startDate: "2024-06-20", enrolled: 22, status: "active" }
@@ -94,8 +93,8 @@ const AdminDashboard = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">573</div>
-              <p className="text-xs text-muted-foreground">+48 from last month</p>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">0</p>
             </CardContent>
           </Card>
           
@@ -105,8 +104,8 @@ const AdminDashboard = () => {
               <Trophy className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">298</div>
-              <p className="text-xs text-muted-foreground">+15 from last week</p>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">0</p>
             </CardContent>
           </Card>
           
@@ -116,8 +115,8 @@ const AdminDashboard = () => {
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">3 new this week</p>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">0</p>
             </CardContent>
           </Card>
         </div>
@@ -148,7 +147,7 @@ const AdminDashboard = () => {
                       <div>
                         <CardTitle className="text-lg">{course.title}</CardTitle>
                         <CardDescription>
-                          {course.sessions} sessions • {course.enrolled} enrolled
+                          {course.sessionsCount} sessions • {course.enrolledUsersCount} enrolled
                         </CardDescription>
                       </div>
                       <div className="flex items-center space-x-2">
