@@ -35,11 +35,13 @@ const CourseSessionsPage = () => {
   const [cart, setCart] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [cartPurchased, setCartPurchased] = useState(false);
+  const [viewingMaterial, setViewingMaterial] = useState(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         const data = await getCourseById(courseId);
+        console.log("Fetched course data:", data);
         setCourse(data);
       } catch (err) {
         console.error("Failed to fetch course:", err);
@@ -53,12 +55,12 @@ const CourseSessionsPage = () => {
 
   useEffect(() => {
     if (!course) return;
-    
+
     let total = cart.reduce((sum, sessionId) => {
       const session = course.sessions.find((s) => s._id === sessionId);
       return sum + (session?.price.amount || 0);
     }, 0);
-    
+
     // Apply discounts
     if (cart.length === 1 || cart.length < course.sessions.length) {
       // 10% discount for single session
@@ -67,7 +69,7 @@ const CourseSessionsPage = () => {
       // 20% discount for full course
       total = total * 0.8;
     }
-    
+
     setCartTotal(total);
   }, [cart, course]);
 
@@ -99,6 +101,30 @@ const CourseSessionsPage = () => {
     }
   };
 
+  const handleViewNotes = (session) => {
+    if (purchasedSessions.includes(session._id)) {
+      if (session.notes) {
+        setViewingMaterial({ type: "notes", url: session.notes });
+      } else {
+        alert("Notes not available for this session.");
+      }
+    } else {
+      alert("Please buy access to view notes.");
+    }
+  };
+
+  const handleViewPPT = (session) => {
+    if (purchasedSessions.includes(session._id)) {
+      if (session.ppt) {
+        setViewingMaterial({ type: "ppt", url: session.ppt });
+      } else {
+        alert("PPT not available for this session.");
+      }
+    } else {
+      alert("Please buy access to view PPT.");
+    }
+  };
+
   const handleWatchPreview = (session) => {
     if (session.previewVideo) {
       setSelectedVideoUrl(session.previewVideo);
@@ -109,8 +135,8 @@ const CourseSessionsPage = () => {
 
   const handleWatchFullVideo = (session) => {
     if (purchasedSessions.includes(session._id)) {
-      if (session.fullVideo) {
-        setSelectedVideoUrl(session.fullVideo);
+      if (session.videoUrl) {
+        setSelectedVideoUrl(session.videoUrl);
       } else {
         alert("No full video available.");
       }
@@ -206,16 +232,26 @@ const CourseSessionsPage = () => {
                 className="overflow-hidden hover:shadow-md transition-shadow"
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                        {index + 1}
+                  <div className="flex items-center justify-between">
+                    <div className="flex item-center gap-4">
+                      <div
+                        className="rounded-lg bg-blue-100 flex items-center justify-center"
+                        style={{ width: "300px", height: "auto" }}
+                      >
+                        <img
+                          src={session.sessionImage}
+                          alt={session.title}
+                          className="w-full h-full object-cover"
+                          style={{
+                            borderRadius: "8px",
+                            objectFit: "cover",
+                          }}
+                        />
                       </div>
                       <div>
                         <CardTitle className="text-lg">
                           {session.title}
                         </CardTitle>
-                        <CardDescription>{session.description}</CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -237,9 +273,7 @@ const CourseSessionsPage = () => {
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2">
                       <h4 className="font-semibold mb-3">What you'll learn:</h4>
-                      <h5 className="font-semibold mb-2">
-                        {session.description}
-                      </h5>
+                      <h5 className=" mb-2">{session.description}</h5>
 
                       {/* BOTH Buttons shown before purchase */}
                       <div className="flex gap-4">
@@ -276,12 +310,10 @@ const CourseSessionsPage = () => {
                           variant="outline"
                           size="sm"
                           className="w-full justify-start"
-                          disabled={!isAccessible}
+                          disabled={!isAccessible || !session.videoUrl}
+                          onClick={() => handleWatchFullVideo(session)}
                         >
-                          <Video
-                            className="h-4 w-4 mr-2"
-                            onClick={() => handleWatchFullVideo(session)}
-                          />
+                          <Video className="h-4 w-4 mr-2" />
                           Watch Video
                           {!isAccessible && (
                             <LockIcon className="h-3 w-3 ml-auto" />
@@ -291,22 +323,25 @@ const CourseSessionsPage = () => {
                           variant="outline"
                           size="sm"
                           className="w-full justify-start"
-                          disabled={!isAccessible}
+                          disabled={!isAccessible || !session.notes}
+                          onClick={() => handleViewNotes(session)}
                         >
                           <FileText className="h-4 w-4 mr-2" />
-                          Download Notes
+                          View Notes
                           {!isAccessible && (
                             <LockIcon className="h-3 w-3 ml-auto" />
                           )}
                         </Button>
+
                         <Button
                           variant="outline"
                           size="sm"
                           className="w-full justify-start"
-                          disabled={!isAccessible}
+                          disabled={!isAccessible || !session.ppt}
+                          onClick={() => handleViewPPT(session)}
                         >
                           <Presentation className="h-4 w-4 mr-2" />
-                          Download PPT
+                          View PPT
                           {!isAccessible && (
                             <LockIcon className="h-3 w-3 ml-auto" />
                           )}
@@ -326,13 +361,17 @@ const CourseSessionsPage = () => {
             <h3 className="text-lg font-bold mb-2">Your Cart</h3>
             <ul className="mb-2 max-h-48 overflow-auto">
               {cart.map((sessionId) => {
-                const session = course.sessions.find((s) => s._id === sessionId);
+                const session = course.sessions.find(
+                  (s) => s._id === sessionId
+                );
                 return (
                   <li
                     key={sessionId}
                     className="flex justify-between items-center mb-1"
                   >
-                      <span className="block w-40 truncate">{session?.title}</span>
+                    <span className="block w-40 truncate">
+                      {session?.title}
+                    </span>
                     <div>
                       <span>₹{session?.price.amount}</span>
                       <button
@@ -346,28 +385,29 @@ const CourseSessionsPage = () => {
                 );
               })}
             </ul>
-            
+
             {/* Discount display */}
             {cart.length < course.sessions.length && (
               <div className="text-sm text-green-600 mb-1">
-                <span className="line-through">₹{(cartTotal / 0.9).toFixed(2)}</span>
+                <span className="line-through">
+                  ₹{(cartTotal / 0.9).toFixed(2)}
+                </span>
                 <span className="ml-2">10% discount applied!</span>
               </div>
             )}
             {cart.length === course.sessions.length && (
               <div className="text-sm text-green-600 mb-1">
-                <span className="line-through">₹{(cartTotal / 0.8).toFixed(2)}</span>
+                <span className="line-through">
+                  ₹{(cartTotal / 0.8).toFixed(2)}
+                </span>
                 <span className="ml-2">20% discount applied!</span>
               </div>
             )}
-            
+
             <div className="flex justify-between font-semibold text-gray-800 mb-2">
               <span>Total:</span> <span>₹{cartTotal.toFixed(2)}</span>
             </div>
-            <Button
-              onClick={buyCart}
-              className="w-full"
-            >
+            <Button onClick={buyCart} className="w-full">
               Buy Now
             </Button>
           </div>
@@ -414,6 +454,32 @@ const CourseSessionsPage = () => {
             >
               Your browser does not support the video tag.
             </video>
+          </div>
+        </div>
+      )}
+
+      {viewingMaterial && (
+        <div
+          onContextMenu={(e) => e.preventDefault()}
+          className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
+        >
+          <div className="bg-white rounded-lg w-full max-w-4xl h-[80vh] relative flex flex-col">
+            <button
+              onClick={() => setViewingMaterial(null)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold z-10"
+            >
+              ×
+            </button>
+
+            <iframe
+              src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                viewingMaterial.url
+              )}&embedded=true`}
+              className="flex-grow w-full"
+              frameBorder="0"
+              title={`${viewingMaterial.type.toUpperCase()} Preview`}
+              sandbox="allow-scripts allow-same-origin"
+            />
           </div>
         </div>
       )}

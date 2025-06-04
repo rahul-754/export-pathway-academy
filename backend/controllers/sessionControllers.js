@@ -1,6 +1,7 @@
-import Session from '../models/sessionModel.js';
-import Course from '../models/courseModel.js';
-import User from '../models/userModel.js';
+import Session from "../models/sessionModel.js";
+import Course from "../models/courseModel.js";
+import User from "../models/userModel.js";
+import mongoose from "mongoose";
 
 export const createSession = async (req, res) => {
   try {
@@ -16,39 +17,45 @@ export const createSession = async (req, res) => {
       );
     }
 
-    res.status(201).json({ message: 'Session created successfully', session });
+    res.status(201).json({ message: "Session created successfully", session });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to create session', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to create session", error: error.message });
   }
 };
 
 export const updateSession = async (req, res) => {
   try {
     const updates = req.body;
-    const session = await Session.findByIdAndUpdate(req.params.id, updates, { new: true });
-    if (!session) return res.status(404).json({ message: 'Session not found' });
+    const session = await Session.findByIdAndUpdate(req.params.id, updates, {
+      new: true,
+    });
+    if (!session) return res.status(404).json({ message: "Session not found" });
 
-    res.json({ message: 'Session updated', session });
+    res.json({ message: "Session updated", session });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update session', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update session", error: error.message });
   }
 };
 
 export const getSessionById = async (req, res) => {
   try {
-    const sessionId = req.params.id;
+    const sessionId = new mongoose.Types.ObjectId(req.params.id);
 
     const session = await Session.findById(sessionId);
     if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
+      return res.status(404).json({ message: "Session not found" });
     }
 
     const course = await Course.findOne({ sessions: sessionId })
-      .select('title _id')
+      .select("title _id")
       .lean();
 
     const enrolledStudents = await User.find({ enrolledSessions: sessionId })
-      .select('name emailAddress')
+      .select("name emailAddress")
       .lean();
 
     res.json({
@@ -58,7 +65,9 @@ export const getSessionById = async (req, res) => {
       parentCourse: course || null,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch session', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch session", error: error.message });
   }
 };
 
@@ -68,9 +77,11 @@ export const getAllSessions = async (req, res) => {
 
     const sessionsWithDetails = await Promise.all(
       sessions.map(async (session) => {
-        const enrolledStudentsCount = await User.countDocuments({ enrolledSessions: session._id });
+        const enrolledStudentsCount = await User.countDocuments({
+          enrolledSessions: session._id,
+        });
         const course = await Course.findOne({ sessions: session._id })
-          .select('title _id')
+          .select("title _id")
           .lean();
 
         return {
@@ -86,14 +97,19 @@ export const getAllSessions = async (req, res) => {
       sessions: sessionsWithDetails,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch sessions', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch sessions", error: error.message });
   }
 };
 
 export const deleteSession = async (req, res) => {
   try {
-    const sessionId = req.params.id;
-    
+    const sessionId = new mongoose.Types.ObjectId(req.params.id);
+
+    if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+      return res.status(400).json({ message: "Invalid session ID" });
+    }
     await Course.updateMany(
       { sessions: sessionId },
       { $pull: { sessions: sessionId } }
@@ -105,24 +121,28 @@ export const deleteSession = async (req, res) => {
     );
 
     const session = await Session.findByIdAndDelete(sessionId);
-    if (!session) return res.status(404).json({ message: 'Session not found' });
+    if (!session) return res.status(404).json({ message: "Session not found" });
 
-    res.json({ message: 'Session deleted successfully' });
+    res.json({ message: "Session deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to delete session', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to delete session", error: error.message });
   }
 };
 
 export const getSessionsByCourse = async (req, res) => {
   try {
     const courseId = req.params.courseId;
-    
-    const course = await Course.findById(courseId).populate('sessions');
-    if (!course) return res.status(404).json({ message: 'Course not found' });
+
+    const course = await Course.findById(courseId).populate("sessions");
+    if (!course) return res.status(404).json({ message: "Course not found" });
 
     const sessionsWithDetails = await Promise.all(
       course.sessions.map(async (session) => {
-        const enrolledStudentsCount = await User.countDocuments({ enrolledSessions: session._id });
+        const enrolledStudentsCount = await User.countDocuments({
+          enrolledSessions: session._id,
+        });
         return {
           ...session.toObject(),
           enrolledStudentsCount,
@@ -137,6 +157,9 @@ export const getSessionsByCourse = async (req, res) => {
       sessions: sessionsWithDetails,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch sessions for course', error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch sessions for course",
+      error: error.message,
+    });
   }
-}; 
+};
