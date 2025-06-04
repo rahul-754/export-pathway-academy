@@ -146,7 +146,7 @@ const CourseSessionsPage = () => {
           Back to Dashboard
         </Link>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border border-blue-700">
           <div className="flex flex-col lg:flex-row gap-6">
             <img
               src={course.courseImg}
@@ -219,15 +219,15 @@ const CourseSessionsPage = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-500">
+                      <Clock className="h-4 w-4 text-blue-800 font-bold" />
+                      <span className="text-sm text-blue-800 font-bold">
                         {session.duration}
                       </span>
                       {isAccessible && session.isCompleted && (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-green-600" />
                       )}
                       {!isAccessible && (
-                        <Lock className="h-5 w-5 text-gray-400" />
+                        <Lock className="h-5 w-5 text-blue-800 font-bold" />
                       )}
                     </div>
                   </div>
@@ -246,10 +246,10 @@ const CourseSessionsPage = () => {
                         {/* Add to Cart button - only show if session is not already purchased */}
                         {!isAccessible && (
                           <Button
+                            variant="outline"
+                            size="sm"
+                            className={`border-blue-700 text-blue-900 font-bold hover:bg-blue-50 flex items-center ${inCart ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
                             onClick={() => addToCart(session._id)}
-                            className={`flex items-center ${
-                              inCart ? "bg-green-600 hover:bg-green-700" : ""
-                            }`}
                             disabled={inCart}
                           >
                             {inCart
@@ -258,10 +258,12 @@ const CourseSessionsPage = () => {
                           </Button>
                         )}
 
-                        {/* Watch Video button */}
+                        {/* Watch Preview button */}
                         <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-blue-900 text-blue-900 font-bold hover:bg-blue-50 flex items-center"
                           onClick={() => handleWatchPreview(session)}
-                          className="flex items-center"
                         >
                           <Play className="h-4 w-4 mr-2" />
                           Watch Preview
@@ -275,40 +277,38 @@ const CourseSessionsPage = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full justify-start"
+                          className="w-full justify-start border-blue-900 text-black-900 font-extrabold hover:bg-blue-50 flex items-center"
                           disabled={!isAccessible}
+                          onClick={() => handleWatchFullVideo(session)}
                         >
-                          <Video
-                            className="h-4 w-4 mr-2"
-                            onClick={() => handleWatchFullVideo(session)}
-                          />
-                          Watch Video
+                          <Video className="h-4 w-4 mr-2" />
+                          <span className="text-blue-900 font-extrabold">Watch Video</span>
                           {!isAccessible && (
-                            <LockIcon className="h-3 w-3 ml-auto" />
+                            <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
                           )}
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full justify-start"
+                          className="w-full justify-start border-blue-900 text-black-900 font-extrabold hover:bg-blue-50 flex items-center"
                           disabled={!isAccessible}
                         >
                           <FileText className="h-4 w-4 mr-2" />
-                          Download Notes
+                          <span className="text-blue-900 font-extrabold">Download Notes</span>
                           {!isAccessible && (
-                            <LockIcon className="h-3 w-3 ml-auto" />
+                            <LockIcon className="h-3 w-3 ml-auto text-black-800 font-bold" />
                           )}
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full justify-start"
+                          className="w-full justify-start border-blue-900 text-black-900 font-extrabold hover:bg-blue-50 flex items-center"
                           disabled={!isAccessible}
                         >
                           <Presentation className="h-4 w-4 mr-2" />
-                          Download PPT
+                          <span className="text-blue-900 font-extrabold">Download PPT</span>
                           {!isAccessible && (
-                            <LockIcon className="h-3 w-3 ml-auto" />
+                            <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
                           )}
                         </Button>
                       </div>
