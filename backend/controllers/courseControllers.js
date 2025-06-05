@@ -116,6 +116,7 @@ export const getAllCourse = async (req, res) => {
           createdAt: course.createdAt,
           updatedAt: course.updatedAt,
           sessionsCount: course.sessions.length,
+          sessionTitles: course.sessions.map((s) => s.title),
           enrolledUsersCount,
         };
       })
