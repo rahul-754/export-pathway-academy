@@ -18,12 +18,11 @@ import { getUserById } from "./Apis/Apis";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
-    useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const userId = "683ea3257b617b196caeb490"; // Replace with actual user ID
         const userData = await getUserById(userId);
-        
       } catch (error) {
         console.error("Failed to fetch user", error);
       }
@@ -42,7 +41,10 @@ const App = () => {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/courses" element={<CoursesPage />} />
-            <Route path="/course/:courseId/sessions" element={<CourseSessionsPage />} />
+            <Route
+              path="/course/:courseId/sessions"
+              element={<CourseSessionsPage />}
+            />
             <Route path="/programs" element={<ProgramsPage />} />
             <Route path="/batches" element={<BatchesPage />} />
             <Route path="/certification" element={<CertificationPage />} />
