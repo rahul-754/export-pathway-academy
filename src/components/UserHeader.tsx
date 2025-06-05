@@ -81,10 +81,6 @@ const UserHeader = () => {
               alt="Logo"
               style={{ width: "auto", height: "40px", objectFit: "cover" }}
             />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">TerraSourcing</h1>
-              <p className="text-sm text-gray-500">Learning Platform</p>
-            </div>
 
             {/* Explore Dropdown */}
             <div
