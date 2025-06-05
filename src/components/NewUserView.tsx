@@ -21,10 +21,17 @@ import {
   Flag,
 } from "lucide-react";
 import { getCourses } from "@/Apis/Apis";
+<<<<<<< HEAD
 import curosal1 from "./ect.jpg";
 import curosal2 from "./ect (1).jpg";
 import curosal3 from "./ect (2).jpg";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+=======
+import curosal1 from "./Untitled design (1).jpg";
+import curosal2 from "./Untitled design (2).jpg";
+import curosal3 from "./Untitled design (3).jpg";
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+>>>>>>> 0b734fd (new images)
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 interface Course {
