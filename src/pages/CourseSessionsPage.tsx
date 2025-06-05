@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import UserHeader from "@/components/UserHeader";
+import { getCourseById } from "@/Apis/Apis";
 import { enrollInSessions, getCourseById, getUserById } from "@/Apis/Apis";
 
 import { ArrowLeft } from "lucide-react";
@@ -20,6 +21,7 @@ const CourseSessionsPage = () => {
   const [cart, setCart] = useState([]);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -181,6 +183,38 @@ const CourseSessionsPage = () => {
     }
   };
 
+  const handleWatchPreview = (session) => {
+    if (session.previewVideo) {
+      setSelectedVideoUrl(session.previewVideo);
+    } else {
+      alert("No preview available for this session.");
+    }
+  };
+
+  const handleWatchFullVideo = (session) => {
+    if (purchasedSessions.includes(session._id)) {
+      if (session.videoUrl) {
+        setSelectedVideoUrl(session.videoUrl);
+      } else {
+        alert("No full video available.");
+      }
+    } else {
+      alert("Please buy access to watch the full session.");
+    }
+  };
+  if (loading) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Loading course details...
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="p-6 text-center text-red-500">Course not found.</div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-50 mb-16">
       <UserHeader />
@@ -224,6 +258,7 @@ const CourseSessionsPage = () => {
           />
         )}
       </div>
+      {/* Preview Modal */}
       {showPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
           <div className="bg-white p-4 rounded-lg max-w-2xl w-full relative">
