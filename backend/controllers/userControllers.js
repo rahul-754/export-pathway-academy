@@ -97,8 +97,8 @@ export const loginUser = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .populate("enrolledCourses")
-      .populate("enrolledSessions");
+      .populate("enrolledCourses.course")
+      .populate("enrolledSessions.session");
 
     if (!user) return res.status(404).json({ message: "User not found" });
 

@@ -1,19 +1,24 @@
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  BookOpen, 
-  Video, 
-  Calendar, 
-  Trophy, 
-  Users, 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  BookOpen,
+  Video,
+  Calendar,
+  Trophy,
+  Users,
   Play,
   Clock,
-  CheckCircle
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
+  CheckCircle,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface EnrolledCourse {
   id: number;
@@ -44,44 +49,51 @@ interface EnrolledUserViewProps {
   onCourseClick: (courseId: number) => void;
 }
 
-const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
-  console.log(user)
-  const enrolledCourses: EnrolledCourse[] = [
-    { 
-      id: 1, 
-      title: "Export Documentation Basics", 
-      progress: 75, 
-      sessionsCompleted: 4, 
-      totalSessions: 6,
-      nextSession: "Letter of Credit Basics",
-      category: "Basic",
-      courseImg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop"
-    },
-    { 
-      id: 2, 
-      title: "International Trade Laws", 
-      progress: 45, 
-      sessionsCompleted: 5, 
-      totalSessions: 12,
-      nextSession: "WTO Regulations",
-      category: "Advanced",
-      courseImg: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop"
-    }
-  ];
+const EnrolledUserView = ({ user, onCourseClick }: EnrolledUserViewProps) => {
+  const enrolledCourses: EnrolledCourse[] =
+    user.enrolledCourses?.map((enrolled: any) => {
+      const course = enrolled.course || {};
+      const completedCount = enrolled.completedSessions?.length || 0;
 
+      // Find next session name or show default
+      const nextSession = (() => {
+        // sessions is an array of session IDs in the course
+        const allSessions = course.sessions || [];
+        const completedSessions = enrolled.completedSessions || [];
+
+        const nextSessionId = allSessions.find(
+          (sessionId: string) => !completedSessions.includes(sessionId)
+        );
+        return nextSessionId || "Upcoming session";
+      })();
+
+      return {
+        id: course._id || "",
+        title: course.title || "Untitled Course",
+        progress: enrolled.progress || 0,
+        sessionsCompleted: completedCount,
+        totalSessions: enrolled.totalSessions || 0,
+        nextSession,
+        category: course.category || "General",
+        courseImg:
+          course.courseImg ||
+          "https://via.placeholder.com/400x200?text=No+Image",
+      };
+    }) || [];
+  console.log("Enrolled Courses:", enrolledCourses);
   const upcomingPrograms: UpcomingProgram[] = [
     {
       id: 1,
       title: "Export Finance Workshop",
       date: "Dec 15",
-      time: "2:00 PM"
+      time: "2:00 PM",
     },
     {
       id: 2,
       title: "Trade Documentation Webinar",
       date: "Dec 18",
-      time: "10:00 AM"
-    }
+      time: "10:00 AM",
+    },
   ];
 
   const recentCertificates: RecentCertificate[] = [
@@ -89,21 +101,23 @@ const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
       id: 1,
       title: "Export Documentation",
       date: "Nov 30, 2024",
-      level: "Basic"
+      level: "Basic",
     },
     {
       id: 2,
       title: "Trade Compliance",
       date: "Nov 25, 2024",
-      level: "Advanced"
-    }
+      level: "Advanced",
+    },
   ];
 
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Welcome Section */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user.name}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Welcome back, {user.name}
+        </h2>
         <p className="text-gray-600">Continue your export learning journey</p>
       </div>
 
@@ -111,44 +125,51 @@ const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Courses Enrolled</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Courses Enrolled
+            </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{user.enrolledCoursesCount}</div>
+            <div className="text-2xl font-bold">
+              {user.enrolledCoursesCount}
+            </div>
             <p className="text-xs text-muted-foreground"></p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Certificates Earned</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Certificates Earned
+            </CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">+2 this month</p>
+            <div className="text-2xl font-bold">0</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Batches</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Batches
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">Join discussions</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Study Hours</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">42</div>
+            <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">This month</p>
           </CardContent>
         </Card>
@@ -167,40 +188,48 @@ const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
             </CardHeader>
             <CardContent className="space-y-4">
               {enrolledCourses.map((course) => (
-                <div key={course.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => onCourseClick(course.id)}>
+                <div
+                  key={course.id}
+                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => onCourseClick(course.id)}
+                >
                   <div className="flex gap-4">
-                    <img 
-                      src={course.courseImg} 
+                    <img
+                      src={course.courseImg}
                       alt={course.title}
                       className="w-20 h-16 object-cover rounded"
                     />
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h4 className="font-semibold text-gray-900">{course.title}</h4>
-                          <Badge variant="outline" className="mt-1">{course.category}</Badge>
+                          <h4 className="font-semibold text-gray-900">
+                            {course.title}
+                          </h4>
+                          <Badge variant="outline" className="mt-1">
+                            {course.category}
+                          </Badge>
                         </div>
                         <div className="text-right text-sm text-gray-600">
-                          {course.sessionsCompleted}/{course.totalSessions} sessions
+                          {course.sessionsCompleted}/
+                          {user.enrolledSessions.length} sessions
                         </div>
                       </div>
-                      
+
                       <Progress value={course.progress} className="mb-3" />
-                      
+
                       <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm text-gray-600">Next: {course.nextSession}</p>
-                        </div>
                         <Button size="sm">
                           <Play className="h-4 w-4 mr-1" />
-                          Continue Learning
+                          {course.progress === 0
+                            ? "Start Learning"
+                            : "Continue Learning"}
                         </Button>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-              
+
               <Link to="/courses">
                 <Button variant="outline" className="w-full">
                   Browse More Courses
@@ -222,9 +251,14 @@ const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
             </CardHeader>
             <CardContent className="space-y-3">
               {upcomingPrograms.map((program) => (
-                <div key={program.id} className="border-l-4 border-blue-500 pl-3 py-2">
+                <div
+                  key={program.id}
+                  className="border-l-4 border-blue-500 pl-3 py-2"
+                >
                   <h5 className="font-medium text-sm">{program.title}</h5>
-                  <p className="text-xs text-gray-600">{program.date} at {program.time}</p>
+                  <p className="text-xs text-gray-600">
+                    {program.date} at {program.time}
+                  </p>
                 </div>
               ))}
               <Link to="/programs">
@@ -250,7 +284,9 @@ const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
                   <div>
                     <h5 className="font-medium text-sm">{cert.title}</h5>
                     <p className="text-xs text-gray-600">{cert.date}</p>
-                    <Badge variant="secondary" className="mt-1">{cert.level}</Badge>
+                    <Badge variant="secondary" className="mt-1">
+                      {cert.level}
+                    </Badge>
                   </div>
                 </div>
               ))}
@@ -268,14 +304,22 @@ const EnrolledUserView = ({ user,  onCourseClick }: EnrolledUserViewProps) => {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Link to="/sessions">
-                <Button variant="outline" size="sm" className="w-full justify-start">
+              <Link to="/courses">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                >
                   <Video className="h-4 w-4 mr-2" />
-                  Browse Sessions
+                  Browse courses
                 </Button>
               </Link>
               <Link to="/batches">
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                >
                   <Users className="h-4 w-4 mr-2" />
                   Join Discussions
                 </Button>

@@ -27,9 +27,9 @@ const userSchema = new mongoose.Schema(
     enrolledSessions: [
       {
         session: { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
-        watchedDuration: { type: Number, default: 0 }, // in seconds or minutes
+        watchedDuration: { type: Number, default: 0 },
         isCompleted: { type: Boolean, default: false },
-        lastWatchedAt: { type: Date }, // optional: timestamp
+        lastWatchedAt: { type: Date },
       },
     ],
     role: {

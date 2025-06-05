@@ -102,7 +102,6 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <img src={logo} alt="Logo" className="h-10 w-auto object-cover" />
-              <h1 className="text-2xl font-bold text-gray-900">TerraSouring</h1>
             </div>
             <div className="hidden md:flex items-center space-x-6 text-sm text-gray-600">
               <span className="flex items-center space-x-1">

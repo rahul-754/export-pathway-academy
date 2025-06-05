@@ -63,23 +63,47 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
   }, []);
 
   return (
-    <div className="container  from-blue-50 via-white to-gray-0 min-h-screen">
+    <div className="container  from-blue-50 via-white to-gray-0 min-h-screen mt-5 p-6">
       {/* Carousel Section */}
       <div className="mb-8 w-full">
         <Carousel
           showThumbs={false}
           infiniteLoop
-          className="rounded-lg shadow-lg h-96 overflow-hidden"
+          className="rounded-lg shadow-lg"
           showStatus={false}
           showIndicators={true}
           stopOnHover={false}
+          renderArrowPrev={(onClickHandler, hasPrev, label) =>
+            hasPrev && (
+              <button
+                type="button"
+                onClick={onClickHandler}
+                title={label}
+                className="absolute top-1/2 left-2 z-10 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-100 text-gray-800 p-1 rounded-full shadow-md w-8 h-8 flex items-center justify-center" // Smaller size
+              >
+                ❮
+              </button>
+            )
+          }
+          renderArrowNext={(onClickHandler, hasNext, label) =>
+            hasNext && (
+              <button
+                type="button"
+                onClick={onClickHandler}
+                title={label}
+                className="absolute top-1/2 right-2 z-10 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-100 text-gray-800 p-1 rounded-full shadow-md w-8 h-8 flex items-center justify-center" // Smaller size
+              >
+                ❯
+              </button>
+            )
+          }
         >
           {/* Slide 1 */}
           <div className="relative w-full h-96">
             <img
               src={curosal1}
               alt="Carousel Image 1"
-              className="w-full h-96 object-cover"
+              className="w-full h-96 object-contain"
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white  text-gray-800 p-4 rounded-lg shadow-md w-72">
               <h3 className="text-lg font-bold mb-2">
@@ -97,7 +121,7 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
             <img
               src={curosal2}
               alt="Carousel Image 2"
-              className="w-full h-96 object-cover"
+              className="w-full h-96 object-contain"
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white bg-opacity-100 text-gray-800 p-4 rounded-lg shadow-md w-72">
               <h3 className="text-lg font-bold mb-2">Smart Email Outreach</h3>
@@ -113,7 +137,7 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
             <img
               src={curosal3}
               alt="Carousel Image 3"
-              className="w-full h-96 object-cover"
+              className="w-full h-96 object-contain"
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white bg-opacity-100 text-gray-800 p-4 rounded-lg shadow-md w-72">
               <h3 className="text-lg font-bold mb-2">
@@ -141,108 +165,6 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
           Start your export journey with our comprehensive courses
         </p>
       </div> */}
-
-      {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-          {/* Top gradient bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-          <CardContent className="flex justify-between items-center p-5">
-            <div>
-              <p className="text-slate-500 text-base">Courses Enrolled</p>
-              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <BookOpen className="text-[#0474e4] w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-          {/* Top gradient bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-          <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-            {/* Top gradient bar */}
-            <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-            <CardContent className="flex justify-between items-center p-5">
-              <div>
-                <p className="text-slate-500 text-base">Active Batches</p>
-                <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Flag className="text-[#0474e4] w-6 h-6" />
-              </div>
-            </CardContent>
-          </Card>
-          <CardContent className="flex justify-between items-center p-5">
-            <div>
-              <p className="text-slate-500 text-base">Active Batches</p>
-              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <Flag className="text-[#0474e4] w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-          {/* Top gradient bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-          <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-            {/* Top gradient bar */}
-            <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-            <CardContent className="flex justify-between items-center p-5">
-              <div>
-                <p className="text-slate-500 text-base">Certified Members</p>
-                <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Trophy className="text-[#0474e4] w-6 h-6" />
-              </div>
-            </CardContent>
-          </Card>
-          <CardContent className="flex justify-between items-center p-5">
-            <div>
-              <p className="text-slate-500 text-base">Certified Members</p>
-              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <Trophy className="text-[#0474e4] w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-          {/* Top gradient bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-          <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-            {/* Top gradient bar */}
-            <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-            <CardContent className="flex justify-between items-center p-5">
-              <div>
-                <p className="text-slate-500 text-base">Active Users</p>
-                <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <User className="text-[#0474e4] w-6 h-6" />
-              </div>
-            </CardContent>
-          </Card>
-          <CardContent className="flex justify-between items-center p-5">
-            <div>
-              <p className="text-slate-500 text-base">Active Users</p>
-              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <User className="text-[#0474e4] w-6 h-6" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Courses Section */}
       {loading ? (
