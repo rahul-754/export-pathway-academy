@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import {
   Card,
   CardContent,
@@ -19,6 +21,12 @@ import {
   Flag,
 } from "lucide-react";
 import { getCourses } from "@/Apis/Apis";
+import curosal1 from "./ect.jpg";
+import curosal2 from "./ect (1).jpg";
+import curosal3 from "./ect (2).jpg";
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+
 
 interface Course {
   _id: string;
@@ -56,101 +64,142 @@ const NewUserView = ({ onCourseClick }: NewUserViewProps) => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-blue-50 via-white to-gray-50 min-h-screen">
-      <div className="mb-8 text-center">
+    <div className="container  from-blue-50 via-white to-gray-0 min-h-screen">
+      {/* Carousel Section */}
+     <div className="mb-8 w-full">
+  <Carousel
+  showThumbs={false}
+  infiniteLoop
+  className="rounded-lg shadow-lg h-96 overflow-hidden"
+  showStatus={false}
+  showIndicators={true}
+  stopOnHover={false}
+>
+  {/* Slide 1 */}
+  <div className="relative w-full h-96">
+    <img
+      src={curosal1}
+      alt="Carousel Image 1"
+      className="w-full h-96 object-cover"
+    />
+    <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white  text-gray-800 p-4 rounded-lg shadow-md w-72">
+      <h3 className="text-lg font-bold mb-2">Build Your Website with AI</h3>
+      <p className="text-sm">
+        Use tools like WIX, WordPress AI, Shopify, and ChatGPT to go live in minutes.
+      </p>
+    </div>
+  </div>
+
+  {/* Slide 2 */}
+  <div className="relative w-full h-96">
+    <img
+      src={curosal2}
+      alt="Carousel Image 2"
+      className="w-full h-96 object-cover"
+    />
+    <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white bg-opacity-100 text-gray-800 p-4 rounded-lg shadow-md w-72">
+      <h3 className="text-lg font-bold mb-2">Smart Email Outreach</h3>
+      <p className="text-sm">
+        Write better emails using ChatGPT, Jasper.AI, Canva & Flowrite to get responses.
+      </p>
+    </div>
+  </div>
+
+  {/* Slide 3 */}
+  <div className="relative w-full h-96">
+    <img
+      src={curosal3}
+      alt="Carousel Image 3"
+      className="w-full h-96 object-cover"
+    />
+    <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white bg-opacity-100 text-gray-800 p-4 rounded-lg shadow-md w-72">
+      <h3 className="text-lg font-bold mb-2">Automate with WhatsApp Bots</h3>
+      <p className="text-sm">
+        Use tools like WATI, Interakt, and Twilio to reply instantly and close more deals.
+      </p>
+    </div>
+  </div>
+</Carousel>
+</div>
+
+      {/* Welcome Section */}
+      {/* <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2">
-  <span className="text-gray-800">Welcome to </span>
-  <span className="text-blue-700">TerraSourcing!</span>
-</h2>
+          <span className="text-gray-800">Welcome to </span>
+          <span className="text-blue-700">TerraSourcing!</span>
+        </h2>
         <p className="text-gray-500">
           Start your export journey with our comprehensive courses
         </p>
-      </div>
+      </div> */}
+
+      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        {/* Cards for stats */}
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Courses Enrolled</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <BookOpen className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Active Batches</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <Flag className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
-   <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Courses Enrolled</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <BookOpen className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Certified Members</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <Trophy className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
-
-
-<Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Active Batches</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <Flag className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
-
-
-
-<Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Certified Members</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <Trophy className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
-
-
-
-<Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Active Users</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <User className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
-
-
-
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Active Users</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <User className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
+      {/* Courses Section */}
       {loading ? (
         <p className="text-center text-gray-500">Loading courses...</p>
       ) : (
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          style={{
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-            paddingLeft: "0px",
-          }}
-        >
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-10">
           {courses.courses &&
             courses.courses.map((course) => (
               <Card

@@ -15,6 +15,7 @@ import CertificationPage from "./pages/CertificationPage";
 import CourseSessionsPage from "./pages/CourseSessionsPage";
 import NotFound from "./pages/NotFound";
 import { getUserById } from "./Apis/Apis";
+import Footer from "./components/Footer";
 
 const App = () => {
   const queryClient = React.useMemo(() => new QueryClient(), []);
@@ -48,6 +49,7 @@ const App = () => {
             <Route path="/certification" element={<CertificationPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Footer />
         </HashRouter>
       </TooltipProvider>
     </QueryClientProvider>

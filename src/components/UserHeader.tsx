@@ -58,10 +58,6 @@ const UserHeader = () => {
               alt="Logo"
               style={{ width: 'auto', height: '40px', objectFit: 'cover' }}
             />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">TerraSourcing</h1>
-              <p className="text-sm text-gray-500">Learning Platform</p>
-            </div>
 
             {/* Explore Dropdown */}
             <div
@@ -129,7 +125,7 @@ const UserHeader = () => {
                 placeholder="Search for anything"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-[475px] pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[33vw] pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <svg
@@ -234,7 +230,7 @@ const UserHeader = () => {
                 Home
               </Button>
             </Link>
-            <Link to="/user-dashboard">
+            <Link to="/">
               <Button
                 variant="outline"
                 size="sm"
