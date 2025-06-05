@@ -21,7 +21,7 @@ const AdminHeader = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Link to="/">
+            <Link to="/admin-dashboard">
               <Button variant="outline" size="sm">
                 <Home className="w-4 h-4 mr-2" />
                 Back to Home
