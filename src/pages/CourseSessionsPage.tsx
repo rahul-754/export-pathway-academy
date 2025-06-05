@@ -23,6 +23,7 @@ import {
   LockIcon,
 } from "lucide-react";
 import UserHeader from "@/components/UserHeader";
+import CourseSessionsPageMain from "@/components/CourseSessionsPageMain";
 import { getCourseById } from "@/Apis/Apis";
 
 const CourseSessionsPage = () => {
@@ -36,6 +37,8 @@ const CourseSessionsPage = () => {
   const [cartTotal, setCartTotal] = useState(0);
   const [cartPurchased, setCartPurchased] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -146,279 +149,240 @@ const CourseSessionsPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="p-6 text-center text-gray-500">
-        Loading course details...
-      </div>
-    );
+    return <div className="p-6 text-center text-gray-500">Loading course details...</div>;
   }
 
   if (!course) {
-    return (
-      <div className="p-6 text-center text-red-500">Course not found.</div>
-    );
+    return <div className="p-6 text-center text-red-500">Course not found.</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white-50">
       <UserHeader />
 
-      <div className="container mx-auto px-4 py-6">
-        <Link
-          to="/user-dashboard"
-          className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
-        </Link>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border border-blue-700">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <img
-              src={course.courseImg}
-              alt={course.title}
-              onClick={() => setShowPreview(true)}
-              className="w-full lg:w-80 h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition"
-            />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-green-600">{course.level}</Badge>
-                {purchasedSessions.length === course.sessions.length ? (
-                  <Badge variant="outline" className="text-green-600">
-                    Fully Enrolled
-                  </Badge>
-                ) : purchasedSessions.length > 0 ? (
-                  <Badge variant="outline" className="text-yellow-600">
-                    Partially Enrolled
-                  </Badge>
-                ) : null}
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {course.title}
-              </h1>
-              <p className="text-gray-600 mb-4">{course.description}</p>
+      <div className=" mx-auto py-6">
+        {/* <CourseSessionsPageMain /> */}
 
-              <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Video className="h-4 w-4 mr-1" />
-                  {course.sessions.length} sessions
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  {course.duration}
-                </div>
-                <div className="flex items-center">
-                  <BookOpen className="h-4 w-4 mr-1" />
-                  Instructor: {course.instructor || "Saumya Prakash"}
-                </div>
-              </div>
-            </div>
-          </div>
+       
+
+        <div className="bg-[#94b9ff] w-full py-10 px-4 md:px-10 text-black">
+  {/* Outer Container */}
+  <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
+    
+    {/* Left Side - Course Info */}
+    <div className="flex-1">
+      <h1 className="text-4xl font-extrabold mb-4">{course.title}</h1>
+      <p className="text-lg text-gray-700 mb-6">{course.description}</p>
+      
+      <div className="flex flex-wrap gap-6 text-sm text-gray-600 mb-4">
+        <div className="flex items-center">
+          <Video className="h-4 w-4 mr-2 text-blue-500" />
+          {course.sessions.length} practice exercises
         </div>
+        <div className="flex items-center">
+          <Clock className="h-4 w-4 mr-2 text-blue-500" />
+          {course.duration}
+        </div>
+        <div className="flex items-center">
+          <BookOpen className="h-4 w-4 mr-2 text-blue-500" />
+          Instructor: {course.instructor}
+        </div>
+        <div className="flex items-center">
+          <span className="text-yellow-500 font-bold">4.7</span>
+          <span className="ml-1 text-gray-500">(439,709 ratings)</span>
+        </div>
+      </div>
 
-        {/* Sessions List */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Course Sessions
-          </h2>
+      <div className="text-xs text-gray-400 mb-4">
+        Last updated 02/2025 • English, Arabic [Auto] + more
+      </div>
+
+      <button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded transition">
+        Start subscription
+      </button>
+
+      <p className="text-sm text-gray-600 mt-2">Starts at ₹850/mo. Cancel anytime.</p>
+      <p className="text-sm mt-1 text-black">👥 <span className="font-semibold">1.5M</span> learners already enrolled</p>
+    </div>
+
+    {/* Right Side - Course Image */}
+    <div className="w-full md:w-1/3 relative">
+      <div className="relative w-full h-64">
+        <img
+          src={course.courseImg}
+          alt={course.title}
+          className="w-full h-full object-cover rounded-lg shadow"
+        />
+        <button
+          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30"
+          onClick={() => setShowPreview(true)}
+          aria-label="Preview this course"
+        >
+          <Play className="h-12 w-12 text-white bg-blue-600 rounded-full p-2 opacity-90 hover:scale-110 transition" />
+        </button>
+      </div>
+      <div className="mt-3 text-center">
+        <span className="inline-block bg-green-600 text-white text-xs px-3 py-1 rounded font-semibold">
+          Bestseller
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+        {/* Course Summary Section - Udemy style */}
+        
+
+
+        {/* Sessions List Section */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Course Sessions</h2>
 
           {course.sessions.map((session, index) => {
             const inCart = cart.includes(session._id);
             const isAccessible = purchasedSessions.includes(session._id);
 
             return (
-              <Card
-                key={session._id}
-                className="overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex item-center gap-4">
-                      <div
-                        className="rounded-lg bg-blue-100 flex items-center justify-center"
-                        style={{ width: "300px", height: "auto" }}
-                      >
-                        <img
-                          src={session.sessionImage}
-                          alt={session.title}
-                          className="w-full h-full object-cover"
-                          style={{
-                            borderRadius: "8px",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">
-                          {session.title}
-                        </CardTitle>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-blue-800 font-bold" />
-                      <span className="text-sm text-blue-800 font-bold">
-                        {session.duration}
-                      </span>
-                      {isAccessible && session.isCompleted && (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      )}
-                      {!isAccessible && (
-                        <Lock className="h-5 w-5 text-blue-800 font-bold" />
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
 
-                <CardContent>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
-                      <h4 className="font-semibold mb-3">What you'll learn:</h4>
-                      <h5 className=" mb-2">{session.description}</h5>
 
-                      {/* BOTH Buttons shown before purchase */}
-                      <div className="flex gap-4">
-                        {/* Add to Cart button - only show if session is not already purchased */}
-                        {!isAccessible && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`border-blue-700 text-blue-900 font-bold hover:bg-blue-50 flex items-center ${
-                              inCart
-                                ? "bg-green-600 hover:bg-green-700 text-white"
-                                : ""
-                            }`}
-                            onClick={() => addToCart(session._id)}
-                            disabled={inCart}
-                          >
-                            {inCart
-                              ? "Added to Cart"
-                              : `Add to Cart - ${session.price.currency} ${session.price.amount}`}
-                          </Button>
-                        )}
 
-                        {/* Watch Preview button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-blue-900 text-blue-900 font-bold hover:bg-blue-50 flex items-center"
-                          onClick={() => handleWatchPreview(session)}
-                        >
-                          <Play className="h-4 w-4 mr-2" />
-                          Watch Preview
-                        </Button>
-                      </div>
-                    </div>
+              <Card key={session._id} className="overflow-hidden hover:shadow-md transition-shadow">
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          {/* LEFT: Image + Title + Buttons */}
+          <div className="flex item-center gap-6">
+            <div
+              className="rounded-lg bg-blue-100 flex items-center justify-center"
+              style={{ width: "200px", height: "auto" }}
+            >
+              <img
+                src={session.sessionImage}
+                alt={session.title}
+                className="w-full h-full object-cover"
+                style={{ borderRadius: "8px", objectFit: "cover" }}
+              />
+            </div>
+            <div>
+              <CardTitle className="text-lg">{session.title}</CardTitle>
+              <div className="flex gap-4 mt-3">
+                {!isAccessible && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`border-blue-700 text-blue-900 font-bold hover:bg-blue-50 flex items-center ${
+                      inCart ? "bg-green-600 hover:bg-green-700 text-white" : ""
+                    }`}
+                    onClick={() => addToCart(session._id)}
+                    disabled={inCart}
+                  >
+                    {inCart
+                      ? "Added to Cart"
+                      : `Add to Cart - ${session.price.currency} ${session.price.amount}`}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-900 text-blue-900 font-bold hover:bg-blue-50 flex items-center"
+                  onClick={() => handleWatchPreview(session)}
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Watch Preview
+                </Button>
+              </div>
+            </div>
+          </div>
 
-                    <div>
-                      <h4 className="font-semibold mb-3">Course Materials:</h4>
-                      <div className="space-y-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start"
-                          disabled={!isAccessible || !session.videoUrl}
-                          onClick={() => handleWatchFullVideo(session)}
-                        >
-                          <Video className="h-4 w-4 mr-2" />
-                          Watch Video
-                          {!isAccessible && (
-                            <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start"
-                          disabled={!isAccessible || !session.notes}
-                          onClick={() => handleViewNotes(session)}
-                        >
-                          <FileText className="h-4 w-4 mr-2" />
-                          View Notes
-                          {!isAccessible && (
-                            <LockIcon className="h-3 w-3 ml-auto text-black-800 font-bold" />
-                          )}
-                        </Button>
+          {/* RIGHT: Clock + Lock + Show More */}
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-blue-800 font-bold" />
+              <span className="text-sm text-blue-800 font-bold">{session.duration}</span>
+              {isAccessible && session.isCompleted && (
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              )}
+              {!isAccessible && <Lock className="h-5 w-5 text-blue-800 font-bold" />}
+            </div>
+            <Button
+              variant="ghost"
+              className="text-blue-800 hover:underline text-sm p-0 mt-9"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? "Show Less ▲" : "Show More ▼"}
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
 
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start"
-                          disabled={!isAccessible || !session.ppt}
-                          onClick={() => handleViewPPT(session)}
-                        >
-                          <Presentation className="h-4 w-4 mr-2" />
-                          View PPT
-                          {!isAccessible && (
-                            <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+      {isExpanded && (
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <h4 className="font-semibold mb-3">What you'll learn:</h4>
+              <h5 className="mb-2">{session.description}</h5>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-3">Course Materials:</h4>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.videoUrl}
+                  onClick={() => handleWatchFullVideo(session)}
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Watch Video
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.notes}
+                  onClick={() => handleViewNotes(session)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Notes
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-black-800 font-bold" />
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.ppt}
+                  onClick={() => handleViewPPT(session)}
+                >
+                  <Presentation className="h-4 w-4 mr-2" />
+                  View PPT
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      )}
+    </Card>
+
+
+
+
             );
           })}
         </div>
-
-        {/* Cart Summary */}
-        {cart.length > 0 && (
-          <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-4 w-80 max-w-full z-50">
-            <h3 className="text-lg font-bold mb-2">Your Cart</h3>
-            <ul className="mb-2 max-h-48 overflow-auto">
-              {cart.map((sessionId) => {
-                const session = course.sessions.find(
-                  (s) => s._id === sessionId
-                );
-                return (
-                  <li
-                    key={sessionId}
-                    className="flex justify-between items-center mb-1"
-                  >
-                    <span className="block w-40 truncate">
-                      {session?.title}
-                    </span>
-                    <div>
-                      <span>₹{session?.price.amount}</span>
-                      <button
-                        className="ml-3 text-red-500 hover:text-red-700 font-bold"
-                        onClick={() => removeFromCart(sessionId)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Discount display */}
-            {cart.length < course.sessions.length && (
-              <div className="text-sm text-green-600 mb-1">
-                <span className="line-through">
-                  ₹{(cartTotal / 0.9).toFixed(2)}
-                </span>
-                <span className="ml-2">10% discount applied!</span>
-              </div>
-            )}
-            {cart.length === course.sessions.length && (
-              <div className="text-sm text-green-600 mb-1">
-                <span className="line-through">
-                  ₹{(cartTotal / 0.8).toFixed(2)}
-                </span>
-                <span className="ml-2">20% discount applied!</span>
-              </div>
-            )}
-
-            <div className="flex justify-between font-semibold text-gray-800 mb-2">
-              <span>Total:</span> <span>₹{cartTotal.toFixed(2)}</span>
-            </div>
-            <Button onClick={buyCart} className="w-full">
-              Buy Now
-            </Button>
-          </div>
-        )}
       </div>
+
+
+
 
       {/* Preview Modal */}
       {showPreview && (
@@ -448,7 +412,7 @@ const CourseSessionsPage = () => {
           <div className="bg-white p-4 rounded-lg max-w-2xl w-full relative">
             <button
               onClick={() => setSelectedVideoUrl(null)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-1000 text-xl font-bold"
             >
               ×
             </button>
