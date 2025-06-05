@@ -238,7 +238,7 @@ const CourseSessionsPage = () => {
     );
   }
   return (
-    <div className="min-h-screen bg-white-50">
+    <div className="min-h-screen bg-white-50 mb-16">
       <UserHeader />
 
       <div className=" mx-auto py-6">

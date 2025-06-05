@@ -130,10 +130,10 @@ const Index = () => {
               AI for Exporters – Master Global Trade with Smart Learning
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Empower your export business with Terra LMS. Our platform offers
-              comprehensive export courses and import-export training programs
+              Empower your export business with Terrasourcing. Our platform
+              offers comprehensive import-export training programs & courses
               designed to equip you with the skills needed to navigate
-              international markets confidently.
+              international markets confidently.{" "}
             </p>
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">

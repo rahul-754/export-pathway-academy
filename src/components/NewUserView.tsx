@@ -103,15 +103,14 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
             <img
               src={curosal1}
               alt="Carousel Image 1"
-              className="w-full h-96 object-contain"
+              className="w-full h-96 object-cover"
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white  text-gray-800 p-4 rounded-lg shadow-md w-72">
               <h3 className="text-lg font-bold mb-2">
-                Build Your Website with AI
+                Upgrade your Export Skills
               </h3>
               <p className="text-sm">
-                Use tools like WIX, WordPress AI, Shopify, and ChatGPT to go
-                live in minutes.
+                Learn modern export tactics to unlock global markets.
               </p>
             </div>
           </div>
@@ -121,13 +120,14 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
             <img
               src={curosal2}
               alt="Carousel Image 2"
-              className="w-full h-96 object-contain"
+              className="w-full h-96 object-cover"
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white bg-opacity-100 text-gray-800 p-4 rounded-lg shadow-md w-72">
-              <h3 className="text-lg font-bold mb-2">Smart Email Outreach</h3>
+              <h3 className="text-lg font-bold mb-2">
+                Use AI to increase your Exports
+              </h3>
               <p className="text-sm">
-                Write better emails using ChatGPT, Jasper.AI, Canva & Flowrite
-                to get responses.
+                Use AI to automate, analyze, and grow exports faster.
               </p>
             </div>
           </div>
@@ -137,15 +137,14 @@ const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
             <img
               src={curosal3}
               alt="Carousel Image 3"
-              className="w-full h-96 object-contain"
+              className="w-full h-96 object-cover"
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 bg-white bg-opacity-100 text-gray-800 p-4 rounded-lg shadow-md w-72">
               <h3 className="text-lg font-bold mb-2">
-                Automate with WhatsApp Bots
+                Join our AI Export Success Mastery Course
               </h3>
               <p className="text-sm">
-                Use tools like WATI, Interakt, and Twilio to reply instantly and
-                close more deals.
+                Subscribe now and start mastering AI for exports.
               </p>
             </div>
           </div>
