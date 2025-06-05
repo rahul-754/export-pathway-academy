@@ -1,28 +1,47 @@
-import { useState, useEffect, Profiler } from 'react';
-import { GraduationCap, Home, Bell, ChevronDown, ShoppingCart, User} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { getCourses } from '@/Apis/Apis';
+import { useState, useEffect, Profiler } from "react";
+import {
+  GraduationCap,
+  Home,
+  Bell,
+  ChevronDown,
+  ShoppingCart,
+  User,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { getCourses } from "@/Apis/Apis";
 
 const UserHeader = () => {
   const [courses, setCourses] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const storedAuth = localStorage.getItem("TerraAuthData");
+    if (storedAuth) {
+      const parsed = JSON.parse(storedAuth);
+      setUser(parsed.user); // Assumes `user` is inside `TerraAuthData`
+    }
+  }, []);
   // Dummy cart data
-  const cartItems = []; // Replace with actual cart data from context or state
-
+  const cartItems = [];
+  const handleLogout = () => {
+    localStorage.removeItem("TerraAuthData");
+    setUser(null);
+    window.location.href = "/terralms/";
+  };
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const data = await getCourses();
         setCourses(data.courses);
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error("Error fetching courses:", error);
       }
     };
 
@@ -37,11 +56,15 @@ const UserHeader = () => {
 
     const query = searchQuery.toLowerCase();
 
-    const results = courses.filter(course =>
-      course.title.toLowerCase().includes(query) ||
-      (course.tags && course.tags.some(tag => tag.toLowerCase().includes(query))) ||
-      (course.sessionTitles &&
-        course.sessionTitles.some(title => title.toLowerCase().includes(query)))
+    const results = courses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(query) ||
+        (course.tags &&
+          course.tags.some((tag) => tag.toLowerCase().includes(query))) ||
+        (course.sessionTitles &&
+          course.sessionTitles.some((title) =>
+            title.toLowerCase().includes(query)
+          ))
     );
 
     setSearchResults(results);
@@ -56,7 +79,7 @@ const UserHeader = () => {
             <img
               src="./logo.png"
               alt="Logo"
-              style={{ width: 'auto', height: '40px', objectFit: 'cover' }}
+              style={{ width: "auto", height: "40px", objectFit: "cover" }}
             />
             <div>
               <h1 className="text-xl font-bold text-gray-900">TerraSourcing</h1>
@@ -72,7 +95,7 @@ const UserHeader = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-blue-900 flex items-center"
+                className="text-blue-900 flex items-center border border-blue-600"
               >
                 <GraduationCap className="w-4 h-4 mr-1" />
                 Explore
@@ -85,18 +108,20 @@ const UserHeader = () => {
                   <div className="w-64 bg-white border border-gray-200 shadow-lg rounded-l-md overflow-hidden">
                     <div className="max-h-[96px] overflow-y-auto">
                       {courses.length > 0 ? (
-                        courses.map(course => (
+                        courses.map((course) => (
                           <div
                             key={course._id}
                             className="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex justify-between items-center cursor-pointer"
                             onMouseEnter={() => setHoveredCourseId(course._id)}
                           >
                             {course.title}
-                            <span className="text-gray-400">{'>'}</span>
+                            <span className="text-gray-400">{">"}</span>
                           </div>
                         ))
                       ) : (
-                        <p className="px-4 py-2 text-sm text-gray-500">Loading...</p>
+                        <p className="px-4 py-2 text-sm text-gray-500">
+                          Loading...
+                        </p>
                       )}
                     </div>
                   </div>
@@ -105,7 +130,7 @@ const UserHeader = () => {
                   {hoveredCourseId && (
                     <div className="absolute left-64 top-0 w-64 bg-white border border-gray-200 shadow-lg rounded-r-md z-50">
                       {courses
-                        .find(course => course._id === hoveredCourseId)
+                        .find((course) => course._id === hoveredCourseId)
                         ?.sessionTitles?.slice(0, 5)
                         .map((title, idx) => (
                           <Link
@@ -129,7 +154,7 @@ const UserHeader = () => {
                 placeholder="Search for anything"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-[475px] pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[34vw] pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <svg
@@ -170,7 +195,6 @@ const UserHeader = () => {
               )}
             </div>
           </div>
-
           {/* Right Section: Cart + Notifications + Home */}
           <div className="flex items-center space-x-4 relative">
             {/* Cart */}
@@ -181,7 +205,7 @@ const UserHeader = () => {
                 className="border-blue-600 text-blue-900 hover:bg-blue-50"
                 onClick={() => setCartOpen(!cartOpen)}
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
+                <ShoppingCart className="w-4 h-4" />
                 Cart
                 {cartItems.length > 0 && (
                   <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">
@@ -195,14 +219,20 @@ const UserHeader = () => {
                   {cartItems.length === 0 ? (
                     <div className="p-4 text-sm text-gray-600 text-center">
                       Your cart is empty.
-                      <Link to="/courses" className="text-blue-600 hover:underline block mt-2">
+                      <Link
+                        to="/courses"
+                        className="text-blue-600 hover:underline block mt-2"
+                      >
                         Keep shopping
                       </Link>
                     </div>
                   ) : (
                     <ul className="max-h-64 overflow-auto">
                       {cartItems.map((item, idx) => (
-                        <li key={idx} className="p-3 border-b text-sm text-gray-700">
+                        <li
+                          key={idx}
+                          className="p-3 border-b text-sm text-gray-700"
+                        >
                           {item.title}
                         </li>
                       ))}
@@ -218,9 +248,11 @@ const UserHeader = () => {
               size="sm"
               className="relative border-blue-600 text-blue-900 hover:bg-blue-50"
             >
-              <Bell className="w-4 h-4 mr-2" />
+              <Bell className="w-4 h-4" />
               Notifications
-              <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">3</Badge>
+              <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">
+                3
+              </Badge>
             </Button>
 
             {/* Home */}
@@ -230,20 +262,32 @@ const UserHeader = () => {
                 size="sm"
                 className="border-blue-600 text-blue-900 hover:bg-blue-50"
               >
-                <Home className="w-4 h-4 mr-2" />
+                <Home className="w-4 h-4" />
                 Home
               </Button>
             </Link>
-            <Link to="/user-dashboard">
+            {user ? (
               <Button
                 variant="outline"
                 size="sm"
-                className= ' bg-[#0072e6] text-white'
+                className="bg-red-600 text-white"
+                onClick={handleLogout}
               >
                 <User className="w-4 h-4 mr-2" />
-                Log in
+                Log out
               </Button>
-            </Link>
+            ) : (
+              <Link to="/">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-[#0072e6] text-white"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Log in
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

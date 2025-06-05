@@ -36,10 +36,10 @@ interface NewUserViewProps {
   onCourseClick: (courseId: string) => void;
 }
 
-const NewUserView = ({ onCourseClick }: NewUserViewProps) => {
+const NewUserView = ({ user, onCourseClick }: NewUserViewProps) => {
   const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
   const [loading, setLoading] = useState(true);
-
+  console.log(user);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -59,86 +59,73 @@ const NewUserView = ({ onCourseClick }: NewUserViewProps) => {
     <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-blue-50 via-white to-gray-50 min-h-screen">
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2">
-  <span className="text-gray-800">Welcome to </span>
-  <span className="text-blue-700">TerraSourcing!</span>
-</h2>
+          <span className="text-gray-800">Welcome to </span>
+          <span className="text-blue-700">TerraSourcing!</span>
+        </h2>
         <p className="text-gray-500">
           Start your export journey with our comprehensive courses
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Courses Enrolled</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <BookOpen className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
-   <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Active Batches</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <Flag className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Courses Enrolled</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <BookOpen className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Certified Members</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <Trophy className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
 
+        <Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
+          {/* Top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
 
-
-<Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Active Batches</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <Flag className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
-
-
-
-<Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Certified Members</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <Trophy className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
-
-
-
-<Card className="rounded-xl shadow-md border border-blue-200 bg-white hover:shadow-lg transition-shadow overflow-hidden">
-  {/* Top gradient bar */}
-  <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-blue-300"></div>
-
-  <CardContent className="flex justify-between items-center p-5">
-    <div>
-      <p className="text-slate-500 text-base">Active Users</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
-    </div>
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-      <User className="text-[#0474e4] w-6 h-6" />
-    </div>
-  </CardContent>
-</Card>
-
-
-
+          <CardContent className="flex justify-between items-center p-5">
+            <div>
+              <p className="text-slate-500 text-base">Active Users</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">0</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <User className="text-[#0474e4] w-6 h-6" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {loading ? (
@@ -185,10 +172,6 @@ const NewUserView = ({ onCourseClick }: NewUserViewProps) => {
                     <div className="flex items-center text-sm text-gray-600">
                       <Video className="h-4 w-4 mr-1" />
                       {course.sessionsCount} sessions
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="h-4 w-4 mr-1" />
-                      {course.pricing?.duration || "4 weeks"}
                     </div>
                   </div>
 
