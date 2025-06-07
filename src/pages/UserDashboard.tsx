@@ -23,7 +23,8 @@ const UserDashboard = () => {
           const noCourses = userData.enrolledCourses?.length === 0;
           const noSessions = userData.enrolledSessions?.length === 0;
           console.log("User data:", userData);
-          setIsNewUser(noCourses && noSessions);
+          (noCourses && noSessions)?setIsNewUser(true):setIsNewUser(false)
+          // setIsNewUser(noCourses && noSessions);
         } catch (err) {
           console.error("Invalid auth data in localStorage or API error", err);
         } finally {
@@ -50,11 +51,13 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 mb-20">
       <UserHeader />
-      {!isNewUser ? (
+      {isNewUser ? (
         <NewUserView user={user} onCourseClick={handleCourseClick} />
       ) : (
         <EnrolledUserView user={user} onCourseClick={handleCourseClick} />
       )}
+
+       
     </div>
   );
 };

@@ -112,6 +112,7 @@ const Index = () => {
                 <Trophy className="h-4 w-4" />
                 <span>Certification</span>
               </span>
+            
               <span className="flex items-center space-x-1">
                 <Users className="h-4 w-4" />
                 <span>Community</span>

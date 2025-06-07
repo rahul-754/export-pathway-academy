@@ -5,12 +5,13 @@ import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
   base: "/terralms/", // Set this to your subfolder path
-  plugins: [react(), mode === "development" && componentTagger()].filter(
-    Boolean
-  ),
+  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  server: {
+    port: 2025,
   },
 }));
