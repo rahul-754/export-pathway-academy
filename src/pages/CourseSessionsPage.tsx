@@ -43,7 +43,7 @@ const CourseSessionsPage = () => {
   const [cartTotal, setCartTotal] = useState(0);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedSet, setIdtoExpanded] = useState(new Set());
 
   useEffect(() => {
     if (!course) return;
@@ -244,9 +244,9 @@ const CourseSessionsPage = () => {
       <div className=" mx-auto py-6">
         {/* <CourseSessionsPageMain /> */}
 
-        <div className="bg-[#94b9ff] w-full py-10 px-4 md:px-10 text-black">
+        <div className="bg-[#94b9ff] w-full py-10 text-black">
           {/* Outer Container */}
-          <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
+          <div className="max-w-[80%] mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row gap-10 items-center">
             {/* Left Side - Course Info */}
             <div className="flex-1">
               <h1 className="text-4xl font-extrabold mb-4">{course.title}</h1>
@@ -316,8 +316,8 @@ const CourseSessionsPage = () => {
         {/* Course Summary Section - Udemy style */}
 
         {/* Sessions List Section */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="w-full max-w-[80%] mx-auto py-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 ">
             Course Sessions
           </h2>
 
@@ -328,15 +328,15 @@ const CourseSessionsPage = () => {
             return (
               <Card
                 key={session._id}
-                className="overflow-hidden hover:shadow-md transition-shadow"
+                className="overflow-hidden hover:shadow-md transition-shadow mb-5"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     {/* LEFT: Image + Title + Buttons */}
-                    <div className="flex item-center gap-6">
+                    <div className="flex items-end gap-6 h-[200px]">
                       <div
                         className="rounded-lg bg-blue-100 flex items-center justify-center"
-                        style={{ width: "200px", height: "auto" }}
+                        style={{ width: "auto", height: "100%" }}
                       >
                         <img
                           src={session.sessionImage}
@@ -345,8 +345,8 @@ const CourseSessionsPage = () => {
                           style={{ borderRadius: "8px", objectFit: "cover" }}
                         />
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">
+                      <div className="flex flex-col gap-10 h-full justify-between">
+                        <CardTitle className="text-3xl max-w-[500px]">
                           {session.title}
                         </CardTitle>
                         <div className="flex gap-4 mt-3">
@@ -381,45 +381,38 @@ const CourseSessionsPage = () => {
                     </div>
 
                     {/* RIGHT: Clock + Lock + Show More */}
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end justify-between gap-8 ">
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-blue-800 font-bold" />
+                        <Clock className="h-7 w-7 text-blue-800 font-bold hover:bg-blue-600 hover:text-white p-1 rounded-full transition-colors" />
                         <span className="text-sm text-blue-800 font-bold">
                           {session.duration}
                         </span>
                         {isAccessible && session.isCompleted && (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <CheckCircle className="h-7 w-7 text-green-600 hover:bg-green-600 hover:text-white p-1 rounded-full transition-colors" />
                         )}
                         {!isAccessible && (
-                          <Lock className="h-5 w-5 text-blue-800 font-bold" />
+                          <Lock className="h-7 w-7 text-blue-800 font-bold hover:bg-blue-600 hover:text-white p-1 rounded-xl transition-colors" />
                         )}
+                        <Button
+                          variant="ghost"
+                          className="text-blue-800 hover:underline text-sm hover:bg-transparent"
+                          onClick={() => {
+                            const temp = new Set(expandedSet);
+                            if (temp.has(session._id)) {
+                              temp.delete(session._id);
+                            } else {
+                              temp.add(session._id);
+                            }
+                            setIdtoExpanded(temp);
+                          }}
+                        >
+                          {expandedSet.has(session._id)
+                            ? "Collapse ▲"
+                            : "Expand ▼"}
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        className="text-blue-800 hover:underline text-sm p-0 mt-9"
-                        onClick={() => setIsExpanded(!isExpanded)}
-                      >
-                        {isExpanded ? "Show Less ▲" : "Show More ▼"}
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                {isExpanded && (
-                  <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <div className="lg:col-span-2">
-                        <h4 className="font-semibold mb-3">
-                          What you'll learn:
-                        </h4>
-                        <h5 className="mb-2">{session.description}</h5>
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold mb-3">
-                          Course Materials:
-                        </h4>
-                        <div className="space-y-2">
+                      <div className="flex flex-row-reverse ">
+                        <div className=" max-w-[300px] space-y-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -461,6 +454,47 @@ const CourseSessionsPage = () => {
                           </Button>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                {expandedSet.has(session._id) && (
+                  <CardContent className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5 ">
+                    <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                      <h3 className="font-bold tracking-wide text-xl max-w-[70%]">
+                        Leverage AI Tools for Smarter Customer Outreach
+                      </h3>
+                      <p className=" text-md max-w-[70%]">
+                        Streamline your Email and WhatsApp marketing using
+                        intelligent automation.
+                      </p>
+                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                        1
+                      </span>
+                    </div>
+                    <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                      <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
+                        Build Seamless Workflows with Zapier
+                      </h3>
+                      <p className=" text-md max-w-[75%]">
+                        Integrate your favorite apps to trigger personalized
+                        messages effortlessly.
+                      </p>
+                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                        2
+                      </span>
+                    </div>
+                    <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                      <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
+                        Use WhatsAuto and Mailchimp for Smart Follow-Ups
+                      </h3>
+                      <p className=" text-md max-w-[75%]">
+                        Engage customers at the right time with automated
+                        responses and campaigns.
+                      </p>
+                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                        3
+                      </span>
                     </div>
                   </CardContent>
                 )}

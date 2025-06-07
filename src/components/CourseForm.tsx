@@ -1,21 +1,49 @@
-
-import React, { useEffect, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, Plus, Upload, Calendar as CalendarIcon, FileText, Presentation } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  X,
+  Plus,
+  Upload,
+  Calendar as CalendarIcon,
+  FileText,
+  Presentation,
+} from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Session {
   title: string;
@@ -37,7 +65,7 @@ interface CourseFormData {
   upcoming: boolean;
   featured: boolean;
   publishedOn: Date | null;
-  courseType: 'free' | 'paid';
+  courseType: "free" | "paid";
   amount: number;
   currency: string;
   sessions: Session[];
@@ -50,75 +78,89 @@ interface CourseFormProps {
   isEditing?: boolean;
 }
 
-const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEditing = false }) => {
-  const [tagInput, setTagInput] = useState('');
-  console.log(courseData)
+const CourseForm: React.FC<CourseFormProps> = ({
+  open,
+  onClose,
+  courseData,
+  isEditing = false,
+}) => {
+  const [tagInput, setTagInput] = useState("");
+  console.log(courseData);
   const form = useForm<CourseFormData>({
     defaultValues: {
-      title: courseData?.title || '',
-      instructor: courseData?.instructor || '',
-      shortNote: courseData?.shortNote || '',
-      description: courseData?.description || '',
+      title: courseData?.title || "",
+      instructor: courseData?.instructor || "",
+      shortNote: courseData?.shortNote || "",
+      description: courseData?.description || "",
       image: null,
       videos: [],
       tags: courseData?.tags || [],
-      category: courseData?.category || '',
+      category: courseData?.category || "",
       published: courseData?.published || false,
       upcoming: courseData?.upcoming || false,
       featured: courseData?.featured || false,
       publishedOn: courseData?.publishedOn || null,
-      courseType: courseData?.courseType || 'free',
+      courseType: courseData?.courseType || "free",
       amount: courseData?.amount || 0,
-      currency: courseData?.currency || 'USD',
+      currency: courseData?.currency || "USD",
       sessions: courseData?.sessions || [],
     },
   });
-  
-  const { fields: sessionFields, append: appendSession, remove: removeSession } = useFieldArray({
+
+  const {
+    fields: sessionFields,
+    append: appendSession,
+    remove: removeSession,
+  } = useFieldArray({
     control: form.control,
-    name: 'sessions',
+    name: "sessions",
   });
 
   useEffect(() => {
-  if (courseData) {
-    form.reset({
-      title: courseData.title || '',
-      instructor: courseData.instructor || '',
-      shortNote: courseData.shortNote || '',
-      description: courseData.description || '',
-      image: null,
-      videos: [],
-      tags: courseData.tags || [],
-      category: courseData.category || '',
-      published: courseData.published || false,
-      upcoming: courseData.upcoming || false,
-      featured: courseData.featured || false,
-      publishedOn: courseData.publishedOn ? new Date(courseData.publishedOn) : null,
-      courseType: courseData.courseType || 'free',
-      amount: courseData.amount || 0,
-      currency: courseData.currency || 'USD',
-      sessions: courseData.sessions || [],
-    });
-  }
-}, [courseData, form]);
+    if (courseData) {
+      form.reset({
+        title: courseData.title || "",
+        instructor: courseData.instructor || "",
+        shortNote: courseData.shortNote || "",
+        description: courseData.description || "",
+        image: null,
+        videos: [],
+        tags: courseData.tags || [],
+        category: courseData.category || "",
+        published: courseData.published || false,
+        upcoming: courseData.upcoming || false,
+        featured: courseData.featured || false,
+        publishedOn: courseData.publishedOn
+          ? new Date(courseData.publishedOn)
+          : null,
+        courseType: courseData.courseType || "free",
+        amount: courseData.amount || 0,
+        currency: courseData.currency || "USD",
+        sessions: courseData.sessions || [],
+      });
+    }
+  }, [courseData, form]);
 
-  const courseType = form.watch('courseType');
-  const tags = form.watch('tags');
+  const courseType = form.watch("courseType");
+  const tags = form.watch("tags");
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      form.setValue('tags', [...tags, tagInput.trim()]);
-      setTagInput('');
+      form.setValue("tags", [...tags, tagInput.trim()]);
+      setTagInput("");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    form.setValue('tags', tags.filter(tag => tag !== tagToRemove));
+    form.setValue(
+      "tags",
+      tags.filter((tag) => tag !== tagToRemove)
+    );
   };
 
   const handleAddSession = () => {
     appendSession({
-      title: '',
+      title: "",
       video: null,
       notes: null,
       ppt: null,
@@ -126,7 +168,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
   };
 
   const onSubmit = (data: CourseFormData) => {
-    console.log('Course data:', data);
+    console.log("Course data:", data);
     // Handle form submission here
     onClose();
   };
@@ -135,7 +177,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Course' : 'Create New Course'}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Edit Course" : "Create New Course"}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -195,10 +239,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Detailed course description" 
+                        <Textarea
+                          placeholder="Detailed course description"
                           className="min-h-[100px]"
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -224,14 +268,21 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                           <Upload className="mx-auto h-12 w-12 text-gray-400" />
                           <div className="mt-2">
-                            <label htmlFor="image-upload" className="cursor-pointer">
-                              <span className="text-blue-600 hover:text-blue-500">Upload an image</span>
+                            <label
+                              htmlFor="image-upload"
+                              className="cursor-pointer"
+                            >
+                              <span className="text-blue-600 hover:text-blue-500">
+                                Upload an image
+                              </span>
                               <input
                                 id="image-upload"
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) => field.onChange(e.target.files?.[0] || null)}
+                                onChange={(e) =>
+                                  field.onChange(e.target.files?.[0] || null)
+                                }
                               />
                             </label>
                           </div>
@@ -252,15 +303,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                           <Upload className="mx-auto h-12 w-12 text-gray-400" />
                           <div className="mt-2">
-                            <label htmlFor="video-upload" className="cursor-pointer">
-                              <span className="text-blue-600 hover:text-blue-500">Upload videos</span>
+                            <label
+                              htmlFor="video-upload"
+                              className="cursor-pointer"
+                            >
+                              <span className="text-blue-600 hover:text-blue-500">
+                                Upload videos
+                              </span>
                               <input
                                 id="video-upload"
                                 type="file"
                                 accept="video/*"
                                 multiple
                                 className="hidden"
-                                onChange={(e) => field.onChange(Array.from(e.target.files || []))}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    Array.from(e.target.files || [])
+                                  )
+                                }
                               />
                             </label>
                           </div>
@@ -286,15 +346,27 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                       placeholder="Add a tag"
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                      onKeyPress={(e) =>
+                        e.key === "Enter" &&
+                        (e.preventDefault(), handleAddTag())
+                      }
                     />
-                    <Button type="button" onClick={handleAddTag}>Add</Button>
+                    <Button type="button" onClick={handleAddTag}>
+                      Add
+                    </Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
                         {tag}
-                        <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveTag(tag)} />
+                        <X
+                          className="h-3 w-3 cursor-pointer"
+                          onClick={() => handleRemoveTag(tag)}
+                        />
                       </Badge>
                     ))}
                   </div>
@@ -306,15 +378,22 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="export-basics">Export Basics</SelectItem>
-                          <SelectItem value="documentation">Documentation</SelectItem>
+                          <SelectItem value="export-basics">
+                            Export Basics
+                          </SelectItem>
+                          <SelectItem value="documentation">
+                            Documentation
+                          </SelectItem>
                           <SelectItem value="trade-laws">Trade Laws</SelectItem>
                           <SelectItem value="customs">Customs</SelectItem>
                           <SelectItem value="finance">Finance</SelectItem>
@@ -340,7 +419,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
                         <FormLabel>Published</FormLabel>
                       </FormItem>
@@ -353,7 +435,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
                         <FormLabel>Upcoming</FormLabel>
                       </FormItem>
@@ -366,7 +451,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
                         <FormLabel>Featured</FormLabel>
                       </FormItem>
@@ -449,7 +537,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                   )}
                 />
 
-                {courseType === 'paid' && (
+                {courseType === "paid" && (
                   <div className="flex gap-4">
                     <FormField
                       control={form.control}
@@ -458,11 +546,13 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                         <FormItem className="flex-1">
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
-                              placeholder="0.00" 
+                            <Input
+                              type="number"
+                              placeholder="0.00"
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value) || 0)
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -476,7 +566,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                       render={({ field }) => (
                         <FormItem className="w-32">
                           <FormLabel>Currency</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue />
@@ -503,7 +596,11 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Course Sessions</CardTitle>
-                  <Button type="button" onClick={handleAddSession} variant="outline">
+                  <Button
+                    type="button"
+                    onClick={handleAddSession}
+                    variant="outline"
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Session
                   </Button>
@@ -514,7 +611,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                   <Card key={session.id} className="border border-gray-200">
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-center">
-                        <h4 className="text-sm font-medium">Session {index + 1}</h4>
+                        <h4 className="text-sm font-medium">
+                          Session {index + 1}
+                        </h4>
                         <Button
                           type="button"
                           variant="outline"
@@ -533,7 +632,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                           <FormItem>
                             <FormLabel>Session Title</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter session title" {...field} />
+                              <Input
+                                placeholder="Enter session title"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -549,15 +651,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                               <FormLabel>Video</FormLabel>
                               <FormControl>
                                 <div className="border border-gray-300 rounded p-3 text-center">
-                                  <label htmlFor={`video-${index}`} className="cursor-pointer">
+                                  <label
+                                    htmlFor={`video-${index}`}
+                                    className="cursor-pointer"
+                                  >
                                     <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <span className="text-sm text-blue-600">Upload Video</span>
+                                    <span className="text-sm text-blue-600">
+                                      Upload Video
+                                    </span>
                                     <input
                                       id={`video-${index}`}
                                       type="file"
                                       accept="video/*"
                                       className="hidden"
-                                      onChange={(e) => field.onChange(e.target.files?.[0] || null)}
+                                      onChange={(e) =>
+                                        field.onChange(
+                                          e.target.files?.[0] || null
+                                        )
+                                      }
                                     />
                                   </label>
                                 </div>
@@ -574,15 +685,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                               <FormLabel>Notes</FormLabel>
                               <FormControl>
                                 <div className="border border-gray-300 rounded p-3 text-center">
-                                  <label htmlFor={`notes-${index}`} className="cursor-pointer">
+                                  <label
+                                    htmlFor={`notes-${index}`}
+                                    className="cursor-pointer"
+                                  >
                                     <FileText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <span className="text-sm text-blue-600">Upload Notes</span>
+                                    <span className="text-sm text-blue-600">
+                                      Upload Notes
+                                    </span>
                                     <input
                                       id={`notes-${index}`}
                                       type="file"
                                       accept=".pdf,.doc,.docx"
                                       className="hidden"
-                                      onChange={(e) => field.onChange(e.target.files?.[0] || null)}
+                                      onChange={(e) =>
+                                        field.onChange(
+                                          e.target.files?.[0] || null
+                                        )
+                                      }
                                     />
                                   </label>
                                 </div>
@@ -599,15 +719,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                               <FormLabel>PPT (Optional)</FormLabel>
                               <FormControl>
                                 <div className="border border-gray-300 rounded p-3 text-center">
-                                  <label htmlFor={`ppt-${index}`} className="cursor-pointer">
+                                  <label
+                                    htmlFor={`ppt-${index}`}
+                                    className="cursor-pointer"
+                                  >
                                     <Presentation className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <span className="text-sm text-blue-600">Upload PPT</span>
+                                    <span className="text-sm text-blue-600">
+                                      Upload PPT
+                                    </span>
                                     <input
                                       id={`ppt-${index}`}
                                       type="file"
                                       accept=".ppt,.pptx"
                                       className="hidden"
-                                      onChange={(e) => field.onChange(e.target.files?.[0] || null)}
+                                      onChange={(e) =>
+                                        field.onChange(
+                                          e.target.files?.[0] || null
+                                        )
+                                      }
                                     />
                                   </label>
                                 </div>
@@ -634,7 +763,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ open, onClose, courseData, isEd
                 Cancel
               </Button>
               <Button type="submit">
-                {isEditing ? 'Update Course' : 'Create Course'}
+                {isEditing ? "Update Course" : "Create Course"}
               </Button>
             </div>
           </form>
