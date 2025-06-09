@@ -347,7 +347,7 @@ const CourseSessionsPage = () => {
                       </div>
                       <div className="flex flex-col gap-10 h-full justify-between">
                         <CardTitle className="text-3xl max-w-[500px]">
-                          {session.title}
+                          Session {index + 1} : {session.title}
                         </CardTitle>
                         <div className="flex gap-4 mt-3">
                           {!isAccessible && (
@@ -459,42 +459,45 @@ const CourseSessionsPage = () => {
                 </CardHeader>
 
                 {expandedSet.has(session._id) && (
-                  <CardContent className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5 ">
-                    <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-                      <h3 className="font-bold tracking-wide text-xl max-w-[70%]">
-                        Leverage AI Tools for Smarter Customer Outreach
-                      </h3>
-                      <p className=" text-md max-w-[70%]">
-                        Streamline your Email and WhatsApp marketing using
-                        intelligent automation.
-                      </p>
-                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
-                        1
-                      </span>
-                    </div>
-                    <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-                      <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
-                        Build Seamless Workflows with Zapier
-                      </h3>
-                      <p className=" text-md max-w-[75%]">
-                        Integrate your favorite apps to trigger personalized
-                        messages effortlessly.
-                      </p>
-                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
-                        2
-                      </span>
-                    </div>
-                    <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-                      <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
-                        Use WhatsAuto and Mailchimp for Smart Follow-Ups
-                      </h3>
-                      <p className=" text-md max-w-[75%]">
-                        Engage customers at the right time with automated
-                        responses and campaigns.
-                      </p>
-                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
-                        3
-                      </span>
+                  <CardContent className=" border-t pt-5">
+                    <h3 className="font-semibold text-xl">What you'll learn</h3>
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5">
+                      <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                        <h3 className="font-bold tracking-wide text-xl max-w-[70%]">
+                          Leverage AI Tools for Smarter Customer Outreach
+                        </h3>
+                        <p className=" text-md max-w-[70%]">
+                          Streamline your Email and WhatsApp marketing using
+                          intelligent automation.
+                        </p>
+                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                          1
+                        </span>
+                      </div>
+                      <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                        <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
+                          Build Seamless Workflows with Zapier
+                        </h3>
+                        <p className=" text-md max-w-[75%]">
+                          Integrate your favorite apps to trigger personalized
+                          messages effortlessly.
+                        </p>
+                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                          2
+                        </span>
+                      </div>
+                      <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                        <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
+                          Use WhatsAuto and Mailchimp for Smart Follow-Ups
+                        </h3>
+                        <p className=" text-md max-w-[75%]">
+                          Engage customers at the right time with automated
+                          responses and campaigns.
+                        </p>
+                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                          3
+                        </span>
+                      </div>
                     </div>
                   </CardContent>
                 )}

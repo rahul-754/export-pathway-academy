@@ -1,12 +1,9 @@
-import axios from "axios";
-
-const BASE_URL = 'https://mdm.ai.multipliersolutions.in/api';
-// const BASE_URL = "http://localhost:5000/api";
+import axiosInstance from "./axiosInstance";
 
 // Course API functions
 export const getCourses = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/courses`);
+    const response = await axiosInstance.get(`/courses`);
     return response.data;
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -16,7 +13,7 @@ export const getCourses = async () => {
 
 export const getCourseById = async (id) => {
   try {
-    const response = await axios.get(`${BASE_URL}/courses/${id}`);
+    const response = await axiosInstance.get(`/courses/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching course:", error);
@@ -26,7 +23,7 @@ export const getCourseById = async (id) => {
 
 export const createCourse = async (courseData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/courses`, courseData);
+    const response = await axiosInstance.post(`/courses`, courseData);
     return response.data;
   } catch (error) {
     console.error("Error creating course:", error);
@@ -36,7 +33,7 @@ export const createCourse = async (courseData) => {
 
 export const updateCourse = async (id, updates) => {
   try {
-    const response = await axios.put(`${BASE_URL}/courses/${id}`, updates);
+    const response = await axiosInstance.put(`/courses/${id}`, updates);
     return response.data;
   } catch (error) {
     console.error("Error updating course:", error);
@@ -46,7 +43,7 @@ export const updateCourse = async (id, updates) => {
 
 export const deleteCourse = async (id) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/courses/${id}`);
+    const response = await axiosInstance.delete(`/courses/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting course:", error);
@@ -57,7 +54,7 @@ export const deleteCourse = async (id) => {
 // Session API functions
 export const getSessions = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/sessions`);
+    const response = await axiosInstance.get(`/sessions`);
     return response.data;
   } catch (error) {
     console.error("Error fetching sessions:", error);
@@ -67,7 +64,7 @@ export const getSessions = async () => {
 
 export const getSessionById = async (id) => {
   try {
-    const response = await axios.get(`${BASE_URL}/sessions/${id}`);
+    const response = await axiosInstance.get(`/sessions/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching session:", error);
@@ -77,7 +74,7 @@ export const getSessionById = async (id) => {
 
 export const getSessionsByCourse = async (courseId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/sessions/course/${courseId}`);
+    const response = await axiosInstance.get(`/sessions/course/${courseId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching sessions by course:", error);
@@ -87,7 +84,7 @@ export const getSessionsByCourse = async (courseId) => {
 
 export const createSession = async (sessionData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/sessions`, sessionData);
+    const response = await axiosInstance.post(`/sessions`, sessionData);
     return response.data;
   } catch (error) {
     console.error("Error creating session:", error);
@@ -97,7 +94,7 @@ export const createSession = async (sessionData) => {
 
 export const updateSession = async (id, updates) => {
   try {
-    const response = await axios.put(`${BASE_URL}/sessions/${id}`, updates);
+    const response = await axiosInstance.put(`/sessions/${id}`, updates);
     return response.data;
   } catch (error) {
     console.error("Error updating session:", error);
@@ -107,7 +104,7 @@ export const updateSession = async (id, updates) => {
 
 export const deleteSession = async (id) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/sessions/${id}`);
+    const response = await axiosInstance.delete(`/sessions/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting session:", error);
@@ -118,7 +115,7 @@ export const deleteSession = async (id) => {
 // User API functions
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/users/register`, userData);
+    const response = await axiosInstance.post(`/users/register`, userData);
     return response.data;
   } catch (error) {
     console.error("Error registering user:", error);
@@ -128,7 +125,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`${BASE_URL}/users/login`, credentials);
+    const response = await axiosInstance.post(`/users/login`, credentials);
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
@@ -138,7 +135,7 @@ export const loginUser = async (credentials) => {
 
 export const getUserById = async (UserId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/users/${UserId}`);
+    const response = await axiosInstance.get(`/users/${UserId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching current user:", error);
@@ -149,7 +146,7 @@ export const getUserById = async (UserId) => {
 export const enrollInSessions = async (userId, sessionIds) => {
   try {
     // console.log("Enrolling user:", userId, "in sessions:", sessionIds);
-    const response = await axios.post(`${BASE_URL}/users/enroll/sessions`, {
+    const response = await axiosInstance.post(`/users/enroll/sessions`, {
       userId,
       sessionIds,
     });
