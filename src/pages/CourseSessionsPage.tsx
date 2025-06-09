@@ -463,38 +463,38 @@ const CourseSessionsPage = () => {
                     <h3 className="font-semibold text-xl">What you'll learn</h3>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5">
                       <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-                        <h3 className="font-bold tracking-wide text-xl max-w-[70%]">
+                        <h3 className="font-bold tracking-wide text-xl max-w-[70%] z-[1]">
                           Leverage AI Tools for Smarter Customer Outreach
                         </h3>
-                        <p className=" text-md max-w-[70%]">
+                        <p className=" text-md max-w-[70%] z-[1]">
                           Streamline your Email and WhatsApp marketing using
                           intelligent automation.
                         </p>
-                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 select-none z-0">
                           1
                         </span>
                       </div>
                       <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-                        <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
+                        <h3 className="font-bold tracking-wide text-xl max-w-[75%] z-[1]">
                           Build Seamless Workflows with Zapier
                         </h3>
-                        <p className=" text-md max-w-[75%]">
+                        <p className=" text-md max-w-[75%] z-[1]">
                           Integrate your favorite apps to trigger personalized
                           messages effortlessly.
                         </p>
-                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 z-0 select-none">
                           2
                         </span>
                       </div>
                       <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-                        <h3 className="font-bold tracking-wide text-xl max-w-[75%]">
+                        <h3 className="font-bold tracking-wide text-xl max-w-[75%] z-[1]">
                           Use WhatsAuto and Mailchimp for Smart Follow-Ups
                         </h3>
-                        <p className=" text-md max-w-[75%]">
+                        <p className=" text-md max-w-[75%] z-[1]">
                           Engage customers at the right time with automated
                           responses and campaigns.
                         </p>
-                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10">
+                        <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 z-0 select-none">
                           3
                         </span>
                       </div>
