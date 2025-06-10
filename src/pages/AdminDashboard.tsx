@@ -1,25 +1,31 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { 
-  GraduationCap, 
-  Users, 
-  BookOpen, 
-  Trophy, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  GraduationCap,
+  Users,
+  BookOpen,
+  Trophy,
+  Plus,
+  Edit,
+  Trash2,
   Video,
   BarChart3,
   Calendar,
-  MessageSquare
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import AdminHeader from '@/components/AdminHeader';
-import CourseForm from '@/components/CourseForm';
-import { getCourses } from '@/Apis/Apis';
+  MessageSquare,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import AdminHeader from "@/components/AdminHeader";
+import CourseForm from "@/components/CourseForm/CourseForm";
+import { getCourses } from "@/Apis/Apis";
 
 const AdminDashboard = () => {
   const [courseFormOpen, setCourseFormOpen] = useState(false);
@@ -27,14 +33,47 @@ const AdminDashboard = () => {
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
   const [programs] = useState([
-    { id: 1, title: "Export Fundamentals Program", startDate: "2024-07-15", enrolled: 15, status: "upcoming" },
-    { id: 2, title: "Advanced Export Strategies", startDate: "2024-06-20", enrolled: 22, status: "active" }
+    {
+      id: 1,
+      title: "Export Fundamentals Program",
+      startDate: "2024-07-15",
+      enrolled: 15,
+      status: "upcoming",
+    },
+    {
+      id: 2,
+      title: "Advanced Export Strategies",
+      startDate: "2024-06-20",
+      enrolled: 22,
+      status: "active",
+    },
   ]);
 
   const [users] = useState([
-    { id: 1, name: "John Smith", email: "john@example.com", courses: 3, certified: 2, status: "active" },
-    { id: 2, name: "Sarah Johnson", email: "sarah@example.com", courses: 5, certified: 4, status: "active" },
-    { id: 3, name: "Mike Chen", email: "mike@example.com", courses: 2, certified: 1, status: "active" }
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john@example.com",
+      courses: 3,
+      certified: 2,
+      status: "active",
+    },
+    {
+      id: 2,
+      name: "Sarah Johnson",
+      email: "sarah@example.com",
+      courses: 5,
+      certified: 4,
+      status: "active",
+    },
+    {
+      id: 3,
+      name: "Mike Chen",
+      email: "mike@example.com",
+      courses: 2,
+      certified: 1,
+      status: "active",
+    },
   ]);
 
   const handleNewCourse = () => {
@@ -53,43 +92,50 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-  const fetchCourses = async () => {
-    try {
-      setLoadingCourses(true);
-      const data = await getCourses();
-      setCourses(data);
-    } catch (error) {
-      console.error(error);
-      // Optionally show toast/snackbar here
-    } finally {
-      setLoadingCourses(false);
-    }
-  };
+    const fetchCourses = async () => {
+      try {
+        setLoadingCourses(true);
+        const data = await getCourses();
+        // console.log("course ::", data);
+        setCourses(data);
+      } catch (error) {
+        console.error(error);
+        // Optionally show toast/snackbar here
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
 
-  fetchCourses();
-}, []);
+    fetchCourses();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminHeader />
-      
+
       <div className="container mx-auto px-4 py-6">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Courses
+              </CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{courses.totalCourses}</div>
-              <p className="text-xs text-muted-foreground">+2 from last month</p>
+              <p className="text-xs text-muted-foreground">
+                +2 from last month
+              </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Users
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -97,10 +143,12 @@ const AdminDashboard = () => {
               <p className="text-xs text-muted-foreground">0</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Certified Members</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Certified Members
+              </CardTitle>
               <Trophy className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -108,10 +156,12 @@ const AdminDashboard = () => {
               <p className="text-xs text-muted-foreground">0</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Batches</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Batches
+              </CardTitle>
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -138,49 +188,59 @@ const AdminDashboard = () => {
                 New Course
               </Button>
             </div>
-            
+
             <div className="grid gap-4">
-            {courses.courses && courses.courses.map((course) => (
-                <Card key={course.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{course.title}</CardTitle>
-                        <CardDescription>
-                          {course.sessionsCount} sessions • {course.enrolledUsersCount} enrolled
-                        </CardDescription>
+              {courses.courses &&
+                courses.courses.map((course) => (
+                  <Card key={course.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">
+                            {course.title}
+                          </CardTitle>
+                          <CardDescription>
+                            {course.sessionsCount} sessions •{" "}
+                            {course.enrolledUsersCount} enrolled
+                          </CardDescription>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge
+                            variant={
+                              course.status === "active"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {course.status}
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditCourse(course)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
-                          {course.status}
-                        </Badge>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEditCourse(course)}
-                        >
-                          <Edit className="w-4 h-4" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm">
+                          <Video className="w-4 h-4 mr-1" />
+                          Add Session
                         </Button>
                         <Button variant="outline" size="sm">
-                          <Trash2 className="w-4 h-4" />
+                          <BarChart3 className="w-4 h-4 mr-1" />
+                          Analytics
                         </Button>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        <Video className="w-4 h-4 mr-1" />
-                        Add Session
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <BarChart3 className="w-4 h-4 mr-1" />
-                        Analytics
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </TabsContent>
 
@@ -192,20 +252,29 @@ const AdminDashboard = () => {
                 New Program
               </Button>
             </div>
-            
+
             <div className="grid gap-4">
               {programs.map((program) => (
                 <Card key={program.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg">{program.title}</CardTitle>
+                        <CardTitle className="text-lg">
+                          {program.title}
+                        </CardTitle>
                         <CardDescription>
-                          Starts: {program.startDate} • {program.enrolled} enrolled
+                          Starts: {program.startDate} • {program.enrolled}{" "}
+                          enrolled
                         </CardDescription>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={program.status === 'active' ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={
+                            program.status === "active"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
                           {program.status}
                         </Badge>
                         <Button variant="outline" size="sm">
@@ -227,7 +296,7 @@ const AdminDashboard = () => {
                 Export Report
               </Button>
             </div>
-            
+
             <div className="grid gap-4">
               {users.map((user) => (
                 <Card key={user.id}>
@@ -259,7 +328,7 @@ const AdminDashboard = () => {
                 Create Batch
               </Button>
             </div>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Active Discussion Batches</CardTitle>
@@ -268,7 +337,9 @@ const AdminDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">No active batches found. Create a new batch to get started.</p>
+                <p className="text-gray-600">
+                  No active batches found. Create a new batch to get started.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

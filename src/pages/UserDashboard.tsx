@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import UserHeader from "@/components/UserHeader";
-import NewUserView from "@/components/NewUserView";
+import NewUserView from "@/components/NewUserView/NewUserView";
 import EnrolledUserView from "@/components/EnrolledUserView";
 import { getUserById } from "@/Apis/Apis";
 
@@ -23,7 +23,7 @@ const UserDashboard = () => {
           const noCourses = userData.enrolledCourses?.length === 0;
           const noSessions = userData.enrolledSessions?.length === 0;
           console.log("User data:", userData);
-          (noCourses && noSessions)?setIsNewUser(true):setIsNewUser(false)
+          noCourses && noSessions ? setIsNewUser(true) : setIsNewUser(false);
           // setIsNewUser(noCourses && noSessions);
         } catch (err) {
           console.error("Invalid auth data in localStorage or API error", err);
@@ -49,15 +49,13 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mb-20">
+    <div className="min-h-screen bg-gray-50 pb-10">
       <UserHeader />
       {isNewUser ? (
         <NewUserView user={user} onCourseClick={handleCourseClick} />
       ) : (
         <EnrolledUserView user={user} onCourseClick={handleCourseClick} />
       )}
-
-       
     </div>
   );
 };

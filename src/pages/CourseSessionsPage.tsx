@@ -144,7 +144,7 @@ const CourseSessionsPage = () => {
 
       const result = await enrollInSessions(userId, cart);
       console.log("Enrollment result:", result);
-      if (!result || !result.message === "Enrollment processed") {
+      if (!result || result.message !== "Enrollment processed") {
         throw new Error("Enrollment failed");
       }
       const successfulEnrollments = result.user.enrolledSessions || [];
@@ -289,12 +289,12 @@ const CourseSessionsPage = () => {
             </div>
 
             {/* Right Side - Course Image */}
-            <div className="w-full md:w-1/3 relative">
-              <div className="relative w-full h-64">
+            <div className=" relative">
+              <div className="relative h-64">
                 <img
                   src={course.courseImg}
                   alt={course.title}
-                  className="w-full h-full object-cover rounded-lg shadow"
+                  className="aspect-video h-full  rounded-lg shadow"
                 />
                 <button
                   className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30"

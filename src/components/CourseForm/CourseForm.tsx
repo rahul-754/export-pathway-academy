@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
   Dialog,
@@ -41,24 +41,27 @@ import {
   Calendar as CalendarIcon,
   FileText,
   Presentation,
+  Trash,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import Session from "./SessionSection/Session";
+import { getCourseById } from "@/Apis/Apis";
 
 interface Session {
   title: string;
-  video: File | null;
-  notes: File | null;
-  ppt: File | null;
+  videoUrl: File | string | null;
+  notes: File | string | null;
+  ppt: File | string | null;
 }
 
-interface CourseFormData {
+export interface CourseFormData {
   title: string;
   instructor: string;
   shortNote: string;
   description: string;
-  image: File | null;
-  videos: File[];
+  image: File | string | null;
+  videos: (File | string)[];
   tags: string[];
   category: string;
   published: boolean;
@@ -85,13 +88,13 @@ const CourseForm: React.FC<CourseFormProps> = ({
   isEditing = false,
 }) => {
   const [tagInput, setTagInput] = useState("");
-  console.log(courseData);
+  // console.log("course", courseData);
   const form = useForm<CourseFormData>({
     defaultValues: {
       title: courseData?.title || "",
       instructor: courseData?.instructor || "",
       shortNote: courseData?.shortNote || "",
-      description: courseData?.description || "",
+      description: courseData?.courseDescription || "",
       image: null,
       videos: [],
       tags: courseData?.tags || [],
@@ -118,13 +121,14 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
   useEffect(() => {
     if (courseData) {
+      console.log("course :: ", courseData);
       form.reset({
         title: courseData.title || "",
         instructor: courseData.instructor || "",
-        shortNote: courseData.shortNote || "",
-        description: courseData.description || "",
-        image: null,
-        videos: [],
+        shortNote: courseData.shortIntro || "",
+        description: courseData.courseDescription || "",
+        image: courseData.courseImg || null,
+        videos: [courseData.previewVideo] || [],
         tags: courseData.tags || [],
         category: courseData.category || "",
         published: courseData.published || false,
@@ -133,8 +137,8 @@ const CourseForm: React.FC<CourseFormProps> = ({
         publishedOn: courseData.publishedOn
           ? new Date(courseData.publishedOn)
           : null,
-        courseType: courseData.courseType || "free",
-        amount: courseData.amount || 0,
+        courseType: courseData.pricing || "free",
+        amount: courseData.totalAmount || 0,
         currency: courseData.currency || "USD",
         sessions: courseData.sessions || [],
       });
@@ -160,18 +164,34 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
   const handleAddSession = () => {
     appendSession({
-      title: "",
-      video: null,
+      title: "Untitled",
+      videoUrl: null,
       notes: null,
       ppt: null,
     });
   };
+  console.log("course :: ", courseData);
 
   const onSubmit = (data: CourseFormData) => {
     console.log("Course data:", data);
     // Handle form submission here
     onClose();
   };
+
+  useLayoutEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const { sessions } = await getCourseById(
+          (courseData as { _id: string })._id
+        );
+        for (const i of sessions) appendSession(i);
+      } catch (err) {
+        console.error("Failed to fetch course:", err);
+      }
+    };
+
+    fetchSessions();
+  }, [appendSession, courseData]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -265,28 +285,45 @@ const CourseForm: React.FC<CourseFormProps> = ({
                     <FormItem>
                       <FormLabel>Course Image</FormLabel>
                       <FormControl>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                          <div className="mt-2">
-                            <label
-                              htmlFor="image-upload"
-                              className="cursor-pointer"
+                        {field.value ? (
+                          <div className="relative group">
+                            <Button
+                              onClick={() => field.onChange(null)}
+                              variant="destructive"
+                              className="absolute top-5 right-5 group-hover:block hidden"
                             >
-                              <span className="text-blue-600 hover:text-blue-500">
-                                Upload an image
-                              </span>
-                              <input
-                                id="image-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) =>
-                                  field.onChange(e.target.files?.[0] || null)
-                                }
-                              />
-                            </label>
+                              <Trash />
+                            </Button>
+                            <img
+                              src={field.value as string}
+                              alt="course image"
+                              className="w-full h-auto rounded-lg"
+                            />
                           </div>
-                        </div>
+                        ) : (
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-2">
+                              <label
+                                htmlFor="image-upload"
+                                className="cursor-pointer"
+                              >
+                                <span className="text-blue-600 hover:text-blue-500">
+                                  Upload an image
+                                </span>
+                                <input
+                                  id="image-upload"
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    field.onChange(e.target.files?.[0] || null)
+                                  }
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -300,31 +337,55 @@ const CourseForm: React.FC<CourseFormProps> = ({
                     <FormItem>
                       <FormLabel>Course Videos</FormLabel>
                       <FormControl>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                          <div className="mt-2">
-                            <label
-                              htmlFor="video-upload"
-                              className="cursor-pointer"
+                        {field.value.length !== 0 ? (
+                          <div className="relative group">
+                            <Button
+                              onClick={() => field.onChange([])}
+                              variant="destructive"
+                              className="absolute top-5 right-5 z-[900] group-hover:block hidden"
                             >
-                              <span className="text-blue-600 hover:text-blue-500">
-                                Upload videos
-                              </span>
-                              <input
-                                id="video-upload"
-                                type="file"
-                                accept="video/*"
-                                multiple
-                                className="hidden"
-                                onChange={(e) =>
-                                  field.onChange(
-                                    Array.from(e.target.files || [])
-                                  )
-                                }
+                              <Trash />
+                            </Button>
+                            <video
+                              width="320"
+                              height="240"
+                              controls
+                              className="w-full h-auto"
+                            >
+                              <source
+                                src={field.value[0] as string}
+                                type="video/mp4"
                               />
-                            </label>
+                              Your browser does not support the video tag.
+                            </video>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-2">
+                              <label
+                                htmlFor="video-upload"
+                                className="cursor-pointer"
+                              >
+                                <span className="text-blue-600 hover:text-blue-500">
+                                  Upload videos
+                                </span>
+                                <input
+                                  id="video-upload"
+                                  type="file"
+                                  accept="video/*"
+                                  multiple
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      Array.from(e.target.files || [])
+                                    )
+                                  }
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -388,6 +449,9 @@ const CourseForm: React.FC<CourseFormProps> = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="Business & Technology">
+                            Business & Technology
+                          </SelectItem>
                           <SelectItem value="export-basics">
                             Export Basics
                           </SelectItem>
@@ -608,145 +672,13 @@ const CourseForm: React.FC<CourseFormProps> = ({
               </CardHeader>
               <CardContent className="space-y-4">
                 {sessionFields.map((session, index) => (
-                  <Card key={session.id} className="border border-gray-200">
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-center">
-                        <h4 className="text-sm font-medium">
-                          Session {index + 1}
-                        </h4>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeSession(index)}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <FormField
-                        control={form.control}
-                        name={`sessions.${index}.title`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Session Title</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Enter session title"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={form.control}
-                          name={`sessions.${index}.video`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Video</FormLabel>
-                              <FormControl>
-                                <div className="border border-gray-300 rounded p-3 text-center">
-                                  <label
-                                    htmlFor={`video-${index}`}
-                                    className="cursor-pointer"
-                                  >
-                                    <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <span className="text-sm text-blue-600">
-                                      Upload Video
-                                    </span>
-                                    <input
-                                      id={`video-${index}`}
-                                      type="file"
-                                      accept="video/*"
-                                      className="hidden"
-                                      onChange={(e) =>
-                                        field.onChange(
-                                          e.target.files?.[0] || null
-                                        )
-                                      }
-                                    />
-                                  </label>
-                                </div>
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`sessions.${index}.notes`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Notes</FormLabel>
-                              <FormControl>
-                                <div className="border border-gray-300 rounded p-3 text-center">
-                                  <label
-                                    htmlFor={`notes-${index}`}
-                                    className="cursor-pointer"
-                                  >
-                                    <FileText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <span className="text-sm text-blue-600">
-                                      Upload Notes
-                                    </span>
-                                    <input
-                                      id={`notes-${index}`}
-                                      type="file"
-                                      accept=".pdf,.doc,.docx"
-                                      className="hidden"
-                                      onChange={(e) =>
-                                        field.onChange(
-                                          e.target.files?.[0] || null
-                                        )
-                                      }
-                                    />
-                                  </label>
-                                </div>
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`sessions.${index}.ppt`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>PPT (Optional)</FormLabel>
-                              <FormControl>
-                                <div className="border border-gray-300 rounded p-3 text-center">
-                                  <label
-                                    htmlFor={`ppt-${index}`}
-                                    className="cursor-pointer"
-                                  >
-                                    <Presentation className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <span className="text-sm text-blue-600">
-                                      Upload PPT
-                                    </span>
-                                    <input
-                                      id={`ppt-${index}`}
-                                      type="file"
-                                      accept=".ppt,.pptx"
-                                      className="hidden"
-                                      onChange={(e) =>
-                                        field.onChange(
-                                          e.target.files?.[0] || null
-                                        )
-                                      }
-                                    />
-                                  </label>
-                                </div>
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <Session
+                    session={session}
+                    key={session.id}
+                    index={index}
+                    removeSession={removeSession}
+                    form={form}
+                  />
                 ))}
 
                 {sessionFields.length === 0 && (
