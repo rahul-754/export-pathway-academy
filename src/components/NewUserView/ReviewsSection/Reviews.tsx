@@ -68,7 +68,7 @@ export default function Reviews() {
           return (
             <div
               key={obj.id}
-              className="rounded-lg hover:bg-neutral-600 hover:shadow-lg group transition-colors p-10 shadow-md w-[400px] ml-5 border h-full  gap-3 flex flex-col justify-between"
+              className="rounded-lg hover:bg-blue-600 hover:shadow-lg group transition-colors p-10 shadow-md w-[400px] ml-5 border h-full  gap-3 flex flex-col justify-between"
             >
               <div className="space-y-5">
                 <span className="text-9xl select-none group-hover:text-white transition-colors">

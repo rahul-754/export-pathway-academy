@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ShoppingCart,
   User,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -144,13 +145,13 @@ const UserHeader = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="relative ">
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Search for anything"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-[34vw] pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-[24vw] pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <svg
@@ -193,6 +194,17 @@ const UserHeader = () => {
           </div>
           {/* Right Section: Cart + Notifications + Home */}
           <div className="flex items-center space-x-4 relative">
+            {/* Batches */}
+            <Link to="/batches">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-600 text-blue-900 hover:bg-blue-50 flex items-center"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Batches
+              </Button>
+            </Link>
             {/* Cart */}
             <div className="relative">
               <Button

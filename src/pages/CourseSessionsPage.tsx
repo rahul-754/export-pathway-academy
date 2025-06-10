@@ -341,7 +341,7 @@ const CourseSessionsPage = () => {
                         <img
                           src={session.sessionImage}
                           alt={session.title}
-                          className="w-full h-full object-cover"
+                          className="w-[400px] h-full object-contain"
                           style={{ borderRadius: "8px", objectFit: "cover" }}
                         />
                       </div>

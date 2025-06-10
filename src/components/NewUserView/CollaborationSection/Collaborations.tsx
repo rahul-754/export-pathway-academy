@@ -40,12 +40,15 @@ const staticData = [
 
 export default function Collaborations() {
   return (
-    <div className="space-y-5 py-5 w-full max-w-[1400px] mx-auto">
-      <h2 className="text-center text-xl tracking-tighter">
+    <div className="space-y-3 py-5 w-full max-w-[1400px] mx-auto">
+      <h2 className="text-center text-4xl text-blue-600 font-bold tracking-tighter">
+        Our Trusted Partners
+      </h2>
+      <h3 className="text-center text-xl tracking-tighter">
         Strategic Partnerships with Government Trade Bodies and Export
         Authorities
-      </h2>
-      <div className="flex flex-wrap gap-20 justify-center items-center p-5">
+      </h3>
+      <div className="flex flex-wrap gap-20 justify-center items-center p-5 mt-2">
         {staticData.map((obj) => (
           <img
             key={obj.id}
