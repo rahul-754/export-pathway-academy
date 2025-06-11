@@ -46,7 +46,8 @@ interface RecentCertificate {
 }
 
 interface EnrolledUserViewProps {
-  onCourseClick: (courseId: number) => void;
+  user: any;
+  onCourseClick: (courseId: string) => void;
 }
 
 const EnrolledUserView = ({ user, onCourseClick }: EnrolledUserViewProps) => {

@@ -21,6 +21,7 @@ import {
   BookOpen,
   Presentation,
   LockIcon,
+  BookOpenCheck,
 } from "lucide-react";
 import UserHeader from "@/components/UserHeader";
 
@@ -331,25 +332,22 @@ const CourseSessionsPage = () => {
                 className="overflow-hidden hover:shadow-md transition-shadow mb-5"
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-10">
                     {/* LEFT: Image + Title + Buttons */}
-                    <div className="flex items-end gap-6 h-[200px]">
-                      <div
-                        className="rounded-lg bg-blue-100 flex items-center justify-center"
-                        style={{ width: "auto", height: "100%" }}
-                      >
+                    <div className="flex items-end gap-6">
+                      <div className="rounded-lg bg-blue-100 flex items-center justify-center h-full">
                         <img
                           src={session.sessionImage}
                           alt={session.title}
-                          className="w-[400px] h-full object-contain"
+                          className="max-w-[400px] h-full object-contain"
                           style={{ borderRadius: "8px", objectFit: "cover" }}
                         />
                       </div>
-                      <div className="flex flex-col gap-10 h-full justify-between">
+                      <div className="flex flex-col gap-2 h-full justify-end ">
                         <CardTitle className="text-3xl max-w-[500px]">
                           Session {index + 1} : {session.title}
                         </CardTitle>
-                        <div className="flex gap-4 mt-3">
+                        <div className="flex gap-4 mt-3 ">
                           {!isAccessible && (
                             <Button
                               variant="outline"
@@ -381,7 +379,7 @@ const CourseSessionsPage = () => {
                     </div>
 
                     {/* RIGHT: Clock + Lock + Show More */}
-                    <div className="flex flex-col items-end justify-between gap-8 ">
+                    <div className="flex flex-col items-end justify-between gap-4">
                       <div className="flex items-center gap-2">
                         <Clock className="h-7 w-7 text-blue-800 font-bold hover:bg-blue-600 hover:text-white p-1 rounded-full transition-colors" />
                         <span className="text-sm text-blue-800 font-bold">
@@ -407,8 +405,8 @@ const CourseSessionsPage = () => {
                           }}
                         >
                           {expandedSet.has(session._id)
-                            ? "Collapse ▲"
-                            : "Expand ▼"}
+                            ? "View less ▲"
+                            : "View more ▼"}
                         </Button>
                       </div>
                       <div className="flex flex-row-reverse ">
@@ -436,7 +434,7 @@ const CourseSessionsPage = () => {
                             <FileText className="h-4 w-4 mr-2" />
                             View Notes
                             {!isAccessible && (
-                              <LockIcon className="h-3 w-3 ml-auto text-black-800 font-bold" />
+                              <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
                             )}
                           </Button>
                           <Button
@@ -450,6 +448,19 @@ const CourseSessionsPage = () => {
                             View PPT
                             {!isAccessible && (
                               <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-start"
+                            disabled={!isAccessible}
+                            onClick={() => {}}
+                          >
+                            <BookOpenCheck className="h-4 w-4 mr-2" />
+                            Attempt Quiz
+                            {!isAccessible && (
+                              <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
                             )}
                           </Button>
                         </div>

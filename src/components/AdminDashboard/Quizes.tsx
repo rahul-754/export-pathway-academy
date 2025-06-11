@@ -413,7 +413,13 @@ export default function Quizes({
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Quiz Editor</CardTitle>
-          <Button variant="outline" onClick={() => setSelectedQuiz(null)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setFullscreen(false);
+              setSelectedQuiz(null);
+            }}
+          >
             Back to Quizzes
           </Button>
         </div>

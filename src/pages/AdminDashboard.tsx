@@ -262,13 +262,15 @@ const AdminDashboard = () => {
           onValueChange={() => setFullscreen(false)}
           className="space-y-4"
         >
-          <TabsList>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
-            <TabsTrigger value="programs">Programs</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="batches">Batches</TabsTrigger>
-            <TabsTrigger value="quizes">Quizes</TabsTrigger>
-          </TabsList>
+          {!fullscreen && (
+            <TabsList>
+              <TabsTrigger value="courses">Courses</TabsTrigger>
+              <TabsTrigger value="programs">Programs</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="batches">Batches</TabsTrigger>
+              <TabsTrigger value="quizes">Quizes</TabsTrigger>
+            </TabsList>
+          )}
 
           <TabsContent value="courses" className="space-y-4">
             <div className="flex justify-between items-center">
@@ -417,7 +419,7 @@ const AdminDashboard = () => {
           <TabsContent value="batches" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Batch Management</h3>
-              <Button>
+              <Button onClick={handleNewBatch}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create Batch
               </Button>
