@@ -1,3 +1,4 @@
+import { Quiz } from "@/components/AdminDashboard/Courses/CourseCard/Quizes";
 import axiosInstance from "./axiosInstance";
 
 // Course API functions
@@ -69,6 +70,44 @@ export const getSessionById = async (id) => {
   } catch (error) {
     console.error("Error fetching session:", error);
     throw error;
+  }
+};
+
+export const createQuizWithSessionId = async (
+  sessionId: string,
+  quiz: Omit<Quiz, "_id">
+) => {
+  try {
+    const response = await axiosInstance.post(`/quiz`, {
+      sessionId,
+      quiz,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating quiz:", error);
+    throw error;
+  }
+};
+
+export const getQuizWithSessionId = async (sessionId: string) => {
+  try {
+    const response = await axiosInstance.get(`/quiz`, {
+      params: { sessionId },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error getting quiz:", error);
+    throw error;
+  }
+};
+
+export const updateQuiz = async (quiz: Quiz) => {
+  try {
+    const response = await axiosInstance.patch("/quiz", { quiz });
+    return response.data;
+  } catch (e) {
+    console.error("Error updating quiz", e);
+    throw e;
   }
 };
 
@@ -145,7 +184,7 @@ export const getUserById = async (UserId) => {
 
 export const enrollInSessions = async (userId, sessionIds) => {
   try {
-    // console.log("Enrolling user:", userId, "in sessions:", sessionIds);
+    // //console.log("Enrolling user:", userId, "in sessions:", sessionIds);
     const response = await axiosInstance.post(`/users/enroll/sessions`, {
       userId,
       sessionIds,

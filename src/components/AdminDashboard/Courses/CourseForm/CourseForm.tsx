@@ -88,7 +88,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
   isEditing = false,
 }) => {
   const [tagInput, setTagInput] = useState("");
-  // console.log("course", courseData);
+  // //console.log("course", courseData);
   const form = useForm<CourseFormData>({
     defaultValues: {
       title: courseData?.title || "",
@@ -121,7 +121,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
 
   useEffect(() => {
     if (courseData) {
-      console.log("course :: ", courseData);
+      //console.log("course :: ", courseData);
       form.reset({
         title: courseData.title || "",
         instructor: courseData.instructor || "",
@@ -170,10 +170,9 @@ const CourseForm: React.FC<CourseFormProps> = ({
       ppt: null,
     });
   };
-  console.log("course :: ", courseData);
 
   const onSubmit = (data: CourseFormData) => {
-    console.log("Course data:", data);
+    //console.log("Course data:", data);
     // Handle form submission here
     onClose();
   };
@@ -189,8 +188,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
         console.error("Failed to fetch course:", err);
       }
     };
-
-    fetchSessions();
+    if (courseData) fetchSessions();
   }, [appendSession, courseData]);
 
   return (

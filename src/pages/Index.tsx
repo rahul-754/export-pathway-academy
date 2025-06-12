@@ -34,7 +34,7 @@ const Index = () => {
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
       const decoded = jwtDecode(credentialResponse.credential);
-      console.log("Google login successful", decoded);
+      //console.log("Google login successful", decoded);
       const userRole =
         decoded.email === "dev@terrasourcing.com" ? "admin" : "trainee";
 
@@ -90,7 +90,7 @@ const Index = () => {
   };
 
   const handleGoogleLoginError = () => {
-    console.log("Google login failed");
+    //console.log("Google login failed");
     setError("Google login failed. Please try again.");
   };
 
@@ -112,7 +112,7 @@ const Index = () => {
                 <Trophy className="h-4 w-4" />
                 <span>Certification</span>
               </span>
-            
+
               <span className="flex items-center space-x-1">
                 <Users className="h-4 w-4" />
                 <span>Community</span>

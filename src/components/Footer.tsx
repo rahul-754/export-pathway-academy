@@ -12,7 +12,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 export default function Footer() {
   return (
     <>
-      <div className="relative mt-[-60px] z-50 bg-white border-t border-gray-50 before:content-[''] before:absolute before:-top before:left-0 before:w-full before:h-2 before:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"></div>
+      <div className="relative z-50 bg-white border-t border-gray-50 before:content-[''] before:absolute before:-top before:left-0 before:w-full before:h-2 before:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"></div>
       <footer className="w-full font-sans text-white">
         {/* Bottom section with links and info */}
         <div className="bg-white text-gray-800 px-4 py-12 md:px-8 lg:px-16">

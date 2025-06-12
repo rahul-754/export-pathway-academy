@@ -1,14 +1,20 @@
-import { Plus, X } from "lucide-react";
-import { Button } from "../ui/button";
+import { Check, Plus, X } from "lucide-react";
+import { Button } from "../../../ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+} from "../../../ui/card";
+import { Badge } from "../../../ui/badge";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,9 +35,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getQuizWithSessionId, updateQuiz } from "@/Apis/Apis";
+import { Session } from "./CourseCard";
+import { FaSpinner } from "react-icons/fa";
 
 type Question = {
-  id: string;
+  _id: string;
   question: string;
   marks: number;
   type: "MCQ" | "MSQ";
@@ -40,8 +49,8 @@ type Question = {
   // explanation?: string;
 };
 
-type Quiz = {
-  id: string;
+export type Quiz = {
+  _id: string;
   title: string;
   maxAttempts: number;
   duration: number;
@@ -59,7 +68,7 @@ function QuestionForm({
   onClose,
   existingQuestion,
 }: {
-  onSubmit: (question: Omit<Question, "id">) => void;
+  onSubmit: (question: Omit<Question, "_id">) => void;
   onClose: () => void;
   existingQuestion?: Question;
 }) {
@@ -246,59 +255,24 @@ function QuestionForm({
 }
 
 export default function Quizes({
-  setFullscreen,
+  session,
 }: {
-  setFullscreen: Dispatch<SetStateAction<boolean>>;
+  session: Session;
+  setSessions: Dispatch<SetStateAction<Session[]>>;
 }) {
-  const [quizes, setQuizes] = useState<Quiz[]>([
-    {
-      id: "1",
-      title: "AI bootcamp for exporters Basic",
-      duration: 1,
-      maxAttempts: 4,
-      passingMarks: 5,
-      totalMarks: 10,
-      questions: [],
-      settings: {
-        showAnswers: false,
-        shuffleQuestions: true,
-      },
-    },
-  ]);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [savingQuiz, setSavingQuiz] = useState(false);
+  const [saved, setSaved] = useState(true);
 
-  const addNewQuiz = () => {
-    setQuizes((state) => [
-      ...state,
-      {
-        id: (quizes.length + 1).toString(),
-        title: "Untitled",
-        duration: 0,
-        maxAttempts: 0,
-        passingMarks: 0,
-        totalMarks: 0,
-        questions: [],
-        settings: {
-          showAnswers: false,
-          shuffleQuestions: false,
-        },
-      },
-    ]);
-  };
-
-  const selectQuiz = (quiz: Quiz) => {
-    setSelectedQuiz(quiz);
-    setFullscreen(true);
-  };
-
-  const addQuestion = (questionData: Omit<Question, "id">) => {
+  const addQuestion = (questionData: Omit<Question, "_id">) => {
     if (!selectedQuiz) return;
 
     const newQuestion: Question = {
       ...questionData,
-      id: `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      _id: `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
     const updatedQuiz = {
@@ -306,11 +280,8 @@ export default function Quizes({
       questions: [...selectedQuiz.questions, newQuestion],
       totalMarks: selectedQuiz.totalMarks + questionData.marks,
     };
-
     setSelectedQuiz(updatedQuiz);
-    setQuizes((prev) =>
-      prev.map((q) => (q.id === selectedQuiz.id ? updatedQuiz : q))
-    );
+    setSaved(false);
   };
 
   const updateQuestion = (questionData: Omit<Question, "id">) => {
@@ -318,43 +289,40 @@ export default function Quizes({
 
     const updatedQuestion: Question = {
       ...questionData,
-      id: editingQuestion.id,
+      _id: editingQuestion._id,
     };
 
     const updatedQuiz = {
       ...selectedQuiz,
       questions: selectedQuiz.questions.map((q) =>
-        q.id === editingQuestion.id ? updatedQuestion : q
+        q._id === editingQuestion._id ? updatedQuestion : q
       ),
       totalMarks:
         selectedQuiz.totalMarks - editingQuestion.marks + questionData.marks,
     };
 
     setSelectedQuiz(updatedQuiz);
-    setQuizes((prev) =>
-      prev.map((q) => (q.id === selectedQuiz.id ? updatedQuiz : q))
-    );
+
     setEditingQuestion(null);
+    setSaved(false);
   };
 
   const deleteQuestion = (questionId: string) => {
     if (!selectedQuiz) return;
 
     const questionToDelete = selectedQuiz.questions.find(
-      (q) => q.id === questionId
+      (q) => q._id === questionId
     );
     if (!questionToDelete) return;
 
     const updatedQuiz = {
       ...selectedQuiz,
-      questions: selectedQuiz.questions.filter((q) => q.id !== questionId),
+      questions: selectedQuiz.questions.filter((q) => q._id !== questionId),
       totalMarks: selectedQuiz.totalMarks - questionToDelete.marks,
     };
 
     setSelectedQuiz(updatedQuiz);
-    setQuizes((prev) =>
-      prev.map((q) => (q.id === selectedQuiz.id ? updatedQuiz : q))
-    );
+    setSaved(false);
   };
 
   const openNewQuestionDialog = () => {
@@ -367,136 +335,145 @@ export default function Quizes({
     setIsQuestionDialogOpen(true);
   };
 
-  if (!selectedQuiz)
-    return (
-      <>
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Quiz Management</h3>
-          <Button variant="default" onClick={addNewQuiz}>
-            <Plus />
-            New Quiz
-          </Button>
-        </div>
+  const saveQuiz = useCallback(async () => {
+    setSavingQuiz(true);
+    try {
+      await updateQuiz(selectedQuiz);
+      setSavingQuiz(false);
+      setSaved(true);
+    } catch (e) {
+      console.error(e);
+      setSavingQuiz(false);
+    }
+  }, [selectedQuiz]);
 
-        <div className="grid gap-4">
-          {quizes.map((quiz) => (
-            <Card
-              key={quiz.id}
-              className="cursor-pointer"
-              onClick={() => selectQuiz(quiz)}
-            >
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">
-                    Title : {quiz.title}
-                  </CardTitle>
-                  <Badge variant="outline">
-                    Max attempts : {quiz.maxAttempts}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex space-x-4 text-sm text-gray-600">
-                  <span>Total marks : {quiz.totalMarks}</span>
-                  <span>Pass Marks : {quiz.passingMarks}</span>
-                  <span>Questions : {quiz.questions.length}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </>
-    );
+  useEffect(() => {
+    const fetchQuizes = async () => {
+      setLoading(true);
+      try {
+        const { quiz } = await getQuizWithSessionId(session._id);
+        setSelectedQuiz(quiz);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        console.error("Failed to fetch quiz:", e);
+      }
+    };
+
+    fetchQuizes();
+  }, [session._id]);
+
+  useEffect(() => {
+    if (loading) return;
+    const totalMarks =
+      selectedQuiz?.questions?.reduce(
+        (totalSum, obj) => totalSum + obj.marks,
+        0
+      ) ?? 0;
+    setSelectedQuiz((previousValue) => ({ ...previousValue, totalMarks }));
+  }, [selectedQuiz, loading]);
+
+  if (loading) return <FaSpinner className="animate-spin w-full h-10" />;
 
   return (
-    <Card className="w-full max-w-4xl mx-auto mt-10 h-[70vh] overflow-y-auto">
+    <Card className="w-full max-w-4xl mx-auto h-[70vh] overflow-y-auto">
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Quiz Editor</CardTitle>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setFullscreen(false);
-              setSelectedQuiz(null);
-            }}
-          >
-            Back to Quizzes
+        <div className="flex justify-end gap-2 items-center">
+          {saved ? (
+            <Check className="text-green-500" />
+          ) : (
+            <X className="text-red-500" />
+          )}
+          <Button disabled={savingQuiz} onClick={saveQuiz} variant="default">
+            {savingQuiz ? "Saving" : "Save"}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
+        <div className="space-y-2">
           <Label htmlFor="title">Title</Label>
           <Input
             id="title"
             value={selectedQuiz.title}
-            onChange={(e) =>
+            disabled={savingQuiz}
+            onChange={(e) => {
               setSelectedQuiz((state) =>
                 state ? { ...state, title: e.target.value } : null
-              )
-            }
+              );
+              setSaved(false);
+            }}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="maxAttempts">Maximum Attempts</Label>
             <Input
               id="maxAttempts"
               type="number"
+              disabled={savingQuiz}
               value={selectedQuiz.maxAttempts}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedQuiz((state) =>
                   state
                     ? { ...state, maxAttempts: parseInt(e.target.value) || 0 }
                     : null
-                )
-              }
+                );
+                setSaved(false);
+              }}
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="duration">Duration (in minutes)</Label>
             <Input
               id="duration"
               type="number"
+              disabled={savingQuiz}
               value={selectedQuiz.duration}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedQuiz((state) =>
                   state
                     ? { ...state, duration: parseInt(e.target.value) || 0 }
                     : null
-                )
-              }
+                );
+                setSaved(false);
+              }}
             />
           </div>
-          <div>
-            <Label htmlFor="totalMarks">Total Marks</Label>
+          <div className="space-y-2">
+            <Label htmlFor="totalMarks">
+              Total Marks{" "}
+              <Badge className="ml-2">Calculated from questions</Badge>
+            </Label>
             <Input
               id="totalMarks"
               type="number"
+              disabled
               value={selectedQuiz.totalMarks}
-              onChange={(e) =>
-                setSelectedQuiz((state) =>
-                  state
-                    ? { ...state, totalMarks: parseInt(e.target.value) || 0 }
-                    : null
-                )
-              }
+              className="disabled:cursor-default disabled:text-black disabled:border-gray-300 "
             />
           </div>
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="passingMarks">Passing Marks</Label>
             <Input
               id="passingMarks"
               type="number"
+              disabled={savingQuiz}
               value={selectedQuiz.passingMarks}
-              onChange={(e) =>
+              onChange={(e) => {
                 setSelectedQuiz((state) =>
                   state
-                    ? { ...state, passingMarks: parseInt(e.target.value) || 0 }
+                    ? {
+                        ...state,
+                        passingMarks: Math.min(
+                          selectedQuiz.totalMarks,
+                          Math.max(parseInt(e.target.value) || 0, 0)
+                        ),
+                      }
                     : null
-                )
-              }
+                );
+                setSaved(false);
+              }}
             />
           </div>
         </div>
@@ -509,8 +486,9 @@ export default function Quizes({
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="showAnswers"
+                disabled={savingQuiz}
                 checked={selectedQuiz.settings.showAnswers}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked) => {
                   setSelectedQuiz((state) =>
                     state
                       ? {
@@ -521,8 +499,9 @@ export default function Quizes({
                           },
                         }
                       : null
-                  )
-                }
+                  );
+                  setSaved(false);
+                }}
               />
               <Label htmlFor="showAnswers">Show Answers</Label>
             </div>
@@ -534,8 +513,9 @@ export default function Quizes({
           <div className="flex items-center space-x-2">
             <Checkbox
               id="shuffleQuestions"
+              disabled={savingQuiz}
               checked={selectedQuiz.settings.shuffleQuestions}
-              onCheckedChange={(checked) =>
+              onCheckedChange={(checked) => {
                 setSelectedQuiz((state) =>
                   state
                     ? {
@@ -546,8 +526,9 @@ export default function Quizes({
                         },
                       }
                     : null
-                )
-              }
+                );
+                setSaved(false);
+              }}
             />
             <Label htmlFor="shuffleQuestions">Shuffle Questions</Label>
           </div>
@@ -563,7 +544,11 @@ export default function Quizes({
               onOpenChange={setIsQuestionDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button variant="outline" onClick={openNewQuestionDialog}>
+                <Button
+                  disabled={savingQuiz}
+                  variant="outline"
+                  onClick={openNewQuestionDialog}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   New Question
                 </Button>
@@ -590,7 +575,7 @@ export default function Quizes({
           ) : (
             <div className="space-y-4">
               {selectedQuiz.questions.map((q, index) => (
-                <Card key={q.id} className="border">
+                <Card key={q._id} className="border">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 space-y-2">
@@ -635,14 +620,16 @@ export default function Quizes({
                         <Button
                           variant="outline"
                           size="sm"
+                          disabled={savingQuiz}
                           onClick={() => openEditQuestionDialog(q)}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="destructive"
+                          disabled={savingQuiz}
                           size="sm"
-                          onClick={() => deleteQuestion(q.id)}
+                          onClick={() => deleteQuestion(q._id)}
                         >
                           Delete
                         </Button>

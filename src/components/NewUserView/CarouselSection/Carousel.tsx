@@ -9,19 +9,16 @@ const staticcData = [
     img: curosal1,
     heading: "Upgrade your Export Skills",
     subHeading: "Learn modern export tactics to unlock global markets.",
-    link: "",
   },
   {
     img: curosal2,
     heading: "Use AI to increase your Exports",
     subHeading: "Use AI to automate, analyze, and grow exports faster.",
-    link: "",
   },
   {
     img: curosal3,
     heading: "Join our AI Export Success Mastery Course",
     subHeading: "Subscribe now and start mastering AI for exports.",
-    link: "",
   },
 ];
 
@@ -29,11 +26,12 @@ export default function CarouselSection() {
   return (
     <Carousel
       showThumbs={false}
-      infiniteLoop
-      className="rounded-lg shadow-lg w-full max-w-[1400px] mx-auto"
+      infiniteLoop={true}
+      autoPlay
+      className=" shadow- w-full max-w-[1520px] mx-auto pt-10"
       showStatus={false}
       showIndicators={true}
-      stopOnHover={false}
+      stopOnHover={true}
       renderArrowPrev={(onClickHandler, hasPrev, label) =>
         hasPrev && (
           <button
@@ -61,25 +59,19 @@ export default function CarouselSection() {
     >
       {staticcData.map((obj, index) => {
         return (
-          <div className="relative w-full h-96">
+          <div key={index} className="relative w-full h-[600px]">
             <img
               src={obj.img}
               alt={`Carousel Image ${index + 1}`}
-              className="w-full h-96 object-cover"
+              className="w-full h-full object-cover brightness-75"
             />
-            <div className="absolute top-1/2 left-0 gap-3 transform -translate-y-1/2 bg-white/50  text-gray-800 rounded-lg shadow-md w-full ml-16 max-w-[500px] py-5 px-6 flex flex-col">
-              <h3 className="text-4xl font-bold text-start leading-tight">
+            <div className="absolute top-1/2 left-0 gap-3 transform -translate-y-1/2  text-white rounded-lg max-w-[1000px] w-full ml-16  py-5 px-6 flex flex-col">
+              <h3 className="text-6xl font-bold text-start leading-tight">
                 {obj.heading}
               </h3>
-              <p className="text-md text-start tracking-tight leading-tight">
+              <p className="text-2xl text-start tracking-tight leading-tight">
                 {obj.subHeading}
               </p>
-              <a
-                href={obj.link}
-                className="bg-blue-600 font-bold hover:bg-blue-600 transition-colors text-white px-5 py-2 mt-2 rounded-sm w-fit"
-              >
-                View Plans
-              </a>
             </div>
           </div>
         );

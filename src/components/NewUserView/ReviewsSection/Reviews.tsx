@@ -55,15 +55,11 @@ const staticData: Review[] = [
 
 export default function Reviews() {
   return (
-    <div className="space-y-5 py-5 w-full max-w-[1400px] mx-auto">
+    <div className="space-y-5 py-5 px-10 w-full max-w-[1600px] mx-auto">
       <h2 className="text-4xl font-bold">
         See what others are achieving through learning
       </h2>
-      <Marquee
-        pauseOnHover
-        loop={0}
-        className="overflow-hidden space-x-5 h-auto py-5"
-      >
+      <Marquee pauseOnHover loop={0} className="overflow-hidden h-auto py-5">
         {staticData.map((obj) => {
           return (
             <div
@@ -85,8 +81,10 @@ export default function Reviews() {
                 <div className="flex gap-1 items-center">
                   {Array(obj.rating)
                     .fill(1)
-                    .map(() => {
-                      return <Star fill="#f97316" color="#f97316" />;
+                    .map((_, index) => {
+                      return (
+                        <Star key={index} fill="#f97316" color="#f97316" />
+                      );
                     })}
                 </div>
                 <h3 className="font-bold text-xl tracking-tight group-hover:text-white transition-colors">

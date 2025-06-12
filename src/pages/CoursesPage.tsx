@@ -71,7 +71,7 @@ const CoursesPage = () => {
       course.category.toLowerCase() === categoryFilter;
     return matchesSearch && matchesCategory;
   });
-  console.log(filteredCourses);
+  //console.log(filteredCourses);
   return (
     <div className="min-h-screen bg-gray-50">
       <UserHeader />
