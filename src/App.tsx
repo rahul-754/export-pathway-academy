@@ -13,6 +13,7 @@ import ProgramsPage from "./pages/ProgramsPage";
 import BatchesPage from "./pages/BatchesPage";
 import CertificationPage from "./pages/CertificationPage";
 import CourseSessionsPage from "./pages/CourseSessionsPage";
+import QuizPage from "./pages/QuizPage";
 import NotFound from "./pages/NotFound";
 import { getUserById } from "./Apis/Apis";
 import Footer from "./components/Footer";
@@ -46,6 +47,7 @@ const App = () => {
               path="/course/:courseId/sessions"
               element={<CourseSessionsPage />}
             />
+            <Route path="/quiz/:sessionId" element={<QuizPage />} />
             <Route path="/programs" element={<ProgramsPage />} />
             <Route path="/batches" element={<BatchesPage />} />
             <Route path="/certification" element={<CertificationPage />} />

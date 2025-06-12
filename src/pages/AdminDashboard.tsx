@@ -26,6 +26,7 @@ import AdminHeader from "@/components/AdminHeader";
 import Quizes from "@/components/AdminDashboard/Courses/CourseCard/Quizes";
 import BatchForm from "@/components/BatchForm";
 import Courses from "@/components/AdminDashboard/Courses/Courses";
+import ProgramForm from '@/components/ProgramForm';
 
 interface Batch {
   id: string;
@@ -99,6 +100,23 @@ const AdminDashboard = () => {
     },
   ]);
 
+  const [programFormOpen, setProgramFormOpen] = useState(false);
+
+  // Add mock data for demonstration if not present
+  const courses = [
+    { id: 'course1', title: 'Export Fundamentals' },
+    { id: 'course2', title: 'Advanced Export Strategies' }
+  ];
+  const membersByCourse = {
+    course1: [
+      { id: 'user1', name: 'John Smith' },
+      { id: 'user2', name: 'Sarah Johnson' }
+    ],
+    course2: [
+      { id: 'user3', name: 'Mike Chen' }
+    ]
+  };
+
   const handleNewBatch = () => {
     setEditingBatch(null);
     setBatchFormOpen(true);
@@ -154,6 +172,14 @@ const AdminDashboard = () => {
         batch.id === batchId ? { ...batch, status: newStatus } : batch
       )
     );
+  };
+
+  const handleNewProgram = () => setProgramFormOpen(true);
+  const handleCloseProgramForm = () => setProgramFormOpen(false);
+
+  const handleCreateProgram = (programData) => {
+    // Add your logic to save the program (e.g., setPrograms([...programs, programData]))
+    setProgramFormOpen(false);
   };
 
   return (
@@ -236,11 +262,23 @@ const AdminDashboard = () => {
           <TabsContent value="programs" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Program Management</h3>
-              <Button>
+              <Button onClick={handleNewProgram}>
                 <Plus className="w-4 h-4 mr-2" />
                 New Program
               </Button>
             </div>
+
+            {programFormOpen && (
+              <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white p-8 rounded shadow-lg w-full max-w-2xl max-h-[70vh] overflow-y-auto relative">
+                  <ProgramForm
+                    onClose={handleCloseProgramForm}
+                    onSubmit={handleCreateProgram}
+                    users={users}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="grid gap-4">
               {programs.map((program) => (
