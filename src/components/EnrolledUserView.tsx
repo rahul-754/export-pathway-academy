@@ -81,7 +81,7 @@ const EnrolledUserView = ({ user, onCourseClick }: EnrolledUserViewProps) => {
           "https://via.placeholder.com/400x200?text=No+Image",
       };
     }) || [];
-  console.log("Enrolled Courses:", enrolledCourses);
+  //console.log("Enrolled Courses:", enrolledCourses);
   const upcomingPrograms: UpcomingProgram[] = [
     {
       id: 1,

@@ -7,8 +7,8 @@ import {
 
 const router = express.Router();
 
+router.patch("/", updateQuiz);
 router.get("/", getQuizesBySessionId);
 router.post("/", createQuiz);
-router.patch("/", updateQuiz);
 
 export default router;

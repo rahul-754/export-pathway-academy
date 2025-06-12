@@ -22,6 +22,7 @@ import {
   Presentation,
   LockIcon,
   BookOpenCheck,
+  AwardIcon,
 } from "lucide-react";
 import UserHeader from "@/components/UserHeader";
 
@@ -31,6 +32,9 @@ import CourseOverview from "@/components/CourseOverview";
 import SessionItem from "@/components/SessionItem";
 import CartSummary from "@/components/CartSummary";
 import PaymentSuccessDialog from "@/components/ui/PaymentSuccessDialog";
+
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const CourseSessionsPage = () => {
   const { courseId } = useParams();
@@ -144,7 +148,7 @@ const CourseSessionsPage = () => {
       const userId = parsed.user?._id;
 
       const result = await enrollInSessions(userId, cart);
-      console.log("Enrollment result:", result);
+      //console.log("Enrollment result:", result);
       if (!result || result.message !== "Enrollment processed") {
         throw new Error("Enrollment failed");
       }
@@ -160,7 +164,7 @@ const CourseSessionsPage = () => {
   };
 
   const handleWatchPreview = (session) => {
-    console.log("Preview video URL:", session.previewVideo);
+    //console.log("Preview video URL:", session.previewVideo);
     if (session.previewVideo) {
       setSelectedVideoUrl(session.previewVideo);
     } else {
@@ -225,6 +229,31 @@ const CourseSessionsPage = () => {
       alert("Please buy access to watch the full session.");
     }
   };
+
+  const handleDownloadCertificate = async () => {
+    const certificate = document.getElementById("certificate-template");
+    if (!certificate) return;
+
+    // Make it visible for rendering
+    certificate.style.display = "block";
+
+    // Render to canvas
+    const canvas = await html2canvas(certificate, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    // Hide again
+    certificate.style.display = "none";
+
+    // Create PDF
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height],
+    });
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+    pdf.save("certificate.pdf");
+  };
+
   if (loading) {
     return (
       <div className="p-6 text-center text-gray-500">
@@ -325,6 +354,7 @@ const CourseSessionsPage = () => {
           {course.sessions.map((session, index) => {
             const inCart = cart.includes(session._id);
             const isAccessible = purchasedSessions.includes(session._id);
+            const isCompleted = session.isCompleted;
 
             return (
               <Card
@@ -449,16 +479,16 @@ const CourseSessionsPage = () => {
                             {!isAccessible && (
                               <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
                             )}
-                          </Button>
+                          </Button>    
                           <Button
                             variant="outline"
                             size="sm"
                             className="w-full justify-start"
                             disabled={!isAccessible}
-                            onClick={() => {}}
+                            onClick={handleDownloadCertificate}
                           >
-                            <BookOpenCheck className="h-4 w-4 mr-2" />
-                            Attempt Quiz
+                            <AwardIcon className="h-4 w-4 mr-2" />
+                            Download certificate
                             {!isAccessible && (
                               <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
                             )}
@@ -639,6 +669,31 @@ const CourseSessionsPage = () => {
           </Button>
         </div>
       )}
+      {/* Hidden certificate template for download */}
+      <div
+        id="certificate-template"
+        style={{
+          display: "none",
+          width: "1086px",
+          height: "768px",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: -9999,
+          backgroundImage: "url('sample 1 (4).jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          fontFamily: "serif",
+        }}
+      >
+        <div style={{ position: "absolute", top: "235px", width: "100%", textAlign: "center" }}>
+          <h3 style={{ color: "#1976d2", fontSize: "26px", margin: 0 }}>{course?.title || "Course Name"}</h3>
+        </div>
+
+        <div style={{ position: "absolute", top: "370px", width: "100%", textAlign: "center" }}>
+          <h2 style={{ color: "#1976d2", fontSize: "36px" }}>{localStorage.getItem("userName") || "User Name"}</h2>
+        </div>
+      </div>
     </div>
   );
 };

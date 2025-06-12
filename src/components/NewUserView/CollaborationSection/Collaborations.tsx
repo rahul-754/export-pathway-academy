@@ -40,7 +40,7 @@ const staticData = [
 
 export default function Collaborations() {
   return (
-    <div className="space-y-3 py-5 w-full max-w-[1400px] mx-auto">
+    <div className="space-y-3 py-5 px-10 w-full max-w-[1600px] mx-auto">
       <h2 className="text-center text-4xl text-blue-600 font-bold tracking-tighter">
         Our Trusted Partners
       </h2>
@@ -54,7 +54,7 @@ export default function Collaborations() {
             key={obj.id}
             src={obj.image}
             alt={obj.alt}
-            className="w-28 aspect-square grayscale object-contain"
+            className="w-28 aspect-square object-contain"
           />
         ))}
       </div>

@@ -38,5 +38,5 @@ app.use("/api/quiz", quizRoutes);
 
 app.listen(port, () => {
   connectToDatabase();
-  console.log(`Example app listening on port ${port}`);
+  //console.log(`Example app listening on port ${port}`);
 });
