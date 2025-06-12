@@ -96,8 +96,18 @@ export const getQuizWithSessionId = async (sessionId: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating quiz:", error);
+    console.error("Error getting quiz:", error);
     throw error;
+  }
+};
+
+export const updateQuiz = async (quiz: Quiz) => {
+  try {
+    const response = await axiosInstance.patch("/quiz", { quiz });
+    return response.data;
+  } catch (e) {
+    console.error("Error updating quiz", e);
+    throw e;
   }
 };
 
