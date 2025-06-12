@@ -22,12 +22,10 @@ import {
   Calendar,
   MessageSquare,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import AdminHeader from "@/components/AdminHeader";
-import CourseForm from "@/components/CourseForm/CourseForm";
-import { getCourses } from "@/Apis/Apis";
-import Quizes from "@/components/AdminDashboard/Quizes";
+import Quizes from "@/components/AdminDashboard/Courses/CourseCard/Quizes";
 import BatchForm from "@/components/BatchForm";
+import Courses from "@/components/AdminDashboard/Courses/Courses";
 
 interface Batch {
   id: string;
@@ -52,14 +50,11 @@ interface Batch {
 }
 
 const AdminDashboard = () => {
-  const [courseFormOpen, setCourseFormOpen] = useState(false);
   const [batchFormOpen, setBatchFormOpen] = useState(false);
-  const [editingCourse, setEditingCourse] = useState(null);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
-  const [loadingCourses, setLoadingCourses] = useState(false);
-  const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
   const [batches, setBatches] = useState<Batch[]>([]);
-  const [fullscreen, setFullscreen] = useState(false);
+  // const [fullscreen, setFullscreen] = useState(false);
+  const [totalCourses, setTotalCourses] = useState<number | null>(null);
   const [programs] = useState([
     {
       id: 1,
@@ -104,20 +99,6 @@ const AdminDashboard = () => {
     },
   ]);
 
-  const handleNewCourse = () => {
-    setEditingCourse(null);
-    setCourseFormOpen(true);
-  };
-
-  const handleEditCourse = (course) => {
-    setEditingCourse(course);
-    setCourseFormOpen(true);
-  };
-
-  const handleCloseCourseForm = () => {
-    setCourseFormOpen(false);
-    setEditingCourse(null);
-  };
   const handleNewBatch = () => {
     setEditingBatch(null);
     setBatchFormOpen(true);
@@ -175,165 +156,81 @@ const AdminDashboard = () => {
     );
   };
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoadingCourses(true);
-        const data = await getCourses();
-        setCourses(data);
-      } catch (error) {
-        console.error(error);
-        // Optionally show toast/snackbar here
-      } finally {
-        setLoadingCourses(false);
-      }
-    };
-
-    fetchCourses();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <AdminHeader />
 
       <div className="container mx-auto px-4 py-6">
         {/* Stats Overview */}
-        {!fullscreen && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Courses
-                </CardTitle>
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{courses.totalCourses}</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 from last month
-                </p>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Active Users
-                </CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">0</p>
-              </CardContent>
-            </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Courses
+              </CardTitle>
+              <BookOpen className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalCourses}</div>
+              <p className="text-xs text-muted-foreground">
+                +2 from last month
+              </p>
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Certified Members
-                </CardTitle>
-                <Trophy className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">0</p>
-              </CardContent>
-            </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Active Users
+              </CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">0</p>
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Active Batches
-                </CardTitle>
-                <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">0</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Certified Members
+              </CardTitle>
+              <Trophy className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">0</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Active Batches
+              </CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-xs text-muted-foreground">0</p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Management Tabs */}
-        <Tabs
-          defaultValue="courses"
-          onValueChange={() => setFullscreen(false)}
-          className="space-y-4"
-        >
-          {!fullscreen && (
-            <TabsList>
-              <TabsTrigger value="courses">Courses</TabsTrigger>
-              <TabsTrigger value="programs">Programs</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="batches">Batches</TabsTrigger>
-              <TabsTrigger value="quizes">Quizes</TabsTrigger>
-            </TabsList>
-          )}
+        <Tabs defaultValue="courses" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="programs">Programs</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="batches">Batches</TabsTrigger>
+            {/* <TabsTrigger value="quizes">Quizes</TabsTrigger> */}
+          </TabsList>
 
-          <TabsContent value="courses" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Course Management</h3>
-              <Button onClick={handleNewCourse}>
-                <Plus className="w-4 h-4 mr-2" />
-                New Course
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              {courses.courses &&
-                courses.courses.map((course) => (
-                  <Card key={course.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">
-                            {course.title}
-                          </CardTitle>
-                          <CardDescription>
-                            {course.sessionsCount} sessions •{" "}
-                            {course.enrolledUsersCount} enrolled
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge
-                            variant={
-                              course.status === "active"
-                                ? "default"
-                                : "secondary"
-                            }
-                          >
-                            {course.status}
-                          </Badge>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditCourse(course)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Video className="w-4 h-4 mr-1" />
-                          Add Session
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <BarChart3 className="w-4 h-4 mr-1" />
-                          Analytics
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
+          <TabsContent value="courses" className="space-y-4 overflow-y-auto">
+            <Courses setTotalCourses={setTotalCourses} />
           </TabsContent>
 
           <TabsContent value="programs" className="space-y-4">
@@ -412,9 +309,9 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="quizes" className="space-y-4">
+          {/* <TabsContent value="quizes" className="space-y-4">
             <Quizes setFullscreen={setFullscreen} />
-          </TabsContent>
+          </TabsContent> */}
 
           <TabsContent value="batches" className="space-y-4">
             <div className="flex justify-between items-center">
@@ -523,14 +420,6 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
         </Tabs>
-
-        {/* Course Form Dialog */}
-        <CourseForm
-          open={courseFormOpen}
-          onClose={handleCloseCourseForm}
-          courseData={editingCourse}
-          isEditing={!!editingCourse}
-        />
         {batchFormOpen && (
           <BatchForm
             onClose={handleCloseBatchForm}

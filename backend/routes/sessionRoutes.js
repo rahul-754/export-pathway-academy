@@ -11,10 +11,10 @@ import {
 const router = express.Router();
 
 router.post("/", createSession);
+router.get("/", getAllSessions);
+router.get("/course/:courseId", getSessionsByCourse);
 router.put("/:id", updateSession);
 router.delete("/:id", deleteSession);
 router.get("/:id", getSessionById);
-router.get("/", getAllSessions);
-router.get("/course/:courseId", getSessionsByCourse);
 
 export default router;

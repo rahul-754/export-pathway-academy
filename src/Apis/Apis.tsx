@@ -1,3 +1,4 @@
+import { Quiz } from "@/components/AdminDashboard/Courses/CourseCard/Quizes";
 import axiosInstance from "./axiosInstance";
 
 // Course API functions
@@ -68,6 +69,34 @@ export const getSessionById = async (id) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching session:", error);
+    throw error;
+  }
+};
+
+export const createQuizWithSessionId = async (
+  sessionId: string,
+  quiz: Omit<Quiz, "_id">
+) => {
+  try {
+    const response = await axiosInstance.post(`/quiz`, {
+      sessionId,
+      quiz,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating quiz:", error);
+    throw error;
+  }
+};
+
+export const getQuizWithSessionId = async (sessionId: string) => {
+  try {
+    const response = await axiosInstance.get(`/quiz`, {
+      params: { sessionId },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating quiz:", error);
     throw error;
   }
 };

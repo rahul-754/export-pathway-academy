@@ -1,13 +1,13 @@
 import { Plus, X } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "../../../ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
+} from "../../../ui/card";
+import { Badge } from "../../../ui/badge";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
@@ -29,9 +29,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createQuizWithSessionId, getQuizWithSessionId } from "@/Apis/Apis";
+import { Session } from "./CourseCard";
+import { FaSpinner } from "react-icons/fa";
 
 type Question = {
-  id: string;
+  _id: string;
   question: string;
   marks: number;
   type: "MCQ" | "MSQ";
@@ -40,8 +43,8 @@ type Question = {
   // explanation?: string;
 };
 
-type Quiz = {
-  id: string;
+export type Quiz = {
+  _id: string;
   title: string;
   maxAttempts: number;
   duration: number;
@@ -59,7 +62,7 @@ function QuestionForm({
   onClose,
   existingQuestion,
 }: {
-  onSubmit: (question: Omit<Question, "id">) => void;
+  onSubmit: (question: Omit<Question, "_id">) => void;
   onClose: () => void;
   existingQuestion?: Question;
 }) {
@@ -246,59 +249,28 @@ function QuestionForm({
 }
 
 export default function Quizes({
-  setFullscreen,
+  session,
+  setSessions,
 }: {
-  setFullscreen: Dispatch<SetStateAction<boolean>>;
+  session: Session;
+  setSessions: Dispatch<SetStateAction<Session[]>>;
 }) {
-  const [quizes, setQuizes] = useState<Quiz[]>([
-    {
-      id: "1",
-      title: "AI bootcamp for exporters Basic",
-      duration: 1,
-      maxAttempts: 4,
-      passingMarks: 5,
-      totalMarks: 10,
-      questions: [],
-      settings: {
-        showAnswers: false,
-        shuffleQuestions: true,
-      },
-    },
-  ]);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-
-  const addNewQuiz = () => {
-    setQuizes((state) => [
-      ...state,
-      {
-        id: (quizes.length + 1).toString(),
-        title: "Untitled",
-        duration: 0,
-        maxAttempts: 0,
-        passingMarks: 0,
-        totalMarks: 0,
-        questions: [],
-        settings: {
-          showAnswers: false,
-          shuffleQuestions: false,
-        },
-      },
-    ]);
-  };
+  const [loading, setLoading] = useState(true);
+  const [creatingNewQuiz, setCreatingNewQuiz] = useState(false);
 
   const selectQuiz = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
-    setFullscreen(true);
   };
 
-  const addQuestion = (questionData: Omit<Question, "id">) => {
+  const addQuestion = (questionData: Omit<Question, "_id">) => {
     if (!selectedQuiz) return;
 
     const newQuestion: Question = {
       ...questionData,
-      id: `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      _id: `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
     const updatedQuiz = {
@@ -308,9 +280,6 @@ export default function Quizes({
     };
 
     setSelectedQuiz(updatedQuiz);
-    setQuizes((prev) =>
-      prev.map((q) => (q.id === selectedQuiz.id ? updatedQuiz : q))
-    );
   };
 
   const updateQuestion = (questionData: Omit<Question, "id">) => {
@@ -318,22 +287,20 @@ export default function Quizes({
 
     const updatedQuestion: Question = {
       ...questionData,
-      id: editingQuestion.id,
+      _id: editingQuestion._id,
     };
 
     const updatedQuiz = {
       ...selectedQuiz,
       questions: selectedQuiz.questions.map((q) =>
-        q.id === editingQuestion.id ? updatedQuestion : q
+        q._id === editingQuestion._id ? updatedQuestion : q
       ),
       totalMarks:
         selectedQuiz.totalMarks - editingQuestion.marks + questionData.marks,
     };
 
     setSelectedQuiz(updatedQuiz);
-    setQuizes((prev) =>
-      prev.map((q) => (q.id === selectedQuiz.id ? updatedQuiz : q))
-    );
+
     setEditingQuestion(null);
   };
 
@@ -341,20 +308,17 @@ export default function Quizes({
     if (!selectedQuiz) return;
 
     const questionToDelete = selectedQuiz.questions.find(
-      (q) => q.id === questionId
+      (q) => q._id === questionId
     );
     if (!questionToDelete) return;
 
     const updatedQuiz = {
       ...selectedQuiz,
-      questions: selectedQuiz.questions.filter((q) => q.id !== questionId),
+      questions: selectedQuiz.questions.filter((q) => q._id !== questionId),
       totalMarks: selectedQuiz.totalMarks - questionToDelete.marks,
     };
 
     setSelectedQuiz(updatedQuiz);
-    setQuizes((prev) =>
-      prev.map((q) => (q.id === selectedQuiz.id ? updatedQuiz : q))
-    );
   };
 
   const openNewQuestionDialog = () => {
@@ -367,61 +331,29 @@ export default function Quizes({
     setIsQuestionDialogOpen(true);
   };
 
-  if (!selectedQuiz)
-    return (
-      <>
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Quiz Management</h3>
-          <Button variant="default" onClick={addNewQuiz}>
-            <Plus />
-            New Quiz
-          </Button>
-        </div>
+  useEffect(() => {
+    const fetchQuizes = async () => {
+      setLoading(true);
+      try {
+        const { quiz } = await getQuizWithSessionId(session._id);
+        setSelectedQuiz(quiz);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        console.error("Failed to fetch quiz:", e);
+      }
+    };
 
-        <div className="grid gap-4">
-          {quizes.map((quiz) => (
-            <Card
-              key={quiz.id}
-              className="cursor-pointer"
-              onClick={() => selectQuiz(quiz)}
-            >
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">
-                    Title : {quiz.title}
-                  </CardTitle>
-                  <Badge variant="outline">
-                    Max attempts : {quiz.maxAttempts}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex space-x-4 text-sm text-gray-600">
-                  <span>Total marks : {quiz.totalMarks}</span>
-                  <span>Pass Marks : {quiz.passingMarks}</span>
-                  <span>Questions : {quiz.questions.length}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </>
-    );
+    fetchQuizes();
+  }, [session._id]);
+
+  if (loading) return <FaSpinner className="animate-spin w-full h-10" />;
 
   return (
     <Card className="w-full max-w-4xl mx-auto mt-10 h-[70vh] overflow-y-auto">
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Quiz Editor</CardTitle>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setFullscreen(false);
-              setSelectedQuiz(null);
-            }}
-          >
-            Back to Quizzes
-          </Button>
+        <div className="flex justify-end gap-2 items-center">
+          <Button variant="default">Save</Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -590,7 +522,7 @@ export default function Quizes({
           ) : (
             <div className="space-y-4">
               {selectedQuiz.questions.map((q, index) => (
-                <Card key={q.id} className="border">
+                <Card key={q._id} className="border">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 space-y-2">
@@ -642,7 +574,7 @@ export default function Quizes({
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => deleteQuestion(q.id)}
+                          onClick={() => deleteQuestion(q._id)}
                         >
                           Delete
                         </Button>

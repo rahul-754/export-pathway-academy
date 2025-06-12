@@ -170,7 +170,6 @@ const CourseForm: React.FC<CourseFormProps> = ({
       ppt: null,
     });
   };
-  console.log("course :: ", courseData);
 
   const onSubmit = (data: CourseFormData) => {
     console.log("Course data:", data);
@@ -189,8 +188,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
         console.error("Failed to fetch course:", err);
       }
     };
-
-    fetchSessions();
+    if (courseData) fetchSessions();
   }, [appendSession, courseData]);
 
   return (

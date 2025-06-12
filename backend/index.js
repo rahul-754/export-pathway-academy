@@ -9,6 +9,7 @@ import connectToDatabase from "./DB/database.js";
 import userRoutes from "./routes/userRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
+import quizRoutes from "./routes/quizRoutes.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/", router);
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use("/api/quiz", quizRoutes);
 
 app.listen(port, () => {
   connectToDatabase();

@@ -13,6 +13,9 @@ const sessionSchema = new mongoose.Schema(
     },
     ppt: { type: String },
     notes: { type: String },
+    quiz: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
