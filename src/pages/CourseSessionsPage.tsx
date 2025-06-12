@@ -144,7 +144,7 @@ const CourseSessionsPage = () => {
       const userId = parsed.user?._id;
 
       const result = await enrollInSessions(userId, cart);
-      console.log("Enrollment result:", result);
+      //console.log("Enrollment result:", result);
       if (!result || result.message !== "Enrollment processed") {
         throw new Error("Enrollment failed");
       }
@@ -160,7 +160,7 @@ const CourseSessionsPage = () => {
   };
 
   const handleWatchPreview = (session) => {
-    console.log("Preview video URL:", session.previewVideo);
+    //console.log("Preview video URL:", session.previewVideo);
     if (session.previewVideo) {
       setSelectedVideoUrl(session.previewVideo);
     } else {

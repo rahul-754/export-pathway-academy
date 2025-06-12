@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CardElement from "./components/CardElement";
 import { getCourses } from "@/Apis/Apis";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FaSpinner } from "react-icons/fa";
 
 interface Course {
   _id: string;
@@ -15,14 +17,14 @@ interface Course {
 }
 
 export default function Courses({ user, onCourseClick }) {
-  const [courses, setCourses] = useState({ totalCourses: 0, courses: [] });
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  console.log(user);
+  //console.log(user);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const data = await getCourses();
-        setCourses(data);
+        setCourses(data.courses);
       } catch (error) {
         console.error("Failed to load courses:", error);
       } finally {
@@ -34,20 +36,22 @@ export default function Courses({ user, onCourseClick }) {
   }, []);
 
   if (loading)
-    return <p className="text-center text-gray-500">Loading courses...</p>;
-  return (
-    <section className="space-y-5 py-5 w-full max-w-[1400px] mx-auto">
-      <h2 className="text-4xl font-bold">Courses</h2>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-10">
-        {courses.courses &&
-          courses.courses.map((course) => (
-            <CardElement
-              key={course._id}
-              course={course}
-              onCourseClick={onCourseClick}
-            />
-          ))}
+    return (
+      <div className="w-full max-w-[1600px] mx-auto p-10 flex items-center justify-center">
+        <FaSpinner className="animate-spin w-10 h-10" />
       </div>
+    );
+  return (
+    <section className="space-y-10 px-10 py-5 w-full max-w-[1600px] mx-auto">
+      <h2 className="text-4xl font-bold">Courses</h2>
+      {courses.map((course, index) => (
+        <CardElement
+          key={course._id}
+          course={course}
+          reverse={index % 2 === 0}
+          onCourseClick={onCourseClick}
+        />
+      ))}
     </section>
   );
 }

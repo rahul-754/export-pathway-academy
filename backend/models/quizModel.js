@@ -17,6 +17,7 @@ const quizSchema = new mongoose.Schema(
     questions: {
       type: [
         {
+          _id: { type: String, required: true },
           question: { type: String, required: true },
           marks: { type: Number, required: true },
           type: { type: String, required: true },

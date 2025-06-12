@@ -22,7 +22,7 @@ const UserDashboard = () => {
           setUser(userData);
           const noCourses = userData.enrolledCourses?.length === 0;
           const noSessions = userData.enrolledSessions?.length === 0;
-          console.log("User data:", userData);
+          // //console.log("User data:", userData);
           if (noCourses && noSessions) setIsNewUser(true);
           else setIsNewUser(false);
           // setIsNewUser(noCourses && noSessions);
@@ -50,7 +50,7 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
+    <div className="min-h-screen bg-gray-50">
       <UserHeader />
       {isNewUser ? (
         <NewUserView user={user} onCourseClick={handleCourseClick} />

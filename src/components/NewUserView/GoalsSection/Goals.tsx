@@ -53,15 +53,16 @@ export default function Goals() {
 
   return (
     <section className="py-10 bg-neutral-200/30">
-      <div className="space-y-10 w-full max-w-[1400px] mx-auto">
+      <div className="space-y-10 px-10 w-full max-w-[1600px] mx-auto">
         <h2 className="font-bold text-4xl">Learning focused on your goals</h2>
         <div className="flex gap-5 justify-between items-center ">
           <div className="space-y-5">
-            {staticData.map((obj) => {
+            {staticData.map((obj, index) => {
               return (
                 <div
+                  key={index}
                   onClick={() => setSelectedItem(obj)}
-                  className={`space-y-1 max-w-[550px] cursor-pointer border p-5 bg-white ${
+                  className={`space-y-1 max-w-[700px] cursor-pointer border p-5 bg-white ${
                     selectedItem.id === obj.id &&
                     "shadow-md border-l-[6px] border-blue-600"
                   } transition-all hover:shadow-md hover:border-blue-600 rounded-lg`}
@@ -77,7 +78,7 @@ export default function Goals() {
           <img
             src={selectedItem.img}
             alt={selectedItem.id + ""}
-            className="w-full max-w-[600px] aspect-square"
+            className="w-full max-w-[500px] aspect-square"
           />
         </div>
       </div>

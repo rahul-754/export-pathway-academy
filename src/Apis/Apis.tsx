@@ -184,7 +184,7 @@ export const getUserById = async (UserId) => {
 
 export const enrollInSessions = async (userId, sessionIds) => {
   try {
-    // console.log("Enrolling user:", userId, "in sessions:", sessionIds);
+    // //console.log("Enrolling user:", userId, "in sessions:", sessionIds);
     const response = await axiosInstance.post(`/users/enroll/sessions`, {
       userId,
       sessionIds,
