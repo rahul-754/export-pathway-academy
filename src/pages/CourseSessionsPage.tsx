@@ -479,7 +479,7 @@ const CourseSessionsPage = () => {
                             {!isAccessible && (
                               <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
                             )}
-                          </Button>    
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"
@@ -498,6 +498,51 @@ const CourseSessionsPage = () => {
                     </div>
                   </div>
                 </CardHeader>
+                <div
+                  id="certificate-template"
+                  style={{
+                    display: "none",
+                    width: "1086px",
+                    height: "768px",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    zIndex: -9999,
+                    backgroundImage: "url('sample 1 (4).jpg')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    fontFamily: "serif",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "235px",
+                      width: "100%",
+                      textAlign: "center",
+                    }}
+                  >
+                    <h3
+                      style={{ color: "#1976d2", fontSize: "26px", margin: 0 }}
+                    >
+                      {session.title || "Course Name"}
+                    </h3>
+                  </div>
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "370px",
+                      width: "100%",
+                      textAlign: "center",
+                    }}
+                  >
+                    <h2 style={{ color: "#1976d2", fontSize: "36px" }}>
+                      {JSON.parse(localStorage.getItem("TerraAuthData")).user
+                        .name || "User Name"}
+                    </h2>
+                  </div>
+                </div>
 
                 {expandedSet.has(session._id) && (
                   <CardContent className=" border-t pt-5">
@@ -670,30 +715,6 @@ const CourseSessionsPage = () => {
         </div>
       )}
       {/* Hidden certificate template for download */}
-      <div
-        id="certificate-template"
-        style={{
-          display: "none",
-          width: "1086px",
-          height: "768px",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          zIndex: -9999,
-          backgroundImage: "url('sample 1 (4).jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          fontFamily: "serif",
-        }}
-      >
-        <div style={{ position: "absolute", top: "235px", width: "100%", textAlign: "center" }}>
-          <h3 style={{ color: "#1976d2", fontSize: "26px", margin: 0 }}>{course?.title || "Course Name"}</h3>
-        </div>
-
-        <div style={{ position: "absolute", top: "370px", width: "100%", textAlign: "center" }}>
-          <h2 style={{ color: "#1976d2", fontSize: "36px" }}>{localStorage.getItem("userName") || "User Name"}</h2>
-        </div>
-      </div>
     </div>
   );
 };
