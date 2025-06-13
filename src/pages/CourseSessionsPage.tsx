@@ -254,6 +254,10 @@ const CourseSessionsPage = () => {
     pdf.save("certificate.pdf");
   };
 
+  const handleQuizOpen = (sessionId: string) => {
+    navigate(`/quiz/${sessionId}`);
+  };
+
   if (loading) {
     return (
       <div className="p-6 text-center text-gray-500">
@@ -476,6 +480,19 @@ const CourseSessionsPage = () => {
                           >
                             <Presentation className="h-4 w-4 mr-2" />
                             View PPT
+                            {!isAccessible && (
+                              <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-start"
+                            disabled={!isAccessible || !session.quiz}
+                            onClick={() => handleQuizOpen(session._id)}
+                          >
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            Attempt Quiz
                             {!isAccessible && (
                               <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
                             )}
