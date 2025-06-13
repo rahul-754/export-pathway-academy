@@ -16,33 +16,33 @@ type ListItem = {
 const staticData: ListItem[] = [
   {
     id: 1,
-    heading: "Hands-on training",
+    heading: "Practical, Hands-On Learning",
     subheading:
-      "Engage in practical exercises to reinforce key concepts and build real-world skills.",
+      "Work on real-world export scenarios—build websites, craft outreach, and automate tasks with AI tools you can start using immediately.",
     img: image1,
     icon: "",
   },
   {
     id: 2,
-    heading: "Certification Prep",
+    heading: "Certification-Backed Credibility",
     subheading:
-      "Get ready for industry-recognized certifications with expert-curated materials and mock exams.",
+      "Earn a verifiable certificate that showcases your AI-enabled export marketing skills and builds trust with global buyers and partners.",
     img: image2,
     icon: "",
   },
   {
     id: 3,
-    heading: "Insights",
+    heading: "Expert-Led, Insight-Rich Sessions",
     subheading:
-      "Gain valuable knowledge from industry trends, expert advice, and data-driven analysis.",
+      "Stay ahead with actionable insights from export consultants, global trade data, and proven strategies used by successful exporters.",
     img: image3,
     icon: "",
   },
   {
     id: 4,
-    heading: "AI Enhanced learning",
+    heading: "AI-Driven Skill Acceleration",
     subheading:
-      "Leverage the power of AI to personalize your learning journey and accelerate outcomes.",
+      "Use AI to fast-track learning, personalize outputs, and turn complex digital tasks into simplified, scalable workflows.",
     img: image4,
     icon: "",
   },

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import UserHeader from "@/components/UserHeader";
-import NewUserView from "@/components/NewUserView/NewUserView";
+import NewUserView from "@/pages/NewUserView";
 import EnrolledUserView from "@/components/EnrolledUserView";
 import { getUserById } from "@/Apis/Apis";
+import { FaSpinner } from "react-icons/fa";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -41,24 +42,15 @@ const UserDashboard = () => {
     fetchUser();
   }, [navigate]);
 
-  const handleCourseClick = (courseId: string) => {
-    navigate(`/course/${courseId}/sessions`);
-  };
-
   if (loading) {
-    return <div className="p-4">Loading user info...</div>;
+    return (
+      <div className="h-[80vh] flex justify-center items-center">
+        <FaSpinner className="animate-spin w-16 h-16" />
+      </div>
+    );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <UserHeader />
-      {isNewUser ? (
-        <NewUserView user={user} onCourseClick={handleCourseClick} />
-      ) : (
-        <EnrolledUserView user={user} onCourseClick={handleCourseClick} />
-      )}
-    </div>
-  );
+  return <EnrolledUserView user={user} />;
 };
 
 export default UserDashboard;

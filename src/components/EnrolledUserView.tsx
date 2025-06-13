@@ -18,7 +18,7 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface EnrolledCourse {
   id: number;
@@ -47,10 +47,14 @@ interface RecentCertificate {
 
 interface EnrolledUserViewProps {
   user: any;
-  onCourseClick: (courseId: string) => void;
 }
 
-const EnrolledUserView = ({ user, onCourseClick }: EnrolledUserViewProps) => {
+const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
+  const navigate = useNavigate();
+  const onCourseClick = (courseId: string) => {
+    navigate(`/course/${courseId}/sessions`);
+  };
+
   const enrolledCourses: EnrolledCourse[] =
     user.enrolledCourses?.map((enrolled: any) => {
       const course = enrolled.course || {};

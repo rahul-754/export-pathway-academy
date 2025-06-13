@@ -19,7 +19,6 @@ const UserHeader = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [hoveredCourseId, setHoveredCourseId] = useState(null);
-  const [cartOpen, setCartOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -29,8 +28,9 @@ const UserHeader = () => {
       setUser(parsed.user); // Assumes `user` is inside `TerraAuthData`
     }
   }, []);
+
+  console.log(user);
   // Dummy cart data
-  const cartItems = [];
   const handleLogout = () => {
     localStorage.removeItem("TerraAuthData");
     setUser(null);
@@ -191,111 +191,6 @@ const UserHeader = () => {
                 </div>
               )}
             </div>
-          </div>
-          {/* Right Section: Cart + Notifications + Home */}
-          <div className="flex items-center space-x-4 relative">
-            {/* Batches */}
-            <Link to="/batches">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-600 text-blue-900 hover:bg-blue-50 flex items-center"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Batches
-              </Button>
-            </Link>
-            {/* Cart */}
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-600 text-blue-900 hover:bg-blue-50"
-                onClick={() => setCartOpen(!cartOpen)}
-              >
-                <ShoppingCart className="w-4 h-4" />
-                Cart
-                {cartItems.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">
-                    {cartItems.length}
-                  </Badge>
-                )}
-              </Button>
-
-              {cartOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 shadow-lg rounded-md z-50">
-                  {cartItems.length === 0 ? (
-                    <div className="p-4 text-sm text-gray-600 text-center">
-                      Your cart is empty.
-                      <Link
-                        to="/courses"
-                        className="text-blue-600 hover:underline block mt-2"
-                      >
-                        Keep shopping
-                      </Link>
-                    </div>
-                  ) : (
-                    <ul className="max-h-64 overflow-auto">
-                      {cartItems.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="p-3 border-b text-sm text-gray-700"
-                        >
-                          {item.title}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Notifications */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="relative border-blue-600 text-blue-900 hover:bg-blue-50"
-            >
-              <Bell className="w-4 h-4" />
-              Notifications
-              <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">
-                3
-              </Badge>
-            </Button>
-
-            {/* Home */}
-            <Link to="/user-dashboard">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-blue-600 text-blue-900 hover:bg-blue-50"
-              >
-                <Home className="w-4 h-4" />
-                Home
-              </Button>
-            </Link>
-            {user ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-red-600 text-white"
-                onClick={handleLogout}
-              >
-                <User className="w-4 h-4 mr-2" />
-                Log out
-              </Button>
-            ) : (
-              <Link to="/">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-[#0072e6] text-white"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Log in
-                </Button>
-              </Link>
-            )}
           </div>
         </div>
       </div>

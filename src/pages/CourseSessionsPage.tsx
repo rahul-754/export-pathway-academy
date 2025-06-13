@@ -28,13 +28,10 @@ import UserHeader from "@/components/UserHeader";
 
 import { enrollInSessions, getCourseById, getUserById } from "@/Apis/Apis";
 
-import CourseOverview from "@/components/CourseOverview";
-import SessionItem from "@/components/SessionItem";
-import CartSummary from "@/components/CartSummary";
-import PaymentSuccessDialog from "@/components/ui/PaymentSuccessDialog";
-
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { FaSpinner } from "react-icons/fa";
+import { useUser } from "@/hooks/useUser";
 
 const CourseSessionsPage = () => {
   const { courseId } = useParams();
@@ -49,6 +46,7 @@ const CourseSessionsPage = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
   const [expandedSet, setIdtoExpanded] = useState(new Set());
+  const { isAuthenticated, user } = useUser();
 
   useEffect(() => {
     if (!course) return;
@@ -180,20 +178,6 @@ const CourseSessionsPage = () => {
     navigate("/user-dashboard");
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 text-center text-gray-500">
-        Loading course details...
-      </div>
-    );
-  }
-
-  if (!course) {
-    return (
-      <div className="p-6 text-center text-red-500">Course not found.</div>
-    );
-  }
-
   const handleViewNotes = (session) => {
     if (purchasedSessions.includes(session._id)) {
       if (session.notes) {
@@ -260,22 +244,23 @@ const CourseSessionsPage = () => {
 
   if (loading) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        Loading course details...
+      <div className="h-[80vh] flex justify-center items-center">
+        <FaSpinner className="animate-spin w-16 h-16" />
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="p-6 text-center text-red-500">Course not found.</div>
+      <div className="h-[80vh] flex justify-center items-center text-2xl text-red-500">
+        Course not found.
+      </div>
     );
   }
-  return (
-    <div className="min-h-screen bg-white-50 mb-16">
-      <UserHeader />
 
-      <div className=" mx-auto py-6">
+  return (
+    <>
+      <div className=" mx-auto min-h-screen bg-white-50">
         {/* <CourseSessionsPageMain /> */}
 
         <div className="bg-[#94b9ff] w-full py-10 text-black">
@@ -368,7 +353,7 @@ const CourseSessionsPage = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-10">
                     {/* LEFT: Image + Title + Buttons */}
-                    <div className="flex items-end gap-6">
+                    <div className="flex items-start gap-6">
                       <div className="rounded-lg bg-blue-100 flex items-center justify-center h-full">
                         <img
                           src={session.sessionImage}
@@ -377,26 +362,34 @@ const CourseSessionsPage = () => {
                           style={{ borderRadius: "8px", objectFit: "cover" }}
                         />
                       </div>
-                      <div className="flex flex-col gap-2 h-full justify-end ">
+                      <div className="flex flex-col gap-2 h-full justify-start ">
                         <CardTitle className="text-3xl max-w-[500px]">
                           Session {index + 1} : {session.title}
                         </CardTitle>
                         <div className="flex gap-4 mt-3 ">
-                          {!isAccessible && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className={`border-blue-700 text-blue-900 font-bold hover:bg-blue-50 flex items-center ${
-                                inCart
-                                  ? "bg-green-600 hover:bg-green-700 text-white"
-                                  : ""
-                              }`}
-                              onClick={() => addToCart(session._id)}
-                              disabled={inCart}
-                            >
-                              {inCart
-                                ? "Added to Cart"
-                                : `Add to Cart - ${session.price.currency} ${session.price.amount}`}
+                          {isAuthenticated ? (
+                            <>
+                              {!isAccessible && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className={`border-blue-700 text-blue-900 font-bold hover:bg-blue-50 flex items-center ${
+                                    inCart
+                                      ? "bg-green-600 hover:bg-green-700 text-white"
+                                      : ""
+                                  }`}
+                                  onClick={() => addToCart(session._id)}
+                                  disabled={inCart}
+                                >
+                                  {inCart
+                                    ? "Added to Cart"
+                                    : `Add to Cart - ${session.price.currency} ${session.price.amount}`}
+                                </Button>
+                              )}
+                            </>
+                          ) : (
+                            <Button variant="outline" disabled>
+                              Please login to access
                             </Button>
                           )}
                           <Button
@@ -423,7 +416,7 @@ const CourseSessionsPage = () => {
                           <CheckCircle className="h-7 w-7 text-green-600 hover:bg-green-600 hover:text-white p-1 rounded-full transition-colors" />
                         )}
                         {!isAccessible && (
-                          <Lock className="h-7 w-7 text-blue-800 font-bold hover:bg-blue-600 hover:text-white p-1 rounded-xl transition-colors" />
+                          <Lock className="h-7 w-7 text-blue-800 font-bold p-1 rounded-xl transition-colors" />
                         )}
                         <Button
                           variant="ghost"
@@ -443,123 +436,130 @@ const CourseSessionsPage = () => {
                             : "View more ▼"}
                         </Button>
                       </div>
-                      <div className="flex flex-row-reverse ">
-                        <div className=" max-w-[300px] space-y-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            disabled={!isAccessible || !session.videoUrl}
-                            onClick={() => handleWatchFullVideo(session)}
-                          >
-                            <Video className="h-4 w-4 mr-2" />
-                            Watch Video
-                            {!isAccessible && (
-                              <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            disabled={!isAccessible || !session.notes}
-                            onClick={() => handleViewNotes(session)}
-                          >
-                            <FileText className="h-4 w-4 mr-2" />
-                            View Notes
-                            {!isAccessible && (
-                              <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            disabled={!isAccessible || !session.ppt}
-                            onClick={() => handleViewPPT(session)}
-                          >
-                            <Presentation className="h-4 w-4 mr-2" />
-                            View PPT
-                            {!isAccessible && (
-                              <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            disabled={!isAccessible || !session.quiz}
-                            onClick={() => handleQuizOpen(session._id)}
-                          >
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            Attempt Quiz
-                            {!isAccessible && (
-                              <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            disabled={!isAccessible}
-                            onClick={handleDownloadCertificate}
-                          >
-                            <AwardIcon className="h-4 w-4 mr-2" />
-                            Download certificate
-                            {!isAccessible && (
-                              <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
-                            )}
-                          </Button>
+                      {isAuthenticated && (
+                        <div className="flex flex-row-reverse ">
+                          <div className=" max-w-[300px] space-y-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                              disabled={!isAccessible || !session.videoUrl}
+                              onClick={() => handleWatchFullVideo(session)}
+                            >
+                              <Video className="h-4 w-4 mr-2" />
+                              Watch Video
+                              {!isAccessible && (
+                                <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                              disabled={!isAccessible || !session.notes}
+                              onClick={() => handleViewNotes(session)}
+                            >
+                              <FileText className="h-4 w-4 mr-2" />
+                              View Notes
+                              {!isAccessible && (
+                                <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                              disabled={!isAccessible || !session.ppt}
+                              onClick={() => handleViewPPT(session)}
+                            >
+                              <Presentation className="h-4 w-4 mr-2" />
+                              View PPT
+                              {!isAccessible && (
+                                <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                              disabled={!isAccessible || !session.quiz}
+                              onClick={() => handleQuizOpen(session._id)}
+                            >
+                              <BookOpen className="h-4 w-4 mr-2" />
+                              Attempt Quiz
+                              {!isAccessible && (
+                                <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                              disabled={!isAccessible}
+                              onClick={handleDownloadCertificate}
+                            >
+                              <AwardIcon className="h-4 w-4 mr-2" />
+                              Download certificate
+                              {!isAccessible && (
+                                <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
+                              )}
+                            </Button>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
-                <div
-                  id="certificate-template"
-                  style={{
-                    display: "none",
-                    width: "1086px",
-                    height: "768px",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    zIndex: -9999,
-                    backgroundImage: "url('sample 1 (4).jpg')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    fontFamily: "serif",
-                  }}
-                >
+                {isAuthenticated && (
                   <div
+                    id="certificate-template"
                     style={{
+                      display: "none",
+                      width: "1086px",
+                      height: "768px",
                       position: "absolute",
-                      top: "235px",
-                      width: "100%",
-                      textAlign: "center",
+                      top: 0,
+                      left: 0,
+                      zIndex: -9999,
+                      backgroundImage: "url('sample 1 (4).jpg')",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      fontFamily: "serif",
                     }}
                   >
-                    <h3
-                      style={{ color: "#1976d2", fontSize: "26px", margin: 0 }}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "235px",
+                        width: "100%",
+                        textAlign: "center",
+                      }}
                     >
-                      {session.title || "Course Name"}
-                    </h3>
-                  </div>
+                      <h3
+                        style={{
+                          color: "#1976d2",
+                          fontSize: "26px",
+                          margin: 0,
+                        }}
+                      >
+                        {session.title || "Course Name"}
+                      </h3>
+                    </div>
 
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "370px",
-                      width: "100%",
-                      textAlign: "center",
-                    }}
-                  >
-                    <h2 style={{ color: "#1976d2", fontSize: "36px" }}>
-                      {JSON.parse(localStorage.getItem("TerraAuthData")).user
-                        .name || "User Name"}
-                    </h2>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "370px",
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      <h2 style={{ color: "#1976d2", fontSize: "36px" }}>
+                        {user?.name || "User Name"}
+                      </h2>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {expandedSet.has(session._id) && (
                   <CardContent className=" border-t pt-5">
@@ -732,7 +732,7 @@ const CourseSessionsPage = () => {
         </div>
       )}
       {/* Hidden certificate template for download */}
-    </div>
+    </>
   );
 };
 

@@ -38,6 +38,7 @@ import {
 import { getQuizWithSessionId, updateQuiz } from "@/Apis/Apis";
 import { Session } from "./CourseCard";
 import { FaSpinner } from "react-icons/fa";
+import { debounce } from "@/lib/utils";
 
 type Question = {
   _id: string;
@@ -347,6 +348,15 @@ export default function Quizes({
     }
   }, [selectedQuiz]);
 
+  const DEBOUNCE_MS = 300;
+  const updateQuizField = useCallback(
+    debounce((field, num) => {
+      setSelectedQuiz((s) => ({ ...s!, [field]: num }));
+      setSaved(false);
+    }, DEBOUNCE_MS),
+    []
+  );
+
   useEffect(() => {
     const fetchQuizes = async () => {
       setLoading(true);
@@ -397,9 +407,7 @@ export default function Quizes({
             value={selectedQuiz.title}
             disabled={savingQuiz}
             onChange={(e) => {
-              setSelectedQuiz((state) =>
-                state ? { ...state, title: e.target.value } : null
-              );
+              setSelectedQuiz((s) => ({ ...s!, maxAttempts: value }));
               setSaved(false);
             }}
           />

@@ -16,7 +16,7 @@ interface Course {
   };
 }
 
-export default function Courses({ user, onCourseClick }) {
+export default function Courses({ onCourseClick }) {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   //console.log(user);
