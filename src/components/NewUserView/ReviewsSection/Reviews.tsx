@@ -55,29 +55,33 @@ const staticData: Review[] = [
 
 export default function Reviews() {
   return (
-    <div className="space-y-5 py-5 px-10 w-full max-w-[1600px] mx-auto">
-      <h2 className="text-4xl font-bold">
+    <div className="md:space-y-5 space-y-2 py-10 md:px-10 px-5 w-full max-w-[1600px] mx-auto">
+      <h2 className="md:text-4xl text-3xl font-bold">
         See what others are achieving through learning
       </h2>
-      <Marquee pauseOnHover loop={0} className="overflow-hidden h-auto py-5">
+      <Marquee
+        pauseOnHover
+        loop={0}
+        className="overflow-hidden h-auto md:py-5 py-3"
+      >
         {staticData.map((obj) => {
           return (
             <div
               key={obj.id}
-              className="rounded-lg hover:bg-blue-600 hover:shadow-lg group transition-colors p-10 shadow-md w-[400px] ml-5 border h-full  gap-3 flex flex-col justify-between"
+              className="rounded-lg hover:bg-blue-600 hover:shadow-lg group transition-colors md:p-10 p-5 shadow-md md:w-[400px] w-[250px] md:ml-5 ml-2 border h-full  md:gap-3 gap-1 flex flex-col justify-between"
             >
-              <div className="space-y-5">
-                <span className="text-9xl select-none group-hover:text-white transition-colors">
+              <div className="md:space-y-5 space-y-2">
+                <span className="md:text-9xl text-7xl select-none group-hover:text-white transition-colors">
                   &#8220;
                 </span>
                 <h5
                   title={obj.review}
-                  className="text-neutral-700 text-2xl line-clamp-2 group-hover:text-white transition-colors"
+                  className="text-neutral-700 md:text-2xl text-lg line-clamp-2 group-hover:text-white transition-colors"
                 >
                   {obj.review}
                 </h5>
               </div>
-              <div className="space-y-5">
+              <div className="md:space-y-5 space-y-2">
                 <div className="flex gap-1 items-center">
                   {Array(obj.rating)
                     .fill(1)
@@ -87,7 +91,7 @@ export default function Reviews() {
                       );
                     })}
                 </div>
-                <h3 className="font-bold text-xl tracking-tight group-hover:text-white transition-colors">
+                <h3 className="font-bold md:text-xl text-md tracking-tight group-hover:text-white transition-colors">
                   {obj.name}
                 </h3>
               </div>

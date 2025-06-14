@@ -42,8 +42,8 @@ export default function Courses({ onCourseClick }) {
       </div>
     );
   return (
-    <section className="space-y-10 px-10 py-5 w-full max-w-[1600px] mx-auto">
-      <h2 className="text-4xl font-bold">Courses</h2>
+    <section className="md:space-y-10 space-y-5 md:px-10 px-5 md:py-5 py-1 w-full max-w-[1600px] mx-auto">
+      <h2 className="md:text-4xl text-3xl font-bold">Courses</h2>
       {courses.map((course, index) => (
         <CardElement
           key={course._id}

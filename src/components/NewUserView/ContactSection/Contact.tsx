@@ -3,12 +3,12 @@ import { Mail, Phone } from "lucide-react";
 export default function Contact() {
   return (
     <section className="py-10 bg-blue-600 text-white min-h-[400px] flex items-center">
-      <div className="flex gap-5 px-10 items-center justify-between w-full max-w-[1600px] mx-auto">
+      <div className="flex flex-wrap gap-5 md:px-10 px-5 items-center justify-between w-full max-w-[1600px] mx-auto">
         <div className="space-y-5 max-w-[800px]">
-          <h2 className="text-5xl font-bold tracking-tight">
+          <h2 className="md:text-4xl text-3xl font-bold tracking-tight">
             Ready to transform your business?
           </h2>
-          <p className="text-xl tracking-tight">
+          <p className="md:text-xl text-sm tracking-tight">
             Join thousands of satisfied customers who have improved their
             operations, increased revenue, and scaled their businesses with our
             solutions.
@@ -20,10 +20,10 @@ export default function Contact() {
               <Mail color="#2563eb" className="w-6 h-6" />
             </div>
             <div>
-              <h5 className="text-lg font-normal">Email us</h5>
+              <h5 className="md:text-lg text-sm font-normal">Email us</h5>
               <a
                 href="mailto:contact@terrasourcing.com"
-                className="text-xl font-bold"
+                className="md:text-xl text-md font-bold"
               >
                 contact@terrasourcing.com
               </a>
@@ -34,10 +34,10 @@ export default function Contact() {
               <Phone color="#2563eb" className="w-6 h-6" />
             </div>
             <div>
-              <h5 className="text-lg font-normal">Contact us</h5>
+              <h5 className="md:text-lg text-sm font-normal">Contact us</h5>
               <a
                 href="tel:+918121020948"
-                className="text-xl font-bold tracking-tight"
+                className="md:text-xl text-md font-bold tracking-tight"
               >
                 +91 8121020948
               </a>

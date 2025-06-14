@@ -1,26 +1,22 @@
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import curosal1 from "../../ect.jpg";
-import curosal2 from "../../ect (1).jpg";
-import curosal3 from "../../ect (2).jpg";
-
 const staticData = [
   {
-    img: curosal1,
+    img: "bg-[url(ect-1.jpg)]",
     heading: "Work Smarter, Export Faster",
     subHeading: "Master AI Tools to Grow Your Global Exports",
     subHeading2:
       "Learn how to automate research, discover buyers, and scale international trade operations with cutting-edge AI. Stay ahead in today’s competitive market.",
   },
   {
-    img: curosal2,
+    img: "bg-[url(ect-2.jpg)]",
     heading: "Automate & Accelerate Your Export Business",
     subHeading: "Use AI to Cut Manual Work and Boost Results",
     subHeading2:
       "From lead generation to email writing—save time, reduce costs, and grow smarter with AI-driven export solutions.",
   },
   {
-    img: curosal3,
+    img: "bg-[url(ect-3.jpg)]",
     heading: "Join the AI Export Success Bootcamp",
     subHeading: "Start Building Global-Ready Skills in Just Days",
     subHeading2:
@@ -65,20 +61,23 @@ export default function CarouselSection() {
     >
       {staticData.map((obj, index) => {
         return (
-          <div key={index} className="relative w-full md:h-[600px] h-[300px]">
-            <img
+          <div
+            key={index}
+            className={`relative w-full md:h-[600px] h-[500px] ${obj.img} bg-no-repeat bg-cover bg-right`}
+          >
+            {/* <img
               src={obj.img}
               alt={`Carousel Image ${index + 1}`}
-              className="w-full h-full object-cover brightness-75"
-            />
-            <div className="absolute top-1/2 left-0 gap-3 transform -translate-y-1/2  text-white rounded-lg max-w-[1000px] w-full ml-16  py-5 px-6 flex flex-col">
-              <h3 className="md:text-6xl text-3xl font-bold text-start leading-tight">
+              className="w-full h-full object-cover brightness-75 st"
+            /> */}
+            <div className="absolute top-0 left-0 gap-3  text-white  bg-black/70 h-full justify-center w-full  py-5 md:px-16 px-10 flex flex-col">
+              <h3 className="md:text-6xl text-4xl font-bold text-start leading-tight max-w-[1000px]">
                 {obj.heading}
               </h3>
-              <p className="md:text-2xl text-lg mt-10 text-start tracking-tight leading-tight font-semibold">
+              <p className="md:text-2xl text-xl md:mt-10 mt-5 text-start tracking-tight leading-tight font-bold">
                 {obj.subHeading}
               </p>
-              <p className="md:text-lg text-md text-start tracking-tight leading-tight max-w-[700px]">
+              <p className="md:text-lg text-sm text-start tracking-tight leading-tight max-w-[700px]">
                 {obj.subHeading2}
               </p>
             </div>

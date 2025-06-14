@@ -53,9 +53,11 @@ export default function Goals() {
 
   return (
     <section className="py-10 bg-neutral-200/30">
-      <div className="space-y-10 px-10 w-full max-w-[1600px] mx-auto">
-        <h2 className="font-bold text-4xl">Learning focused on your goals</h2>
-        <div className="flex gap-5 justify-between items-center ">
+      <div className="md:space-y-10 space-y-3 md:px-10 px-5 w-full max-w-[1600px] mx-auto">
+        <h2 className="font-bold md:text-4xl text-3xl">
+          Learning focused on your goals
+        </h2>
+        <div className="flex lg:flex-row flex-col-reverse gap-5 justify-between items-center ">
           <div className="space-y-5">
             {staticData.map((obj, index) => {
               return (
@@ -67,10 +69,12 @@ export default function Goals() {
                     "shadow-md border-l-[6px] border-blue-600"
                   } transition-all hover:shadow-md hover:border-blue-600 rounded-lg`}
                 >
-                  <h5 className="font-semibold capitalize text-lg">
+                  <h5 className="font-semibold capitalize md:text-lg text-md">
                     {obj.heading}
                   </h5>
-                  <p className="font-normal">{obj.subheading}</p>
+                  <p className="font-normal md:text-md text-sm">
+                    {obj.subheading}
+                  </p>
                 </div>
               );
             })}
