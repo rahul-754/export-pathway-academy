@@ -6,9 +6,16 @@ import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { loginUser, registerUser } from "@/Apis/Apis";
 import { Button } from "./ui/button";
 import { useUser } from "@/hooks/useUser";
-import { Bell, Home, ShoppingCart, Users } from "lucide-react";
+import { Bell, Home, Menu, ShoppingCart, Users } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 
 interface GoogleJwt {
   name: string;
@@ -109,7 +116,7 @@ export default function Header() {
           alt="Logo"
           style={{ width: "auto", height: "40px", objectFit: "cover" }}
         />
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           {isAuthenticated ? (
             <>
               <Link to="/batches">
@@ -252,6 +259,162 @@ export default function Header() {
                 <p className="text-sm text-red-600 mt-2 text-right">{error}</p>
               )}
             </div>
+          )}
+        </div>
+        <div className="md:hidden">
+          {isAuthenticated ? (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="w-5 h-5 text-black" color="#000000" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72">
+                <div className="mt-4 flex flex-col gap-4">
+                  {user?.profilePicture && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <img
+                        src={user.profilePicture}
+                        alt="User"
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <span className="text-sm">{user.name}</span>
+                    </div>
+                  )}
+                  <Link
+                    to={
+                      user.enrolledCourses.length === 0
+                        ? "/"
+                        : "/user-dashboard"
+                    }
+                  >
+                    <Button
+                      variant="outline"
+                      className="w-full border-blue-600 text-blue-900 hover:bg-blue-50"
+                    >
+                      <Home className="w-4 h-4 mr-2" />
+                      Home
+                    </Button>
+                  </Link>
+                  <Link to="/batches">
+                    <Button
+                      variant="outline"
+                      className="w-full border-blue-600 text-blue-900 hover:bg-blue-50"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Batches
+                    </Button>
+                  </Link>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-blue-600 text-blue-900 hover:bg-blue-50 relative"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Cart
+                        {cartItems.length > 0 && (
+                          <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">
+                            {cartItems.length}
+                          </Badge>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-96 p-0">
+                      {cartItems.length === 0 ? (
+                        <div className="p-4 text-sm text-gray-600 ">
+                          Your cart is empty.
+                          <Link
+                            to="/courses"
+                            className="text-blue-600 hover:underline block mt-2"
+                          >
+                            Keep shopping
+                          </Link>
+                        </div>
+                      ) : (
+                        <ul className="max-h-64 overflow-auto">
+                          {cartItems.map((item, idx) => (
+                            <li
+                              key={idx}
+                              className="p-3 border-b text-sm text-gray-700"
+                            >
+                              {item.title}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="relative border-blue-600 text-blue-900 hover:bg-blue-50"
+                      >
+                        <Bell className="w-4 h-4" />
+                        Notifications
+                        {notifications.length > 0 && (
+                          <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-xs">
+                            {notifications.length}
+                          </Badge>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-96 p-0">
+                      <div className="flex justify-between items-center px-4 pt-4">
+                        <h2 className="text-lg font-bold">Notifications</h2>
+                      </div>
+                      <ul className="space-y-2 p-4 pt-2">
+                        {notifications.length === 0 ? (
+                          <li className="text-gray-500 text-center">
+                            No notifications.
+                          </li>
+                        ) : (
+                          notifications.map((n) => (
+                            <li
+                              key={n.id}
+                              className="p-3 bg-gray-100 rounded flex justify-between items-center"
+                            >
+                              <span>{n.text}</span>
+                              <button
+                                onClick={() => handleDismissNotification(n.id)}
+                                className="ml-2 text-gray-400 hover:text-red-600"
+                                title="Dismiss"
+                              >
+                                &#10005;
+                              </button>
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    </PopoverContent>
+                  </Popover>
+
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <>
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginError}
+                shape="pill"
+                theme="filled_blue"
+                text="signin_with"
+              />
+              {error && (
+                <p className="text-sm text-red-600 mt-2 text-right">{error}</p>
+              )}
+            </>
           )}
         </div>
       </div>
