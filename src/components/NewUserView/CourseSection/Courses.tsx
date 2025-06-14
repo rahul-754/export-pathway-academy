@@ -37,7 +37,7 @@ export default function Courses({ onCourseClick }) {
 
   if (loading)
     return (
-      <div className="w-full max-w-[1600px] mx-auto p-10 flex items-center justify-center">
+      <div className="w-full max-w-[1600px] h-[80vh] mx-auto p-10 flex items-center justify-center">
         <FaSpinner className="animate-spin w-10 h-10" />
       </div>
     );

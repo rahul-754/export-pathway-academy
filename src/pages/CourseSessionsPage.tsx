@@ -224,8 +224,11 @@ const CourseSessionsPage = () => {
                 {new Date(course.updatedAt).getUTCFullYear()}
               </span>
               <p className="inline ml-4 text-sm mt-1 text-black">
-                👥 <span className="font-semibold">1.5M</span> learners already
-                enrolled
+                👥{" "}
+                <span className="font-semibold">
+                  {course.enrolledUsersCount}
+                </span>{" "}
+                learners already enrolled
               </p>
               <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
               <p className="text-md text-gray-700 mb-6">
@@ -239,7 +242,7 @@ const CourseSessionsPage = () => {
                 </Badge>
                 <Badge variant="outline" className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  {course.duration}
+                  {course.duration} minutes
                 </Badge>
                 <Badge variant="outline" className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />

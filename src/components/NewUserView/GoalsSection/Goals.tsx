@@ -67,10 +67,10 @@ export default function Goals() {
                     "shadow-md border-l-[6px] border-blue-600"
                   } transition-all hover:shadow-md hover:border-blue-600 rounded-lg`}
                 >
-                  <h5 className="font-semibold tracking-tighter capitalize text-lg">
+                  <h5 className="font-semibold capitalize text-lg">
                     {obj.heading}
                   </h5>
-                  <p>{obj.subheading}</p>
+                  <p className="font-normal">{obj.subheading}</p>
                 </div>
               );
             })}

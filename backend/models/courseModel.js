@@ -17,12 +17,15 @@ const courseSchema = new mongoose.Schema(
     },
     ratingScore: {
       type: Number,
+      default: 0,
     },
     rating: {
       type: Number,
+      default: 0,
     },
     level: {
       type: String,
+      required: true,
     },
     learnings: [{ type: String, required: true }],
     pricing: {
@@ -31,6 +34,7 @@ const courseSchema = new mongoose.Schema(
       required: true,
     },
     instructor: { type: String },
+    duration: { type: Number, default: 0 },
     sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Session" }],
     totalAmount: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },

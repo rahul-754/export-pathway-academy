@@ -1,6 +1,5 @@
 import User from "../models/userModel.js";
 import Course from "../models/courseModel.js";
-import Session from "../models/sessionModel.js";
 import mongoose from "mongoose";
 
 export const createCourse = async (req, res) => {
@@ -72,6 +71,9 @@ export const getCourseById = async (req, res) => {
       tags: course.tags,
       category: course.category,
       instructions: course.instructions,
+      instructor: course.instructor,
+      level: course.level,
+      duration: course.duration,
       setting: course.setting,
       pricing: course.pricing,
       learnings: course.learnings,
@@ -112,6 +114,9 @@ export const getAllCourse = async (req, res) => {
           tags: course.tags,
           category: course.category,
           instructions: course.instructions,
+          instructor: course.instructor,
+          level: course.level,
+          duration: course.duration,
           setting: course.setting,
           learnings: course.learnings,
           rating: course.rating,

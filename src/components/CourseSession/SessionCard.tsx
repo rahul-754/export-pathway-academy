@@ -18,6 +18,7 @@ import { Button } from "../ui/button";
 import { useUser } from "@/hooks/useUser";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function SessionCard({
   session,
@@ -89,7 +90,7 @@ export default function SessionCard({
               </h2>
               <CardTitle
                 title={session.title}
-                className="text-4xl max-w-[700px] line-clamp-1 tracking-tighter font-semibold mb-2"
+                className="text-4xl max-w-[700px] text-ellipsis tracking-tighter font-semibold mb-2"
               >
                 {session.title}
               </CardTitle>
@@ -285,49 +286,60 @@ export default function SessionCard({
         </div>
       )}
 
-      {open && (
-        <CardContent className=" border-t py-10">
-          <h3 className="font-semibold text-xl">What you'll learn</h3>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5">
-            <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-              <h3 className="font-bold text-xl z-[1]">
-                Leverage AI Tools for Smarter Customer Outreach
-              </h3>
-              <p className=" text-md max-w-[75%] z-[1]">
-                Streamline your Email and WhatsApp marketing using intelligent
-                automation.
-              </p>
-              <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 select-none z-0">
-                1
-              </span>
-            </div>
-            <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-              <h3 className="font-bold text-xl z-[1]">
-                Build Seamless Workflows with Zapier
-              </h3>
-              <p className=" text-md max-w-[75%] z-[1]">
-                Integrate your favorite apps to trigger personalized messages
-                effortlessly.
-              </p>
-              <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 z-0 select-none">
-                2
-              </span>
-            </div>
-            <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
-              <h3 className="font-bold text-xl z-[1]">
-                Use WhatsAuto and Mailchimp for Smart Follow-Ups
-              </h3>
-              <p className=" text-md max-w-[75%] z-[1]">
-                Engage customers at the right time with automated responses and
-                campaigns.
-              </p>
-              <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 z-0 select-none">
-                3
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      )}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="expand"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <CardContent className=" border-t py-10">
+              <h3 className="font-semibold text-xl">What you'll learn</h3>
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5">
+                <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                  <h3 className="font-bold text-xl z-[1]">
+                    Leverage AI Tools for Smarter Customer Outreach
+                  </h3>
+                  <p className=" text-md max-w-[75%] z-[1]">
+                    Streamline your Email and WhatsApp marketing using
+                    intelligent automation.
+                  </p>
+                  <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 select-none z-0">
+                    1
+                  </span>
+                </div>
+                <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                  <h3 className="font-bold text-xl z-[1]">
+                    Build Seamless Workflows with Zapier
+                  </h3>
+                  <p className=" text-md max-w-[75%] z-[1]">
+                    Integrate your favorite apps to trigger personalized
+                    messages effortlessly.
+                  </p>
+                  <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 z-0 select-none">
+                    2
+                  </span>
+                </div>
+                <div className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative">
+                  <h3 className="font-bold text-xl z-[1]">
+                    Use WhatsAuto and Mailchimp for Smart Follow-Ups
+                  </h3>
+                  <p className=" text-md max-w-[75%] z-[1]">
+                    Engage customers at the right time with automated responses
+                    and campaigns.
+                  </p>
+                  <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 z-0 select-none">
+                    3
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 }

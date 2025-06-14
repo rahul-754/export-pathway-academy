@@ -22,7 +22,6 @@ const CardElement = ({
 }) => {
   return (
     <Card
-      key={course._id}
       className={`flex ${
         reverse && "flex-row-reverse"
       } items-center gap-5  px-10 py-5 bg-neutral-50 border`}
@@ -77,7 +76,7 @@ const CardElement = ({
             className="max-w-[500px] aspect-video object-cover rounded-xl"
           />
           <div className="absolute top-2 right-2">
-            <Badge>{course.level || "General"}</Badge>
+            <Badge>{course.level}</Badge>
           </div>
         </div>
         <Button
