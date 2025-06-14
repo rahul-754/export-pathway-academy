@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import UserHeader from "@/components/UserHeader";
-import NewUserView from "@/pages/NewUserView";
 import EnrolledUserView from "@/components/EnrolledUserView";
 import { getUserById } from "@/Apis/Apis";
 import { FaSpinner } from "react-icons/fa";
