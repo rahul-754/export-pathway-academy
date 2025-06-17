@@ -61,52 +61,54 @@ export default function SessionCard({
   };
 
   return (
-    <Card key={session._id} className="overflow-hidden  mb-5">
+    <Card key={session._id} className="overflow-hidden mb-5">
       <CardHeader>
-        <div className="flex items-start justify-between gap-10 relative">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-4 lg:gap-10 relative">
           {/* LEFT: Image + Title + Buttons */}
-          <div className="flex items-center gap-6 z-[1]">
-            <img
-              src={session.sessionImage}
-              alt={session.title}
-              className="max-w-[400px] h-full object-contain"
-              style={{ borderRadius: "8px", objectFit: "cover" }}
-            />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+            <div className="w-full sm:w-[180px] lg:w-[250px] aspect-video relative">
+              <img
+                src={session.sessionImage}
+                alt={session.title}
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </div>
 
-            <div className="flex flex-col gap-2 h-full justify-start ">
+            <div className="flex flex-col gap-2 w-full sm:w-auto">
               <div className="flex items-center gap-2">
                 {isAccessible && session.isCompleted && (
-                  <CheckCircle className="h-7 w-7 text-green-600 hover:bg-green-600 hover:text-white p-1 rounded-full transition-colors" />
+                  <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 hover:bg-green-600 hover:text-white p-1 rounded-full transition-colors" />
                 )}
                 <Badge variant="outline" className="w-fit space-x-2">
-                  <Clock className="h-7 w-7 font-bold text-black p-1 rounded-full transition-colors" />
+                  <Clock className="h-5 w-5 sm:h-6 sm:w-6 font-bold text-black p-1 rounded-full transition-colors" />
                   <span className="text-sm text-black font-bold">
                     {session.duration} Minutes
                   </span>
                 </Badge>
               </div>
-              <h2 className=" text-2xl font-medium text-blue-600 z-0 select-none">
+              <h2 className="text-xl sm:text-2xl font-medium text-blue-600 z-0 select-none">
                 Session {index + 1}
               </h2>
               <CardTitle
                 title={session.title}
-                className="text-4xl max-w-[700px] text-ellipsis tracking-tighter font-semibold mb-2"
+                className="text-xl sm:text-2xl lg:text-3xl max-w-[700px] text-ellipsis tracking-tighter font-semibold mb-2 line-clamp-2"
               >
                 {session.title}
               </CardTitle>
-              {isAuthenticated &&
-                (!isAccessible ? (
-                  <div className="flex items-center gap-2 mb-2">
-                    <Lock className="h-4 w-4 text-amber-500 font-bold " />{" "}
-                    <span className="mr-2 text-amber-500">Locked</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 mb-2">
-                    <LockOpen className="h-4 w-4 text-green-500 font-bold " />{" "}
-                    <span className="mr-2 text-green-500">Unlocked</span>
-                  </div>
-                ))}
-              <div className="flex gap-4">
+              
+              {!isAccessible ? (
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock className="h-4 w-4 text-amber-500 font-bold" />
+                  <span className="mr-2 text-amber-500">Locked</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mb-2">
+                  <LockOpen className="h-4 w-4 text-green-500 font-bold" />
+                  <span className="mr-2 text-green-500">Unlocked</span>
+                </div>
+              )}
+              
+              <div className="flex flex-wrap gap-2 sm:gap-4">
                 {isAuthenticated ? (
                   <>
                     {!isAccessible && (
@@ -132,6 +134,7 @@ export default function SessionCard({
                     Please login to access
                   </Button>
                 )}
+                
                 <Button
                   variant="outline"
                   size="sm"
@@ -148,91 +151,89 @@ export default function SessionCard({
                     open
                       ? "border-black text-white bg-black"
                       : "border-blue-900 text-blue-900"
-                  }  font-bold flex items-center`}
+                  } font-bold flex items-center`}
                   onClick={() => {
                     setOpen((temp) => !temp);
                   }}
                 >
-                  {open ? "View less " : "View more"}
+                  {open ? "View less" : "View more"}
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Clock + Lock + Show More */}
-          <div className="flex flex-col items-end my-auto gap-4 z-[1]">
-            {isAuthenticated && (
-              <div className="flex flex-row-reverse ">
-                <div className=" max-w-[300px] space-y-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full justify-start"
-                    disabled={!isAccessible || !session.videoUrl}
-                    onClick={() => handleWatchFullVideo(session)}
-                  >
-                    <Video className="h-4 w-4 mr-2" />
-                    Watch Video
-                    {!isAccessible && (
-                      <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full justify-start"
-                    disabled={!isAccessible || !session.notes}
-                    onClick={() => handleViewNotes(session)}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    View Notes
-                    {!isAccessible && (
-                      <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full justify-start"
-                    disabled={!isAccessible || !session.ppt}
-                    onClick={() => handleViewPPT(session)}
-                  >
-                    <Presentation className="h-4 w-4 mr-2" />
-                    View PPT
-                    {!isAccessible && (
-                      <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full justify-start"
-                    disabled={!isAccessible || !session.quiz}
-                    onClick={() => handleQuizOpen(session._id)}
-                  >
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Attempt Quiz
-                    {!isAccessible && (
-                      <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full justify-start"
-                    disabled={!isAccessible}
-                    onClick={handleDownloadCertificate}
-                  >
-                    <AwardIcon className="h-4 w-4 mr-2" />
-                    Download certificate
-                    {!isAccessible && (
-                      <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
-                    )}
-                  </Button>
-                </div>
+          {/* RIGHT: Action Buttons */}
+          {isAuthenticated && (
+            <div className="w-full lg:w-auto mt-4 lg:mt-0">
+              <div className="flex flex-col gap-2 sm:gap-3">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.videoUrl}
+                  onClick={() => handleWatchFullVideo(session)}
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Watch Video
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                  )}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.notes}
+                  onClick={() => handleViewNotes(session)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Notes
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
+                  )}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.ppt}
+                  onClick={() => handleViewPPT(session)}
+                >
+                  <Presentation className="h-4 w-4 mr-2" />
+                  View PPT
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                  )}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible || !session.quiz}
+                  onClick={() => handleQuizOpen(session._id)}
+                >
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Attempt Quiz
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
+                  )}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled={!isAccessible}
+                  onClick={handleDownloadCertificate}
+                >
+                  <AwardIcon className="h-4 w-4 mr-2" />
+                  Download certificate
+                  {!isAccessible && (
+                    <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
+                  )}
+                </Button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </CardHeader>
       {isAuthenticated && (
@@ -296,22 +297,22 @@ export default function SessionCard({
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <CardContent className=" border-t py-10">
-              <h3 className="font-semibold text-xl">What you'll learn</h3>
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-5 mt-5">
+            <CardContent className="border-t py-6 sm:py-10">
+              <h3 className="font-semibold text-lg sm:text-xl mb-4 sm:mb-5">What you'll learn</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                 {session.learnings.map((learning, index) => {
                   return (
                     <div
                       key={learning._id}
-                      className="px-10 py-8 shadow-lg border shadow-blue-200/50  rounded-xl w-full space-y-2 relative"
+                      className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-8 shadow-lg border shadow-blue-200/50 rounded-xl w-full space-y-2 relative"
                     >
-                      <h3 className="font-bold text-xl z-[1]">
+                      <h3 className="font-bold text-base sm:text-lg lg:text-xl z-[1]">
                         {learning.title}
                       </h3>
-                      <p className=" text-md max-w-[75%] z-[1]">
+                      <p className="text-sm sm:text-base lg:text-md max-w-[90%] sm:max-w-[85%] lg:max-w-[75%] z-[1]">
                         {learning.description}
                       </p>
-                      <span className="absolute bottom-0 right-0 text-9xl font-bold text-blue-600/10 select-none z-0">
+                      <span className="absolute bottom-0 right-0 text-7xl sm:text-8xl lg:text-9xl font-bold text-blue-600/20 select-none z-0">
                         {index + 1}
                       </span>
                     </div>

@@ -279,34 +279,28 @@ const CourseSessionsPage = () => {
 
   return (
     <>
-      <div className=" mx-auto min-h-screen bg-white-50">
-        {/* <CourseSessionsPageMain /> */}
-
-        <div className="bg-[#94b9ff] w-full  p-10 text-black">
-          {/* Outer Container */}
-          <div className="max-w-[1520px] w-full mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12 flex justify-between gap-5 items-center">
-            {/* Left Side - Course Info */}
-            <div className="flex-1 max-w-[600px] space-y-5">
-              <Badge variant="default" className=" bg-green-600 shadow-xl">
-                Bestseller
-              </Badge>
-              <span className="text-xs text-gray-400 ml-4">
-                Last updated {new Date(course.updatedAt).getUTCMonth()}/
-                {new Date(course.updatedAt).getUTCFullYear()}
-              </span>
-              <p className="inline ml-4 text-sm mt-1 text-black">
-                👥{" "}
-                <span className="font-semibold">
-                  {course.enrolledUsersCount}
-                </span>{" "}
-                learners already enrolled
-              </p>
-              <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
-              <p className="text-md text-gray-700 mb-6">
+      <div className="mx-auto min-h-screen bg-white-50">
+        <div className="bg-[#94b9ff] w-full p-4 sm:p-6 md:p-10 text-black">
+          <div className="max-w-[1520px] w-full mx-auto bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col lg:flex-row justify-between gap-5 items-center">
+            <div className="flex-1 w-full lg:max-w-[600px] space-y-4 md:space-y-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="default" className="bg-green-600 shadow-xl">
+                  Bestseller
+                </Badge>
+                <span className="text-xs text-gray-400">
+                  Last updated {new Date(course.updatedAt).getUTCMonth()}/
+                  {new Date(course.updatedAt).getUTCFullYear()}
+                </span>
+                <p className="text-sm text-black">
+                  👥 <span className="font-semibold">25</span> learners already enrolled
+                </p>
+              </div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-4">{course.title}</h1>
+              <p className="text-sm md:text-md text-gray-700 mb-4 md:mb-6">
                 {course.courseDescription}
               </p>
 
-              <div className="flex flex-wrap gap-6 text-2xl text-gray-600 mb-4">
+              <div className="flex flex-wrap gap-3 md:gap-6 text-lg md:text-2xl text-gray-600 mb-4">
                 <Badge variant="outline" className="flex items-center gap-2">
                   <Video className="h-4 w-4" />
                   {course.sessions.length} sessions
@@ -323,18 +317,17 @@ const CourseSessionsPage = () => {
                   <span className="text-yellow-500 font-bold">
                     {course.ratingScore}
                   </span>
-                  <span className=" text-white">({course.rating} ratings)</span>
+                  <span className="text-white">({course.rating} ratings)</span>
                 </Badge>
               </div>
             </div>
 
-            {/* Right Side - Course Image */}
-            <div className=" relative">
-              <div className="relative h-64">
+            <div className="w-full lg:w-auto mt-6 lg:mt-0">
+              <div className="relative h-48 sm:h-56 md:h-64">
                 <img
                   src={course.courseImg}
                   alt={course.title}
-                  className="aspect-video h-full  rounded-lg shadow"
+                  className="aspect-video h-full w-full object-cover rounded-lg shadow"
                 />
 
                 <button
@@ -342,43 +335,42 @@ const CourseSessionsPage = () => {
                   onClick={() => setShowPreview(true)}
                   aria-label="Preview this course"
                 >
-                  <Play className="h-12 w-12 text-white bg-blue-600 rounded-full p-2 opacity-90 hover:scale-110 transition" />
+                  <Play className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-white bg-blue-600 rounded-full p-2 opacity-90 hover:scale-110 transition" />
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Course Summary Section - Udemy style */}
-
-        {/* Sessions List Section */}
-        <div className="w-full max-w-[1600px] mx-auto p-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 ">
+        <div className="w-full max-w-[1600px] mx-auto p-4 sm:p-6 md:p-10">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
             Course Sessions
           </h2>
-          {course.sessions.map((session, index) => (
-            <SessionCard
-              key={session._id}
-              index={index}
-              addToCart={addToCart}
-              handleQuizOpen={handleQuizOpen}
-              handleViewNotes={handleViewNotes}
-              handleViewPPT={handleViewPPT}
-              handleWatchFullVideo={handleWatchFullVideo}
-              handleWatchPreview={handleWatchPreview}
-              session={session}
-              inCart={cart.includes(session._id)}
-              isAccessible={purchasedSessions.includes(session._id)}
-              isCompleted={session.isCompleted}
-            />
-          ))}
+          <div className="grid gap-4">
+            {course.sessions.map((session, index) => (
+              <SessionCard
+                key={session._id}
+                index={index}
+                addToCart={addToCart}
+                handleQuizOpen={handleQuizOpen}
+                handleViewNotes={handleViewNotes}
+                handleViewPPT={handleViewPPT}
+                handleWatchFullVideo={handleWatchFullVideo}
+                handleWatchPreview={handleWatchPreview}
+                session={session}
+                inCart={cart.includes(session._id)}
+                isAccessible={purchasedSessions.includes(session._id)}
+                isCompleted={session.isCompleted}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Preview Modal */}
       {showPreview && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg max-w-2xl w-full relative">
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
             <button
               onClick={() => setShowPreview(false)}
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
@@ -399,11 +391,11 @@ const CourseSessionsPage = () => {
 
       {/* Session Video Modal */}
       {selectedVideoUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg max-w-2xl w-full relative">
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
             <button
               onClick={() => setSelectedVideoUrl(null)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-1000 text-xl font-bold"
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
             >
               ×
             </button>
@@ -444,8 +436,10 @@ const CourseSessionsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Cart */}
       {cart.length > 0 && (
-        <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-4 w-80 max-w-full z-50">
+        <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-4 w-[calc(100%-2rem)] sm:w-80 max-w-full z-50">
           <h3 className="text-lg font-bold mb-2">Your Cart</h3>
           <ul className="mb-2 max-h-48 overflow-auto">
             {cart.map((sessionId) => {
