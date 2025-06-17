@@ -10,6 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
+import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use(morgan("dev"));
 
 app.use("/", router);
 app.use("/api/users", userRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/quiz", quizRoutes);

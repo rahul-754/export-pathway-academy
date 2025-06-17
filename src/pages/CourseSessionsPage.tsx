@@ -7,6 +7,23 @@ import { enrollInSessions, getCourseById, getUserById } from "@/Apis/Apis";
 import { FaSpinner } from "react-icons/fa";
 import SessionCard from "@/components/CourseSession/SessionCard";
 
+// Add Razorpay type to window
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 const CourseSessionsPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -117,19 +134,73 @@ const CourseSessionsPage = () => {
       const parsed = JSON.parse(storedAuth);
       const userId = parsed.user?._id;
 
-      const result = await enrollInSessions(userId, cart);
-      //console.log("Enrollment result:", result);
-      if (!result || result.message !== "Enrollment processed") {
-        throw new Error("Enrollment failed");
+      // 1. Create order on backend
+      const response = await fetch("http://localhost:5000/api/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: cartTotal, userId }),
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Payment order creation failed");
       }
-      const successfulEnrollments = result.user.enrolledSessions || [];
-      setPurchasedSessions((prev) => [...prev, ...successfulEnrollments]);
-      setCart([]);
-      alert("Successfully enrolled in selected sessions!");
-      setShowSuccessDialog(true);
+
+      // 2. Load Razorpay script
+      const res = await loadRazorpayScript();
+      if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        return;
+      }
+
+      // 3. Open Razorpay checkout
+      const options = {
+        key: "rzp_test_9fPmRoWUAdsgdk", // Replace with your Razorpay key id
+        amount: data.orderDetails.amount,
+        currency: data.orderDetails.currency,
+        name: course.title,
+        description: "Course Session Purchase",
+        order_id: data.orderDetails.order_id,
+        handler: async function (response) {
+          // 4. Verify payment on backend
+          const verifyRes = await fetch("http://localhost:5000/api/payment/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            // 5. Enroll user in sessions
+            const result = await enrollInSessions(userId, cart);
+            if (!result || result.message !== "Enrollment processed") {
+              throw new Error("Enrollment failed");
+            }
+            const successfulEnrollments = result.user.enrolledSessions || [];
+            setPurchasedSessions((prev) => [...prev, ...successfulEnrollments]);
+            setCart([]);
+            alert("Successfully enrolled in selected sessions!");
+            setShowSuccessDialog(true);
+          } else {
+            alert("Payment verification failed.");
+          }
+        },
+        prefill: {
+          email: parsed.user?.emailAddress,
+          name: parsed.user?.name,
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (err) {
-      console.error("Enrollment failed:", err);
-      alert("Something went wrong during enrollment. Try again.");
+      console.error("Error during payment process:", err);
+      console.error("Payment/Enrollment failed:", err);
+      alert("Something went wrong during payment or enrollment. Try again.");
     }
   };
 
