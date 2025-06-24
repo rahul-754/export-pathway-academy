@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Video, Play, Clock, BookOpen } from "lucide-react";
+import { Video, Play, Clock, BookOpen, Download } from "lucide-react";
 import { enrollInSessions, getCourseById, getUserById } from "@/Apis/Apis";
 import { FaSpinner } from "react-icons/fa";
 import SessionCard from "@/components/CourseSession/SessionCard";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Add Razorpay type to window
 declare global {
@@ -135,7 +137,7 @@ const CourseSessionsPage = () => {
       const userId = parsed.user?._id;
 
       // 1. Create order on backend
-      const response = await fetch("http://localhost:5000/api/payment/create-order", {
+      const response = await fetch("https://mdm.ai.multipliersolutions.in/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: cartTotal, userId }),
@@ -163,7 +165,7 @@ const CourseSessionsPage = () => {
         order_id: data.orderDetails.order_id,
         handler: async function (response) {
           // 4. Verify payment on backend
-          const verifyRes = await fetch("http://localhost:5000/api/payment/verify-payment", {
+          const verifyRes = await fetch("https://mdm.ai.multipliersolutions.in/api/payment/verify-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -261,6 +263,30 @@ const CourseSessionsPage = () => {
     navigate(`/quiz/${sessionId}`);
   };
 
+  const handleDownloadCertificate = async () => {
+    const certificate = document.getElementById("course-certificate-template");
+    if (!certificate) return;
+
+    // Make it visible for rendering
+    certificate.style.display = "block";
+
+    // Render to canvas
+    const canvas = await html2canvas(certificate, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    // Hide again
+    certificate.style.display = "none";
+
+    // Create PDF
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height],
+    });
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+    pdf.save("course-certificate.pdf");
+  };
+
   if (loading) {
     return (
       <div className="h-[80vh] flex justify-center items-center">
@@ -276,7 +302,7 @@ const CourseSessionsPage = () => {
       </div>
     );
   }
-
+console.log(course)
   return (
     <>
       <div className="mx-auto min-h-screen bg-white-50">
@@ -319,7 +345,17 @@ const CourseSessionsPage = () => {
                   </span>
                   <span className="text-white">({course.rating} ratings)</span>
                 </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 flex items-center gap-2"
+                  onClick={handleDownloadCertificate}
+                >
+                  <Download className="h-4 w-4" />
+                  Download Certificate
+                </Button>
               </div>
+              
             </div>
 
             <div className="w-full lg:w-auto mt-6 lg:mt-0">
@@ -491,6 +527,42 @@ const CourseSessionsPage = () => {
         </div>
       )}
       {/* Hidden certificate template for download */}
+      <div
+        id="course-certificate-template"
+        style={{
+          display: "none",
+          width: "1086px",
+          height: "768px",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: -9999,
+          background: "#fff",
+          border: "10px solid #1976d2",
+          textAlign: "center",
+          fontFamily: "serif",
+        }}
+      >
+        <h1 style={{ marginTop: 100, fontSize: 48, color: "#1976d2" }}>
+          Certificate of Completion
+        </h1>
+        <p style={{ fontSize: 28, marginTop: 60 }}>
+          This is to certify that
+        </p>
+        <h2 style={{ fontSize: 36, margin: "30px 0", color: "#333" }}>
+          {/* You can use user's name here if available */}
+          [Your Name]
+        </h2>
+        <p style={{ fontSize: 24 }}>
+          has successfully completed the course
+        </p>
+        <h2 style={{ fontSize: 32, margin: "30px 0", color: "#1976d2" }}>
+          {course.title}
+        </h2>
+        <p style={{ fontSize: 20, marginTop: 40 }}>
+          Date: {new Date().toLocaleDateString()}
+        </p>
+      </div>
     </>
   );
 };

@@ -112,7 +112,7 @@ export default function Header() {
     <header className="bg-white border-b w-full p-4">
       <div className="flex justify-between items-center w-full max-w-[1520px] mx-auto">
         <img
-          src="./logo.png"
+          src="/logo.png"
           alt="Logo"
           style={{ width: "auto", height: "40px", objectFit: "cover" }}
         />
