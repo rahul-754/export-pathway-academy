@@ -67,13 +67,13 @@ export default function Footer() {
                 <h3 className="text-xl font-bold mb-4">Quick Links</h3>
                 <ul className="space-y-3 font-medium text-sm">
                   <li>
-                    <Link to="#" className="hover:text-blue-500">
+                    <Link to="https://terrasourcing.com/" className="hover:text-blue-500">
                       About Us
                     </Link>
                   </li>
                   <li>
                     <Link
-                      to="/webinarAndEvents"
+                      to="https://terrasourcing.com/webinarAndEvents"
                       className="hover:text-blue-500"
                     >
                       Our Services
@@ -81,19 +81,19 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/exporter/market-research-report"
+                      to="https://terrasourcing.com/exporter/market-research-report"
                       className="hover:text-blue-500"
                     >
                       Our Solution
                     </Link>
                   </li>
                   <li>
-                    <Link to="/blogs" className="hover:text-blue-500">
+                    <Link to="https://terrasourcing.com/blogs" className="hover:text-blue-500">
                       Our Blog
                     </Link>
                   </li>
                   <li>
-                    <Link to="/contact-us" className="hover:text-blue-500">
+                    <Link to="https://terrasourcing.com/contact-us" className="hover:text-blue-500">
                       Contact Us
                     </Link>
                   </li>
@@ -106,7 +106,7 @@ export default function Footer() {
                 <ul className="space-y-3 font-medium text-sm">
                   <li>
                     <Link
-                      to="/exporter/market-research-report"
+                      to="https://terrasourcing.com/exporter/market-research-report"
                       className="hover:text-blue-500"
                     >
                       Market Research Report
@@ -114,7 +114,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/exporter/lead-verification"
+                      to="https://terrasourcing.com/exporter/lead-verification"
                       className="hover:text-blue-500"
                     >
                       Lead verification
@@ -122,7 +122,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/webinarAndEvents"
+                      to="https://terrasourcing.com/webinarAndEvents"
                       className="hover:text-blue-500"
                     >
                       Webinar And Training
