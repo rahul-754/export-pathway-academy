@@ -17,6 +17,7 @@ import { UserProvider } from "./contexts/UserContext";
 import Header from "./components/Header";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import { useMemo } from "react";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
   const queryClient = useMemo(() => new QueryClient(), []);
@@ -43,6 +44,17 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+
+
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
               <Route
                 path="/quiz/:sessionId"
                 element={

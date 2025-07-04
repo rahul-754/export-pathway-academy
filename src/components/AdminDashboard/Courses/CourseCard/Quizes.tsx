@@ -407,7 +407,7 @@ export default function Quizes({
             value={selectedQuiz.title}
             disabled={savingQuiz}
             onChange={(e) => {
-              setSelectedQuiz((s) => ({ ...s!, maxAttempts: value }));
+              setSelectedQuiz((s) => ({ ...s!, title: e.target.value }));
               setSaved(false);
             }}
           />

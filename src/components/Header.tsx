@@ -89,8 +89,15 @@ export default function Header() {
             source: "terrasourcing",
           },
         });
-        if (finalResponse.user.enrolledSessions.length !== 0)
-          navigate("user-dashboard");
+
+        // Redirect based on role
+        if (finalResponse.user.role === "admin") {
+          navigate("/admin-dashboard");
+        } else if (finalResponse.user.enrolledSessions.length !== 0) {
+          navigate("/user-dashboard");
+        } else {
+          navigate("/"); // or wherever you want for new users
+        }
       }
     } catch (err) {
       console.error("Google login error:", err);
