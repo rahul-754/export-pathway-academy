@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const AdminHeader = () => {
   return (
     <div className="bg-white shadow-sm border-b">
-      <div className="container mx-auto px-4 py-4">
+      {/* <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <img
@@ -33,7 +33,7 @@ const AdminHeader = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

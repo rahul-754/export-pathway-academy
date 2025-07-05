@@ -19,18 +19,26 @@ const NewUserView = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    if (user.enrolledCourses.length === 0) {
-      setLoading(false);
-      return;
-    }
-    navigate("/user-dashboard");
+  setLoading(true);
+
+  if (!user) {
     setLoading(false);
-  }, [user]);
+    return;
+  }
+
+  if (user.role === "admin") {
+    navigate("/admin-dashboard");
+    return;
+  }
+
+  if (user.enrolledCourses.length > 0) {
+    navigate("/user-dashboard");
+    return;
+  }
+
+  setLoading(false);
+}, [user]);
+
 
   if (loading)
     return (
