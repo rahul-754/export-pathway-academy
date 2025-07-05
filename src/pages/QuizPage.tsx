@@ -180,10 +180,11 @@ const QuizPage = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        // const data = await getQuizWithSessionId(sessionId);
-        // setQuiz(data);
-        setQuiz(sampleQuiz); // Using sample data for now
-        setTimeLeft(sampleQuiz.duration * 60); // Convert minutes to seconds
+        // Fetch quiz by sessionId from your API
+        const res = await getQuizWithSessionId(sessionId);
+        // If your API returns { quiz: {...} }
+        setQuiz(res.quiz);
+        setTimeLeft((res.quiz.duration || 0) * 60);
       } catch (err) {
         console.error("Failed to fetch quiz:", err);
       } finally {
@@ -510,4 +511,4 @@ const QuizPage = () => {
   );
 };
 
-export default QuizPage; 
+export default QuizPage;

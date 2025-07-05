@@ -89,9 +89,10 @@ export default function Header() {
             source: "terrasourcing",
           },
         });
-
+        
         // Redirect based on role
         if (finalResponse.user.role === "admin") {
+          localStorage.setItem("isAdmin", "true");
           navigate("/admin-dashboard");
         } else if (finalResponse.user.enrolledSessions.length !== 0) {
           navigate("/user-dashboard");
@@ -290,7 +291,7 @@ export default function Header() {
                   )}
                   <Link
                     to={
-                      user.enrolledCourses.length === 0
+                      user.enrolledCourses.length === 0 
                         ? "/"
                         : "/user-dashboard"
                     }
