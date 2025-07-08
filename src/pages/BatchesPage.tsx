@@ -1,4 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUser } from "@/hooks/useUser";
+import {
+  getUserBatches,
+  getBatchMessages,
+  getBatchMembers,
+  sendBatchMessage,
+} from "@/Apis/Apis";
 import {
   Card,
   CardContent,
@@ -22,141 +29,38 @@ import {
 import UserHeader from "@/components/UserHeader";
 
 const BatchesPage = () => {
+  const { user } = useUser();
+  const [batches, setBatches] = useState<any[]>([]);
+  const [selectedBatch, setSelectedBatch] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [selectedBatch, setSelectedBatch] = useState(1);
 
-  const batches = [
-    {
-      id: 1,
-      name: "Export Documentation Group A",
-      course: "Export Documentation Essentials",
-      members: 15,
-      messages: 45,
-      lastActivity: "2 hours ago",
-      isActive: true,
-    },
-    {
-      id: 2,
-      name: "Trade Laws Discussion",
-      course: "International Trade Laws",
-      members: 12,
-      messages: 28,
-      lastActivity: "1 day ago",
-      isActive: true,
-    },
-    {
-      id: 3,
-      name: "Marketing Strategies Batch",
-      course: "Digital Marketing for Exporters",
-      members: 8,
-      messages: 19,
-      lastActivity: "3 days ago",
-      isActive: false,
-    },
-  ];
+  // Fetch batches for the user
+  useEffect(() => {
+    if (user?._id) {
+      getUserBatches(user._id).then(setBatches);
+    }
+  }, [user]);
 
-  const messages = [
-    {
-      id: 1,
-      user: "Sarah Johnson",
-      avatar: "SJ",
-      message:
-        "Hi everyone! I had a question about the commercial invoice template we discussed in session 2. Could someone help clarify the difference between FOB and CIF terms?",
-      timestamp: "10:30 AM",
-      isMe: false,
-    },
-    {
-      id: 2,
-      user: "Mike Chen",
-      avatar: "MC",
-      message:
-        "Great question Sarah! FOB (Free on Board) means the seller's responsibility ends when the goods are loaded on the ship. CIF (Cost, Insurance, and Freight) includes the cost of goods, insurance, and freight to the destination port.",
-      timestamp: "10:45 AM",
-      isMe: false,
-    },
-    {
-      id: 3,
-      user: "You",
-      avatar: "JD",
-      message:
-        "Thanks Mike! That's really helpful. I've been struggling with understanding when to use each term.",
-      timestamp: "11:00 AM",
-      isMe: true,
-    },
-    {
-      id: 4,
-      user: "Dr. Sarah Wilson",
-      avatar: "SW",
-      message:
-        "Excellent discussion! I'm glad to see you're all engaging with the material. Remember, the choice between FOB and CIF often depends on who has better shipping rates and insurance options.",
-      timestamp: "11:15 AM",
-      isMe: false,
-      isInstructor: true,
-    },
-    {
-      id: 5,
-      user: "Emma Rodriguez",
-      avatar: "ER",
-      message:
-        "I've uploaded a helpful comparison chart in our shared resources. Check it out when you get a chance!",
-      timestamp: "11:30 AM",
-      isMe: false,
-    },
-  ];
+  // Fetch messages and members when selectedBatch changes
+  useEffect(() => {
+    if (selectedBatch) {
+      getBatchMessages(selectedBatch).then(setMessages);
+      getBatchMembers(selectedBatch).then(setMembers);
+    }
+  }, [selectedBatch]);
 
-  const members = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      avatar: "SJ",
-      status: "online",
-      role: "student",
-    },
-    {
-      id: 2,
-      name: "Mike Chen",
-      avatar: "MC",
-      status: "online",
-      role: "student",
-    },
-    {
-      id: 3,
-      name: "Emma Rodriguez",
-      avatar: "ER",
-      status: "away",
-      role: "student",
-    },
-    {
-      id: 4,
-      name: "Dr. Sarah Wilson",
-      avatar: "SW",
-      status: "online",
-      role: "instructor",
-    },
-    {
-      id: 5,
-      name: "John Davis",
-      avatar: "JD",
-      status: "online",
-      role: "student",
-    },
-    {
-      id: 6,
-      name: "Lisa Wang",
-      avatar: "LW",
-      status: "offline",
-      role: "student",
-    },
-  ];
-
-  const currentBatch = batches.find((b) => b.id === selectedBatch);
-
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      //console.log('Sending message:', newMessage);
+  const handleSendMessage = async () => {
+    if (newMessage.trim() && selectedBatch && user?._id) {
+      await sendBatchMessage(selectedBatch, newMessage, user._id);
       setNewMessage("");
+      getBatchMessages(selectedBatch).then(setMessages); // Refresh messages
     }
   };
+
+  // Use _id for batch selection and lookup
+  const currentBatch = batches.find((b) => b._id === selectedBatch);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -180,42 +84,43 @@ const BatchesPage = () => {
             <div className="space-y-3">
               {batches.map((batch) => (
                 <Card
-                  key={batch.id}
+                  key={batch._id}
                   className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedBatch === batch.id
+                    selectedBatch === batch._id
                       ? "ring-2 ring-blue-500 bg-blue-50"
                       : ""
                   }`}
-                  onClick={() => setSelectedBatch(batch.id)}
+                  onClick={() => setSelectedBatch(batch._id)}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm line-clamp-2">
-                      {batch.name}
+                      {batch.title}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      {batch.course}
+                      {batch.category} &bull; {batch.medium}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-2">
                     <div className="flex items-center justify-between text-xs text-gray-600">
                       <span className="flex items-center">
                         <Users className="h-3 w-3 mr-1" />
-                        {batch.members}
+                        {batch.members?.length ?? 0}
                       </span>
                       <span className="flex items-center">
-                        <MessageSquare className="h-3 w-3 mr-1" />
-                        {batch.messages}
+                        <Clock className="h-3 w-3 mr-1" />
+                        {batch.startDate?.slice(0, 10)} -{" "}
+                        {batch.endDate?.slice(0, 10)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <Badge
-                        variant={batch.isActive ? "default" : "secondary"}
+                        variant={batch.status === "active" ? "default" : "secondary"}
                         className="text-xs"
                       >
-                        {batch.isActive ? "Active" : "Inactive"}
+                        {batch.status}
                       </Badge>
                       <span className="text-xs text-gray-500">
-                        {batch.lastActivity}
+                        {batch.isPaid ? `₹${batch.amount}` : "Free"}
                       </span>
                     </div>
                   </CardContent>
@@ -232,15 +137,15 @@ const BatchesPage = () => {
                   <div>
                     <CardTitle className="flex items-center">
                       <Hash className="h-5 w-5 mr-2" />
-                      {currentBatch?.name}
+                      {currentBatch?.title}
                     </CardTitle>
                     <CardDescription className="flex items-center mt-1">
                       <BookOpen className="h-4 w-4 mr-1" />
-                      {currentBatch?.course}
+                      {currentBatch?.description}
                     </CardDescription>
                   </div>
                   <Badge variant="outline">
-                    {currentBatch?.members} members
+                    {members.length} members
                   </Badge>
                 </div>
               </CardHeader>
