@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -93,6 +94,11 @@ const AdminDashboard = () => {
   const [programFormOpen, setProgramFormOpen] = useState(false);
   const [selectedBatchMembers, setSelectedBatchMembers] = useState<any[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
+  const [showStudentModal, setShowStudentModal] = useState(false);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Fetch all batches on mount
   useEffect(() => {
@@ -213,15 +219,20 @@ const AdminDashboard = () => {
     setProgramFormOpen(false);
   };
 
+  // Show student modal and set users for the batch
   const handleShowMembers = async (batchId: string) => {
-    setMembersLoading(true);
-    try {
-      const members = await getBatchMembers(batchId);
-      setSelectedBatchMembers(members);
-    } catch (e) {
-      setSelectedBatchMembers([]);
-    }
-    setMembersLoading(false);
+    setSelectedBatchId(batchId);
+    setShowStudentModal(true);
+    // Optionally fetch all users if needed, here we use the already loaded users
+    setAllUsers(users);
+    setSelectedUsers([]); // Reset selection
+  };
+
+  // Add selected users to batch (mock logic, adjust as needed)
+  const handleAddStudentsToBatch = () => {
+    setShowStudentModal(false);
+    setSelectedBatchId(null);
+    // You can add logic to update the batch with selected users here
   };
 
   return (
@@ -325,7 +336,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
-
+            
             <div className="grid gap-4">
               {programs.map((program) => (
                 <Card key={program.id}>
@@ -522,7 +533,7 @@ const AdminDashboard = () => {
                           <BarChart3 className="w-4 h-4 mr-1" />
                           Analytics
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => navigate("/batches")}> {/* Navigate to discussions */}
                           <MessageSquare className="w-4 h-4 mr-1" />
                           Discussions
                         </Button>
@@ -541,18 +552,35 @@ const AdminDashboard = () => {
             batch={editingBatch}
           />
         )}
-        {selectedBatchMembers.length > 0 && (
-          <div>
-            <h4>Batch Members</h4>
-            {membersLoading ? (
-              <p>Loading...</p>
-            ) : (
-              <ul>
-                {selectedBatchMembers.map((member) => (
-                  <li key={member._id}>{member.name} ({member.emailAddress || member.email})</li>
+        {/* Student Modal */}
+        {showStudentModal && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded shadow-lg w-full max-w-2xl max-h-[70vh] overflow-y-auto relative">
+              <h2 className="text-lg font-semibold mb-4">Add Students to Batch</h2>
+              <div className="mb-4">
+                {allUsers.map((user) => (
+                  <div key={user._id} className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user._id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedUsers((prev) => [...prev, user._id]);
+                        } else {
+                          setSelectedUsers((prev) => prev.filter((id) => id !== user._id));
+                        }
+                      }}
+                      className="mr-2"
+                    />
+                    <span>{user.name} ({user.emailAddress || user.email})</span>
+                  </div>
                 ))}
-              </ul>
-            )}
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowStudentModal(false)}>Cancel</Button>
+                <Button onClick={handleAddStudentsToBatch}>Add Selected</Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
