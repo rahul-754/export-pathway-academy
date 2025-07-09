@@ -26,6 +26,7 @@ export default function SessionCard({
   inCart,
   isAccessible,
   isCompleted,
+  remainingDays,
   addToCart,
   handleWatchPreview,
   handleWatchFullVideo,
@@ -96,17 +97,25 @@ export default function SessionCard({
                 {session.title}
               </CardTitle>
               
-              {!isAccessible ? (
-                <div className="flex items-center gap-2 mb-2">
-                  <Lock className="h-4 w-4 text-amber-500 font-bold" />
-                  <span className="mr-2 text-amber-500">Locked</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 mb-2">
-                  <LockOpen className="h-4 w-4 text-green-500 font-bold" />
-                  <span className="mr-2 text-green-500">Unlocked</span>
-                </div>
-              )}
+             {!isAccessible ? (
+  <div className="flex items-center gap-2 mb-2">
+    <Lock className="h-4 w-4 text-amber-500 font-bold" />
+    <span className="mr-2 text-amber-500">Locked</span>
+  </div>
+) : (
+  <div className="flex items-center gap-2 mb-2">
+    <LockOpen className="h-4 w-4 text-green-500 font-bold" />
+    <span className="mr-2 text-green-500">Unlocked</span>
+
+    {/* ✅ Session expiry display */}
+    {remainingDays !== null && remainingDays > 0 && (
+      <span className="text-sm text-gray-700 ml-2">
+        (Expires in {remainingDays} day{remainingDays > 1 ? "s" : ""})
+      </span>
+    )}
+  </div>
+)}
+
               
               <div className="flex flex-wrap gap-2 sm:gap-4">
                 {isAuthenticated ? (

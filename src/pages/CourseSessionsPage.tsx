@@ -38,6 +38,7 @@ const CourseSessionsPage = () => {
   const [cartTotal, setCartTotal] = useState(0);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (!course) return;
@@ -83,6 +84,7 @@ const CourseSessionsPage = () => {
 
         try {
           const userData = await getUserById(userId); // fetch full user
+          setUser(userData); // Set user data to state
 
           // ✅ Check if the user has purchased this course
           const hasPurchasedCourse = userData.enrolledCourses.some(
@@ -383,22 +385,40 @@ console.log(course)
             Course Sessions
           </h2>
           <div className="grid gap-4">
-            {course.sessions.map((session, index) => (
-              <SessionCard
-                key={session._id}
-                index={index}
-                addToCart={addToCart}
-                handleQuizOpen={handleQuizOpen}
-                handleViewNotes={handleViewNotes}
-                handleViewPPT={handleViewPPT}
-                handleWatchFullVideo={handleWatchFullVideo}
-                handleWatchPreview={handleWatchPreview}
-                session={session}
-                inCart={cart.includes(session._id)}
-                isAccessible={purchasedSessions.includes(session._id)}
-                isCompleted={session.isCompleted}
-              />
-            ))}
+            {course.sessions.map((session, index) => {
+              const userEnrolledSession = user?.enrolledSessions.find(
+                (es) => es.session._id === session._id
+              );
+              let remainingDays = null;
+              let isLocked = true;
+              if (userEnrolledSession && userEnrolledSession.enrolledAt) {
+                const enrolledAt = new Date(userEnrolledSession.enrolledAt);
+                const now = new Date();
+                const diffMs = now - enrolledAt;
+                remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                isLocked = remainingDays <= 0;
+              }
+
+              return (
+                <SessionCard
+                  key={session._id}
+                  index={index}
+                  addToCart={addToCart}
+                  handleQuizOpen={handleQuizOpen}
+                  handleViewNotes={handleViewNotes}
+                  handleViewPPT={handleViewPPT}
+                  handleWatchFullVideo={handleWatchFullVideo}
+                  handleWatchPreview={handleWatchPreview}
+                  session={session}
+                  inCart={cart.includes(session._id)}
+                  isAccessible={purchasedSessions.includes(session._id)}
+                  isCompleted={session.isCompleted}
+                  isLocked={isLocked}
+                  remainingDays={remainingDays}
+                />
+                
+              );
+            })}
           </div>
         </div>
       </div>

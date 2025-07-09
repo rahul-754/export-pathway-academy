@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema(
         watchedDuration: { type: Number, default: 0 },
         isCompleted: { type: Boolean, default: false },
         lastWatchedAt: { type: Date },
+        enrolledAt: { type: Date, default: Date.now }, // <-- Add this line
       },
     ],
     role: {
