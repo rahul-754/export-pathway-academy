@@ -111,6 +111,18 @@ export const updateQuiz = async (quiz: Quiz) => {
   }
 };
 
+export const checkAllQuizzesPassed = async (userId: string, courseId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `/quiz/check-all-passed?userId=${userId}&courseId=${courseId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking all quizzes passed:", error);
+    return { allQuizzesPassed: false }; // Return a default value on error
+  }
+};
+
 export const submitQuizAttempt = async (attemptData: {
   quizId: string;
   userId: string;
@@ -118,7 +130,7 @@ export const submitQuizAttempt = async (attemptData: {
   status: "passed" | "failed";
 }) => {
   try {
-            const response = await axiosInstance.post(`/quiz/attempt`, attemptData);
+            const response = await axiosInstance.post(`/quiz/submit-attempt`, attemptData);
     return response.data;
   } catch (error) {
     console.error("Error submitting quiz attempt:", error);

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { getQuizWithSessionId } from "@/Apis/Apis";
+import { getQuizWithSessionId, submitQuizAttempt } from "@/Apis/Apis.tsx";
 import UserHeader from "@/components/UserHeader";
 import { AlertCircle, Clock, CheckCircle2, BookOpenCheck } from "lucide-react";
 
@@ -236,7 +236,7 @@ const QuizPage = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!quiz) return;
 
     let totalScore = 0;
@@ -250,7 +250,26 @@ const QuizPage = () => {
       }
     });
 
-    setScore(totalScore);
+    const finalScore = Math.round(totalScore);
+    const status = finalScore >= quiz.passingMarks ? "passed" : "failed";
+    const storedAuth = localStorage.getItem("TerraAuthData");
+    const userId = storedAuth ? JSON.parse(storedAuth).user?._id : null;
+
+    if (userId) {
+      try {
+        await submitQuizAttempt({
+          quizId: quiz._id,
+          userId,
+          score: finalScore,
+          status,
+        });
+        console.log("Quiz attempt submitted successfully.");
+      } catch (error) {
+        console.error("Failed to submit quiz attempt:", error);
+      }
+    }
+
+    setScore(finalScore);
     setSubmitted(true);
   };
 
@@ -408,7 +427,7 @@ const QuizPage = () => {
                   </div>
                 </div>
                 <Button 
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate(-1, { state: { refresh: true } })}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   Back to Course

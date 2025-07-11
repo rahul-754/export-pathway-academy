@@ -3,7 +3,12 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Video, Play, Clock, BookOpen, Download } from "lucide-react";
-import { enrollInSessions, getCourseById, getUserById } from "@/Apis/Apis";
+import {
+  checkAllQuizzesPassed,
+  enrollInSessions,
+  getCourseById,
+  getUserById,
+} from "@/Apis/Apis";
 import { FaSpinner } from "react-icons/fa";
 import SessionCard from "@/components/CourseSession/SessionCard";
 import html2canvas from "html2canvas";
@@ -40,6 +45,7 @@ const CourseSessionsPage = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
   const [user, setUser] = useState(null); // Initialize user as null to indicate loading state
+  const [allQuizzesPassed, setAllQuizzesPassed] = useState(false);
 
   useEffect(() => {
     if (!course) return;
@@ -95,6 +101,54 @@ const CourseSessionsPage = () => {
 
     fetchCourseAndUserData();
   }, [courseId]);
+
+  useEffect(() => {
+    const checkQuizzes = async () => {
+      if (user && courseId) {
+        const result = await checkAllQuizzesPassed(user._id, courseId);
+        setAllQuizzesPassed(result.allQuizzesPassed);
+      }
+    };
+    checkQuizzes();
+  }, [user, courseId]);
+
+  useEffect(() => {
+    if (location.state?.refresh) {
+      const fetchCourseAndUserData = async () => {
+        if (!courseId) return;
+        setLoading(true);
+        try {
+          const courseData = await getCourseById(courseId);
+          setCourse(courseData);
+
+          const storedAuth = localStorage.getItem("TerraAuthData");
+          if (storedAuth) {
+            const parsed = JSON.parse(storedAuth);
+            const userId = parsed.user?._id;
+            if (userId) {
+              const userData = await getUserById(userId);
+              setUser(userData);
+
+              const purchasedSessionIds = userData.enrolledSessions.map(
+                (enrolled) => enrolled.session._id
+              );
+              const purchased = courseData.sessions
+                .filter((session) => purchasedSessionIds.includes(session._id))
+                .map((session) => session._id);
+              setPurchasedSessions(purchased);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load course and user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchCourseAndUserData();
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, courseId, navigate]);
 
   const addToCart = (sessionId) => {
     if (!cart.includes(sessionId)) {
@@ -208,38 +262,7 @@ const CourseSessionsPage = () => {
     navigate("/user-dashboard");
   };
 
-  const areAllQuizzesPassed = useMemo(() => {
-    // Guard against incomplete data. If course or user data isn't loaded, disable.
-    if (!course || !user) {
-      return false;
-    }
 
-    // Find all sessions that have a quiz.
-    const sessionsWithQuiz = course.sessions.filter(
-      (session) => session.quiz && session.quiz._id
-    );
-
-    // If the course has no quizzes, the certificate is available by default.
-    const totalQuizzes = sessionsWithQuiz.length;
-    if (totalQuizzes === 0) {
-      return true;
-    }
-
-    // If there are quizzes, but the user has no attempts, they haven't passed.
-    if (!user.quizAttempts || user.quizAttempts.length === 0) {
-      return false;
-    }
-
-    // Count how many unique quizzes the user has passed.
-    const passedQuizIds = new Set(
-      user.quizAttempts
-        .filter((qa) => qa.status === "passed")
-        .map((qa) => qa.quiz_id)
-    );
-
-    // The certificate is enabled only if the number of passed quizzes equals the total number of quizzes.
-    return passedQuizIds.size === totalQuizzes;
-  }, [course, user]);
 
   const handleViewMaterial = (materialUrl, type) => {
     setViewingMaterial({ type, url: materialUrl });
@@ -349,12 +372,12 @@ console.log(course)
                     size="sm"
                     className="mt-2 flex items-center gap-2"
                     onClick={handleDownloadCertificate}
-                    disabled={!areAllQuizzesPassed}
+                    disabled={!allQuizzesPassed}
                   >
                     <Download className="h-4 w-4" />
                     Download Certificate
                   </Button>
-                  {!areAllQuizzesPassed && (
+                  {!allQuizzesPassed && (
                     <p className="text-xs text-gray-500 text-right">Complete all quizzes to enable certificate download.</p>
                   )}
                 </div>
@@ -396,7 +419,7 @@ console.log(course)
               if (userEnrolledSession && userEnrolledSession.enrolledAt) {
                 const enrolledAt = new Date(userEnrolledSession.enrolledAt);
                 const now = new Date();
-                const diffMs = now - enrolledAt;
+                const diffMs = now.getTime() - enrolledAt.getTime();
                 remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
               }
 
