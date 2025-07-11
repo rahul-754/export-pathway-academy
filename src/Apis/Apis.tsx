@@ -111,6 +111,21 @@ export const updateQuiz = async (quiz: Quiz) => {
   }
 };
 
+export const submitQuizAttempt = async (attemptData: {
+  quizId: string;
+  userId: string;
+  score: number;
+  status: "passed" | "failed";
+}) => {
+  try {
+            const response = await axiosInstance.post(`/quiz/attempt`, attemptData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting quiz attempt:", error);
+    throw error;
+  }
+};
+
 export const getSessionsByCourse = async (courseId) => {
   try {
     const response = await axiosInstance.get(`/sessions/course/${courseId}`);
