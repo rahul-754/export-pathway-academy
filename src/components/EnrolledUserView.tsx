@@ -19,6 +19,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 interface EnrolledCourse {
   id: number;
@@ -50,6 +51,7 @@ interface EnrolledUserViewProps {
 }
 
 const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
+  const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
   const onCourseClick = (courseId: string) => {
     navigate(`/course/${courseId}/sessions`);
@@ -115,6 +117,15 @@ const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
       level: "Advanced",
     },
   ];
+
+  useEffect(() => {
+    if (user?._id) {
+      fetch(`/api/notifications/${user._id}`)
+        .then((res) => res.json())
+        .then((data) => setNotifications(data.notifications || []))
+        .catch(() => setNotifications([]));
+    }
+  }, [user]);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -333,6 +344,30 @@ const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
           </Card>
         </div>
       </div>
+
+      {notifications.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Trophy className="h-5 w-5 mr-2" />
+              Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {notifications.map((note) => (
+              <div key={note._id} className="flex items-start space-x-3">
+                <CheckCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+                <div>
+                  <p className="text-sm">{note.text}</p>
+                  <span className="text-xs text-gray-400">
+                    {new Date(note.createdAt).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
