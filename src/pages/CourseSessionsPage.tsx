@@ -112,44 +112,6 @@ const CourseSessionsPage = () => {
     checkQuizzes();
   }, [user, courseId]);
 
-  useEffect(() => {
-    if (location.state?.refresh) {
-      const fetchCourseAndUserData = async () => {
-        if (!courseId) return;
-        setLoading(true);
-        try {
-          const courseData = await getCourseById(courseId);
-          setCourse(courseData);
-
-          const storedAuth = localStorage.getItem("TerraAuthData");
-          if (storedAuth) {
-            const parsed = JSON.parse(storedAuth);
-            const userId = parsed.user?._id;
-            if (userId) {
-              const userData = await getUserById(userId);
-              setUser(userData);
-
-              const purchasedSessionIds = userData.enrolledSessions.map(
-                (enrolled) => enrolled.session._id
-              );
-              const purchased = courseData.sessions
-                .filter((session) => purchasedSessionIds.includes(session._id))
-                .map((session) => session._id);
-              setPurchasedSessions(purchased);
-            }
-          }
-        } catch (error) {
-          console.error("Failed to load course and user data:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchCourseAndUserData();
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state, courseId, navigate]);
-
   const addToCart = (sessionId) => {
     if (!cart.includes(sessionId)) {
       setCart([...cart, sessionId]);
@@ -419,7 +381,7 @@ console.log(course)
               if (userEnrolledSession && userEnrolledSession.enrolledAt) {
                 const enrolledAt = new Date(userEnrolledSession.enrolledAt);
                 const now = new Date();
-                const diffMs = now.getTime() - enrolledAt.getTime();
+                const diffMs = now - enrolledAt;
                 remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
               }
 
@@ -610,41 +572,65 @@ Your browser does not support the video tag.
       )}
       {/* Hidden certificate template for download */}
       <div
-        id="course-certificate-template"
-        style={{
-          display: "none",
-          width: "1086px",
-          height: "768px",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          zIndex: -9999,
-          background: "#fff",
-          border: "10px solid #1976d2",
-          textAlign: "center",
-          fontFamily: "serif",
-        }}
-      >
-        <h1 style={{ marginTop: 100, fontSize: 48, color: "#1976d2" }}>
-          Certificate of Completion
-        </h1>
-        <p style={{ fontSize: 28, marginTop: 60 }}>
-          This is to certify that
-        </p>
-        <h2 style={{ fontSize: 36, margin: "30px 0", color: "#333" }}>
-          {/* You can use user's name here if available */}
-          [Your Name]
-        </h2>
-        <p style={{ fontSize: 24 }}>
-          has successfully completed the course
-        </p>
-        <h2 style={{ fontSize: 32, margin: "30px 0", color: "#1976d2" }}>
-          {course.title}
-        </h2>
-        <p style={{ fontSize: 20, marginTop: 40 }}>
-          Date: {new Date().toLocaleDateString()}
-        </p>
-      </div>
+  id="course-certificate-template"
+  style={{
+    display: "none",
+    width: "1086px",
+    height: "768px",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: -9999,
+    backgroundImage: "url('/Advanced_Certificate.jpg')", // <-- your certificate background image
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    fontFamily: "serif",
+  }}
+>
+  <div
+    style={{
+      position: "absolute",
+      top: "250px",
+      width: "100%",
+      textAlign: "center",
+    }}
+  >
+    <h3
+  style={{
+    color: "#1976d2",
+    fontSize: "26px",
+    fontWeight: "bold",
+    marginTop: "5px",        // Increased top margin      // 5px space below
+    fontFamily: "Montserrat, sans-serif",
+  }}
+>
+  {course.title || "Course Name"}
+</h3>
+
+  </div>
+
+  <div
+  style={{
+    position: "absolute",
+    top: "340px",
+    width: "100%",
+    textAlign: "center",
+  }}
+>
+  <h2
+    style={{
+      color: "#1976d2",
+      fontSize: "48px", // Increased size
+      fontWeight: "bold", // Bold text
+      fontFamily: "Niconne", // Niconne font
+    }}
+  >
+    {user?.name || "User Name"}
+  </h2>
+</div>
+
+</div>
+
     </>
   );
 };
