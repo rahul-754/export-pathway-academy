@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -98,6 +98,9 @@ const AdminDashboard = () => {
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [showNotificationBox, setShowNotificationBox] = useState(false);
+  const [notificationText, setNotificationText] = useState("");
+  const [sending, setSending] = useState(false);
   const navigate = useNavigate();
 
   // Fetch all batches on mount
@@ -235,6 +238,24 @@ const AdminDashboard = () => {
     // You can add logic to update the batch with selected users here
   };
 
+  const handleSendNotification = async () => {
+    if (!notificationText.trim()) return;
+    setSending(true);
+    try {
+      await fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: notificationText }),
+      });
+      setNotificationText("");
+      alert("Notification sent to all users!");
+    } catch (err) {
+      alert("Failed to send notification.");
+    }
+    setSending(false);
+    setShowNotificationBox(false);
+  };
+
   return (
     <div className="bg-gray-50">
       <AdminHeader />
@@ -301,6 +322,13 @@ const AdminDashboard = () => {
               <p className="text-xs text-muted-foreground">Active</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Notification Button - place above TabsList */}
+        <div className="flex justify-end mb-4">
+          <Button variant="default" onClick={() => setShowNotificationBox(true)}>
+            Send Notification
+          </Button>
         </div>
 
         {/* Management Tabs */}
@@ -580,6 +608,30 @@ const AdminDashboard = () => {
                 <Button variant="outline" onClick={() => setShowStudentModal(false)}>Cancel</Button>
                 <Button onClick={handleAddStudentsToBatch}>Add Selected</Button>
               </div>
+            </div>
+          </div>
+        )}
+        {/* Notification Modal */}
+        {showNotificationBox && (
+          <div style={{
+            position: "fixed", top: "30%", left: "50%", transform: "translate(-50%, -50%)",
+            background: "#fff", padding: "2rem", borderRadius: "8px", boxShadow: "0 2px 8px #0002", zIndex: 1000
+          }}>
+            <h3>Send Notification to All Users</h3>
+            <textarea
+              rows={4}
+              style={{ width: "100%", marginBottom: "1rem" }}
+              value={notificationText}
+              onChange={e => setNotificationText(e.target.value)}
+              placeholder="Enter your message..."
+            />
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <Button onClick={handleSendNotification} disabled={sending}>
+                {sending ? "Sending..." : "Send"}
+              </Button>
+              <Button variant="outline" onClick={() => setShowNotificationBox(false)}>
+                Cancel
+              </Button>
             </div>
           </div>
         )}

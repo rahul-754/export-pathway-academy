@@ -14,6 +14,7 @@ import sessionRoutes from "./routes/sessionRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import paymentRoutes from "./routes/payment.js";
 import batchRoutes from "./routes/batchRoutes.js";
+import notificationRoutes from "./routes/Notification.js";
 
 
 import batchChatSocket from "./sockets/batchChat.js";
@@ -58,6 +59,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/batches", batchRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 // Start server with HTTP server (not app.listen)
