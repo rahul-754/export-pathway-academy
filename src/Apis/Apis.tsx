@@ -218,14 +218,9 @@ export const getBatchMembers = async (batchId: string) => {
 };
 
 // Add this if you have a messages API for batch discussions
-export const getBatchMessages = async (batchId: string) => {
-  try {
-    const response = await axiosInstance.get(`/batches/${batchId}/messages`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching batch messages:", error);
-    throw error;
-  }
+export const getBatchMessages = async (batchId) => {
+  const response = await axiosInstance.get(`/batches/${batchId}/messages`);
+  return response.data;
 };
 
 export const sendBatchMessage = async (batchId: string, message: string, userId: string) => {

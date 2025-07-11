@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useUser } from "@/hooks/useUser";
 import {
   getUserBatches,
   getBatchMessages,
   getBatchMembers,
-  sendBatchMessage,
 } from "@/Apis/Apis";
+import io from "socket.io-client";
 import {
   Card,
   CardContent,
@@ -27,14 +27,20 @@ import {
   Hash,
 } from "lucide-react";
 import UserHeader from "@/components/UserHeader";
+import { useParams, useNavigate } from "react-router-dom";
+
+const SOCKET_URL = "http://localhost:5000"; // Change if your backend runs elsewhere
 
 const BatchesPage = () => {
   const { user } = useUser();
+  const { batchId } = useParams();
+  const navigate = useNavigate();
   const [batches, setBatches] = useState<any[]>([]);
-  const [selectedBatch, setSelectedBatch] = useState<string | null>(null);
+  const [selectedBatch, setSelectedBatch] = useState<string | null>(batchId || null);
   const [messages, setMessages] = useState<any[]>([]);
   const [members, setMembers] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const socketRef = useRef<any>(null);
 
   // Fetch batches for the user
   useEffect(() => {
@@ -43,24 +49,106 @@ const BatchesPage = () => {
     }
   }, [user]);
 
-  // Fetch messages and members when selectedBatch changes
+  // Select batch from URL or default to first batch
   useEffect(() => {
-    if (selectedBatch) {
-      getBatchMessages(selectedBatch).then(setMessages);
-      getBatchMembers(selectedBatch).then(setMembers);
+    if (batches.length > 0) {
+      if (batchId) {
+        setSelectedBatch(batchId);
+      } else if (!selectedBatch) {
+        setSelectedBatch(batches[0]._id);
+      }
     }
-  }, [selectedBatch]);
+  }, [batches, batchId, selectedBatch]);
 
-  const handleSendMessage = async () => {
-    if (newMessage.trim() && selectedBatch && user?._id) {
-      await sendBatchMessage(selectedBatch, newMessage, user._id);
+  // Socket connection and room join
+  useEffect(() => {
+    if (!selectedBatch || !user?._id) return;
+
+    // Connect socket if not already
+    if (!socketRef.current) {
+      socketRef.current = io(SOCKET_URL, {
+        query: { userId: user._id },
+      });
+      console.log("Socket connected:", socketRef.current.id);
+    }
+
+    // Join batch room
+    socketRef.current.emit("joinBatch", { batchId: selectedBatch, userId: user._id });
+    console.log("Joined batch:", selectedBatch);
+
+    // Handler for new messages
+    const handleBatchMessage = (msg: any) => {
+      console.log("Received batchMessage:", msg);
+      setMessages((prev: any[]) => [
+        ...prev,
+        mapMessage(msg, user._id)
+      ]);
+    };
+
+    // Remove previous listener, then add
+    socketRef.current.off("batchMessage", handleBatchMessage);
+    socketRef.current.on("batchMessage", handleBatchMessage);
+
+    // Fetch initial messages and members
+    getBatchMessages(selectedBatch).then((msgs) => {
+      console.log("Fetched initial messages:", msgs);
+      setMessages(msgs.map((m: any, idx: number) => mapMessage(m, user._id, idx)));
+    });
+    getBatchMembers(selectedBatch).then((members) => {
+      console.log("Fetched members:", members);
+      setMembers(members);
+    });
+
+    // Cleanup on batch change/unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.emit("leaveBatch", { batchId: selectedBatch, userId: user._id });
+        socketRef.current.off("batchMessage", handleBatchMessage);
+        console.log("Left batch:", selectedBatch);
+      }
+    };
+  }, [selectedBatch, user]);
+
+  // Send message via socket
+  const handleSendMessage = () => {
+    if (newMessage.trim() && selectedBatch && user?._id && socketRef.current) {
+      const msgObj = {
+        batchId: selectedBatch,
+        userId: user._id,
+        message: newMessage,
+        name: user.name,
+        timestamp: new Date().toISOString(),
+      };
+      console.log("Sending message:", msgObj);
+      socketRef.current.emit("sendBatchMessage", msgObj);
       setNewMessage("");
-      getBatchMessages(selectedBatch).then(setMessages); // Refresh messages
+      // Do NOT fetch messages here; rely on socket event for real-time update
     }
   };
 
   // Use _id for batch selection and lookup
   const currentBatch = batches.find((b) => b._id === selectedBatch);
+
+  // When user clicks a batch, update URL
+  const handleBatchSelect = (id: string) => {
+    setSelectedBatch(id);
+    navigate(`/batches/${id}`);
+  };
+
+  // Helper to map message for UI
+  function mapMessage(message: any, myId: string, idx?: number) {
+    return {
+      ...message,
+      id: message._id || message.id || idx, // fallback to idx if no id
+      isMe: (message.userId || message.user?._id || message.user) === myId,
+      isInstructor: message.role === "instructor",
+      avatar: message.name ? message.name[0].toUpperCase() : "U",
+      user: message.name || "User",
+      timestamp: message.timestamp
+        ? new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : "",
+    };
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -84,20 +172,20 @@ const BatchesPage = () => {
             <div className="space-y-2">
               {batches.map((batch) => (
                 <Card
-                  key={batch.id}
+                  key={batch._id}
                   className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedBatch === batch.id
+                    selectedBatch === batch._id
                       ? "ring-2 ring-blue-500 bg-blue-50"
                       : ""
                   }`}
-                  onClick={() => setSelectedBatch(batch._id)}
+                  onClick={() => handleBatchSelect(batch._id)}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm line-clamp-2">
-                      {batch.name}
+                      {batch.title}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      {batch.course}
+                      {batch.category}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-1">
@@ -114,13 +202,13 @@ const BatchesPage = () => {
                     </div>
                     <div className="flex items-center justify-between mt-1">
                       <Badge
-                        variant={batch.isActive ? "default" : "secondary"}
+                        variant={batch.status === "active" ? "default" : "secondary"}
                         className="text-xs"
                       >
                         {batch.status}
                       </Badge>
                       <span className="text-xs text-gray-500">
-                        {batch.lastActivity}
+                        {batch.isPaid ? `₹${batch.amount}` : "Free"}
                       </span>
                     </div>
                   </CardContent>
@@ -137,24 +225,24 @@ const BatchesPage = () => {
                   <div>
                     <CardTitle className="flex items-center">
                       <Hash className="h-5 w-5 mr-2" />
-                      {currentBatch?.name}
+                      {currentBatch?.title}
                     </CardTitle>
                     <CardDescription className="flex items-center mt-1">
                       <BookOpen className="h-4 w-4 mr-1" />
-                      {currentBatch?.course}
+                      {currentBatch?.description}
                     </CardDescription>
                   </div>
                   <Badge variant="outline">
-                    {currentBatch?.members} members
+                    {currentBatch?.members?.length ?? 0} members
                   </Badge>
                 </div>
               </CardHeader>
               {/* Messages */}
               <div className="flex-1 flex flex-col min-h-0">
                 <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-white scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ maxHeight: 'calc(70vh - 80px)' }}>
-                  {messages.map((message) => (
+                  {messages.map((message, idx) => (
                     <div
-                      key={message.id}
+                      key={message.id || idx}
                       className={`flex ${
                         message.isMe ? "justify-end" : "justify-start"
                       }`}
@@ -247,62 +335,71 @@ const BatchesPage = () => {
 
           {/* Members List */}
           <div className="lg:col-span-1">
-            <Card className="h-full border rounded-lg">
+            <Card className="h-full border rounded-lg flex flex-col">
               <CardHeader className="bg-gray-50 rounded-t-lg px-4 py-3">
                 <CardTitle className="flex items-center text-base font-semibold">
                   <Users className="h-5 w-5 mr-2 text-blue-500" />
                   Members ({members.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 p-4 bg-white rounded-b-lg">
-                {members.map((member) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center space-x-3 py-2 px-2 rounded hover:bg-gray-50 transition"
-                  >
-                    <div className="relative">
-                      <Avatar className="w-7 h-7">
-                        <AvatarImage src="" />
-                        <AvatarFallback
-                          className={`text-xs ${
-                            member.role === "instructor"
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
-                        >
-                          {member.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div
-                        className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
-                          member.status === "online"
-                            ? "bg-green-500"
-                            : member.status === "away"
-                            ? "bg-yellow-500"
-                            : "bg-gray-400"
-                        }`}
-                      ></div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {member.name}
-                      </p>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-xs text-gray-500 capitalize">
-                          {member.status}
-                        </p>
-                        {member.role === "instructor" && (
-                          <Badge
-                            variant="outline"
-                            className="text-xs px-1 py-0"
+              <CardContent
+                className="space-y-3 p-4 bg-white rounded-b-lg overflow-y-auto"
+                style={{ maxHeight: "60vh" }} // Ensures scroll if too many members
+              >
+                {members.length === 0 ? (
+                  <div className="text-center text-gray-400 py-8">
+                    No members found.
+                  </div>
+                ) : (
+                  members.map((member) => (
+                    <div
+                      key={member._id}
+                      className="flex items-center space-x-3 py-2 px-2 rounded hover:bg-gray-50 transition"
+                    >
+                      <div className="relative">
+                        <Avatar className="w-7 h-7">
+                          <AvatarImage src="" />
+                          <AvatarFallback
+                            className={`text-xs ${
+                              member.role === "instructor"
+                                ? "bg-purple-100 text-purple-700"
+                                : "bg-gray-100 text-gray-700"
+                            }`}
                           >
-                            Instructor
-                          </Badge>
-                        )}
+                            {member.name ? member.name[0].toUpperCase() : "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div
+                          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                            member.status === "online"
+                              ? "bg-green-500"
+                              : member.status === "away"
+                              ? "bg-yellow-500"
+                              : "bg-gray-400"
+                          }`}
+                        ></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {member.name}
+                        </p>
+                        <div className="flex items-center space-x-2">
+                          <p className="text-xs text-gray-500 capitalize">
+                            {member.status}
+                          </p>
+                          {member.role === "instructor" && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs px-1 py-0"
+                            >
+                              Instructor
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </CardContent>
             </Card>
           </div>

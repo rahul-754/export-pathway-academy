@@ -75,7 +75,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/batches"
+                path="/batches/:batchId?"
                 element={
                   <ProtectedRoute>
                     <BatchesPage />

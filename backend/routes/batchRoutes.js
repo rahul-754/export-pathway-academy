@@ -6,7 +6,8 @@ import {
   getAllBatchesAdmin,
   getUserBatches,
   getBatchById,
-  getBatchMembers
+  getBatchMembers,
+  getBatchMessages
 } from '../controllers/batchController.js';
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.get('/all', getAllBatchesAdmin); // Get all batches (admin view)
 router.get('/', getUserBatches); // Get batches for a user
 router.get('/:id', getBatchById); // Get batch details (if member)
 router.get('/:id/members', getBatchMembers); // Get members of a batch
+router.get('/:id/messages', getBatchMessages); // Get messages of a batch
 
 export default router;
