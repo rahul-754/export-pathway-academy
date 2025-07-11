@@ -391,12 +391,16 @@ console.log(course)
               );
               let remainingDays = null;
               let isLocked = true;
+
               if (userEnrolledSession && userEnrolledSession.enrolledAt) {
                 const enrolledAt = new Date(userEnrolledSession.enrolledAt);
                 const now = new Date();
                 const diffMs = now - enrolledAt;
                 remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
                 isLocked = remainingDays <= 0;
+              } else {
+                // User is NOT enrolled, so session should be locked
+                isLocked = true;
               }
 
               return (
@@ -411,7 +415,7 @@ console.log(course)
                   handleWatchPreview={handleWatchPreview}
                   session={session}
                   inCart={cart.includes(session._id)}
-                  isAccessible={purchasedSessions.includes(session._id)}
+                  isAccessible={!!userEnrolledSession && !isLocked}
                   isCompleted={session.isCompleted}
                   isLocked={isLocked}
                   remainingDays={remainingDays}
