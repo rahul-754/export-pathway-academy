@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   AwardIcon,
   BookOpen,
@@ -86,13 +87,13 @@ export default function SessionCard({
               >
                 {session.title}
               </CardTitle>
-              <Button
+              {/* <Button
                 variant="link"
                 onClick={() => setOpen(!open)}
                 className="p-0 h-auto text-blue-600 justify-start"
               >
                 {open ? "Hide Details" : "View Details"}
-              </Button>
+              </Button> */}
 
               {!isAccessible ? (
                 <div className="flex items-center gap-2 mb-2">
@@ -149,6 +150,23 @@ export default function SessionCard({
                   <Play className="h-4 w-4 mr-2" />
                   Watch Preview
                 </Button>
+                <Button
+  variant="link"
+  onClick={() => setOpen(!open)}
+  className="p-0 h-auto text-blue-600 justify-start flex items-center gap-1"
+>
+  {open ? (
+    <>
+      Hide Details
+      <ChevronUp className="w-4 h-4" />
+    </>
+  ) : (
+    <>
+      View Details
+      <ChevronDown className="w-4 h-4" />
+    </>
+  )}
+</Button>
               </div>
             </div>
           </div>
@@ -178,9 +196,9 @@ export default function SessionCard({
                   onClick={() => handleViewMaterial(session.notes, 'notes')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  View Notes
+                  Session Material
                   {!isAccessible && (
-                    <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
+                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
                   )}
                 </Button>
                 <Button
