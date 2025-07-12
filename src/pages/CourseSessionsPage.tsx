@@ -270,6 +270,16 @@ const CourseSessionsPage = () => {
     pdf.save("course-certificate.pdf");
   };
 
+  useEffect(() => {
+    const now = new Date();
+    const msUntilMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+    const timer = setTimeout(() => {
+      setLoading((l) => !l); // Triggers a re-render
+    }, msUntilMidnight);
+    return () => clearTimeout(timer);
+  }, []);
+
   if (loading) {
     return (
       <div className="h-[80vh] flex justify-center items-center">
@@ -378,14 +388,17 @@ console.log(course)
               );
 
               let remainingDays = null;
+              let isLocked = true;
+
               if (userEnrolledSession && userEnrolledSession.enrolledAt) {
                 const enrolledAt = new Date(userEnrolledSession.enrolledAt);
                 const now = new Date();
                 const diffMs = now - enrolledAt;
                 remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                isLocked = remainingDays <= 0;
+              } else {
+                isLocked = true;
               }
-
-              const isLocked = !userEnrolledSession || (remainingDays !== null && remainingDays <= 0);
 
               let quizAttempt = null;
               if (session.quiz && session.quiz._id) {
