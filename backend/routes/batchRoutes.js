@@ -7,7 +7,8 @@ import {
   getUserBatches,
   getBatchById,
   getBatchMembers,
-  getBatchMessages
+  getBatchMessages,
+  addUsersToBatch
 } from '../controllers/batchController.js';
 import Batch from '../models/batchModel.js';
 
@@ -24,6 +25,7 @@ router.get('/', getUserBatches); // Get batches for a user
 router.get('/:id', getBatchById); // Get batch details (if member)
 router.get('/:id/members', getBatchMembers); // Get members of a batch
 router.get('/:id/messages', getBatchMessages); // Get messages of a batch
+router.post('/add-users', addUsersToBatch); // Add users to a batch
 
 router.get('/admin', async (req, res) => {
   try {

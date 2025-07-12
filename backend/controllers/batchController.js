@@ -23,6 +23,7 @@ export const updateBatch = async (req, res) => {
   }
 };
 
+
 // Delete batch (Admin)
 export const deleteBatch = async (req, res) => {
   try {
@@ -88,6 +89,25 @@ export const getBatchMessages = async (req, res) => {
     const batchId = req.params.id;
     const messages = await BatchMessage.find({ batch: batchId }).sort({ timestamp: 1 });
     res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const addUsersToBatch = async (req, res) => {
+  try {
+    const { batchId, userIds } = req.body;
+    if (!batchId || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ error: "batchId and userIds[] required" });
+    }
+    const batch = await Batch.findById(batchId);
+    if (!batch) return res.status(404).json({ error: "Batch not found" });
+
+    // Add users, avoiding duplicates
+    batch.members = Array.from(new Set([...batch.members.map(String), ...userIds.map(String)]));
+    await batch.save();
+
+    res.json({ message: "Users added to batch", batch });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

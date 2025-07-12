@@ -315,3 +315,8 @@ export const getAllUsers = async (page = 1, limit = 10, search = "") => {
     throw error;
   }
 };
+
+export const addUsersToBatch = async (batchId: string, userIds: string[]) => {
+  const response = await axiosInstance.post(`/batches/add-users`, { batchId, userIds });
+  return response.data;
+};

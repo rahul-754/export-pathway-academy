@@ -35,7 +35,9 @@ import {
   deleteBatch,
   getBatchMembers,
   getAllUsers,
+  addUsersToBatch
 } from "@/Apis/Apis";
+import { toast } from "sonner";
 
 interface Batch {
   _id: string;
@@ -232,11 +234,31 @@ const AdminDashboard = () => {
   };
 
   // Add selected users to batch (mock logic, adjust as needed)
-  const handleAddStudentsToBatch = () => {
+  const handleAddStudentsToBatch = async () => {
+  if (!selectedBatchId || selectedUsers.length === 0) {
     setShowStudentModal(false);
     setSelectedBatchId(null);
-    // You can add logic to update the batch with selected users here
-  };
+    return;
+  }
+  try {
+    await addUsersToBatch(selectedBatchId, selectedUsers);
+    toast.success("Users added to batch successfully!", {
+      description: "Selected users have been enrolled in the batch.",
+      duration: 3000,
+    });
+    setShowStudentModal(false);
+    setSelectedBatchId(null);
+    setSelectedUsers([]);
+  } catch (error) {
+    toast.error("Failed to add users to batch.", {
+      description: "Please try again or check your network.",
+      duration: 3000,
+    });
+    setShowStudentModal(false);
+    setSelectedBatchId(null);
+    setSelectedUsers([]);
+  }
+};
 
   const handleSendNotification = async () => {
     if (!notificationText.trim()) return;
