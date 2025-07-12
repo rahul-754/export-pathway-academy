@@ -41,6 +41,7 @@ const BatchesPage = () => {
   const [members, setMembers] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const socketRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch batches for the user
   useEffect(() => {
@@ -149,6 +150,13 @@ const BatchesPage = () => {
         : "",
     };
   }
+
+  // Scroll to bottom on new message
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -304,6 +312,7 @@ const BatchesPage = () => {
                       </div>
                     </div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </CardContent>
                 {/* Message Input */}
                 <div className="border-t p-3 bg-gray-50 rounded-b-lg">
