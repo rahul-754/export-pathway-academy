@@ -5,48 +5,87 @@ import Course from "../models/courseModel.js";
 import Session from "../models/sessionModel.js";
 
 export const registerUser = async (req, res) => {
+  // try {
+  //   const { name, emailAddress, password, ...rest } = req.body;
+
+  //   const existingUser = await User.findOne({ emailAddress });
+  //   if (existingUser)
+  //     return res.status(400).json({ message: "User already exists" });
+
+  //   const hashedPassword = await bcrypt.hash(password, 10);
+
+  //   const user = new User({ name, emailAddress, ...rest });
+  //   user.password = hashedPassword;
+  //   await user.save();
+
+  //   const token = jwt.sign(
+  //     { id: user._id, role: user.role },
+  //     process.env.JWT_SECRET,
+  //     {
+  //       expiresIn: "1d",
+  //     }
+  //   );
+
+  //   res.cookie("token", token, {
+  //     httpOnly: true,
+  //     secure: process.env.NODE_ENV === "production",
+  //     sameSite: "strict",
+  //     maxAge: 24 * 60 * 60 * 1000, // 1 day
+  //   });
+
+  //   const { password: _, ...userData } = user.toObject();
+
+  //   if (process.env.NODE_ENV === "development") {
+  //     res.status(201).json({
+  //       message: "User registered successfully",
+  //       user: userData,
+  //       token,
+  //     });
+  //   } else {
+  //     res
+  //       .status(201)
+  //       .json({ message: "User registered successfully", user: userData });
+  //   }
+  // }
   try {
-    const { name, emailAddress, password, ...rest } = req.body;
-
-    const existingUser = await User.findOne({ emailAddress });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new User({ name, emailAddress, ...rest });
-    user.password = hashedPassword;
-    await user.save();
-
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
-    );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    const { password: _, ...userData } = user.toObject();
-
-    if (process.env.NODE_ENV === "development") {
-      res.status(201).json({
-        message: "User registered successfully",
-        user: userData,
-        token,
-      });
-    } else {
-      res
-        .status(201)
-        .json({ message: "User registered successfully", user: userData });
+    const users = req.body.users; // expecting: [{ name, emailAddress, password, ... }, ...]
+  
+    if (!Array.isArray(users)) {
+      return res.status(400).json({ message: "Invalid data format. 'users' should be an array." });
     }
-  } catch (error) {
+  
+    const createdUsers = [];
+  
+    for (const userData of users) {
+      const { name, emailAddress, password, ...rest } = userData;
+  
+      const existingUser = await User.findOne({ emailAddress });
+      if (existingUser) {
+        continue; // Skip already registered users
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({
+        name,
+        emailAddress,
+        password: hashedPassword,
+        ...rest,
+      });
+  
+      await newUser.save();
+      createdUsers.push({ id: newUser._id, email: newUser.emailAddress });
+    }
+  
+    if (createdUsers.length === 0) {
+      return res.status(400).json({ message: "No new users were created. All already exist." });
+    }
+  
+    return res.status(201).json({
+      message: `${createdUsers.length} users registered successfully`,
+      users: createdUsers,
+    });
+  
+  }  catch (error) {
     res
       .status(500)
       .json({ message: "Error registering user", error: error.message });
