@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Video, Play, Clock, BookOpen, Download } from "lucide-react";
-import { enrollInSessions, getCourseById, getUserById } from "@/Apis/Apis";
+import {
+  checkAllQuizzesPassed,
+  enrollInSessions,
+  getCourseById,
+  getUserById,
+} from "@/Apis/Apis";
 import { FaSpinner } from "react-icons/fa";
 import SessionCard from "@/components/CourseSession/SessionCard";
 import html2canvas from "html2canvas";
@@ -29,6 +34,7 @@ function loadRazorpayScript() {
 const CourseSessionsPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [purchasedSessions, setPurchasedSessions] = useState([]);
@@ -38,6 +44,8 @@ const CourseSessionsPage = () => {
   const [cartTotal, setCartTotal] = useState(0);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [viewingMaterial, setViewingMaterial] = useState(null);
+  const [user, setUser] = useState(null); // Initialize user as null to indicate loading state
+  const [allQuizzesPassed, setAllQuizzesPassed] = useState(false);
 
   useEffect(() => {
     if (!course) return;
@@ -60,56 +68,87 @@ const CourseSessionsPage = () => {
   }, [cart, course]);
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchCourseAndUserData = async () => {
+      if (!courseId) return;
+      setLoading(true);
       try {
-        const data = await getCourseById(courseId);
-        setCourse(data);
-      } catch (err) {
-        console.error("Failed to fetch course:", err);
+        const courseData = await getCourseById(courseId);
+        setCourse(courseData);
+
+        const storedAuth = localStorage.getItem("TerraAuthData");
+        if (storedAuth) {
+          const parsed = JSON.parse(storedAuth);
+          const userId = parsed.user?._id;
+          if (userId) {
+            const userData = await getUserById(userId);
+            setUser(userData);
+
+            const purchasedSessionIds = userData.enrolledSessions.map(
+              (enrolled) => enrolled.session._id
+            );
+            const purchased = courseData.sessions
+              .filter((session) => purchasedSessionIds.includes(session._id))
+              .map((session) => session._id);
+            setPurchasedSessions(purchased);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load course and user data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchCourse();
+
+    fetchCourseAndUserData();
   }, [courseId]);
 
   useEffect(() => {
-    const fetchUserAndSetPurchasedSessions = async () => {
-      const storedAuth = localStorage.getItem("TerraAuthData");
-
-      if (storedAuth && course) {
-        const parsed = JSON.parse(storedAuth);
-        const userId = parsed.user?._id;
-
-        try {
-          const userData = await getUserById(userId); // fetch full user
-
-          // ✅ Check if the user has purchased this course
-          const hasPurchasedCourse = userData.enrolledCourses.some(
-            (enrolled) => enrolled.course._id === course._id
-          );
-
-          // ✅ Get the list of session IDs the user has access to
-          const purchasedSessionIds = userData.enrolledSessions.map(
-            (enrolled) => enrolled.session._id
-          );
-
-          // ✅ Optionally filter course sessions against those purchased
-          const purchased = course.sessions
-            .filter((session) => purchasedSessionIds.includes(session._id))
-            .map((session) => session._id);
-
-          if (hasPurchasedCourse || purchased.length > 0) {
-            setPurchasedSessions(purchased);
-          }
-        } catch (error) {
-          console.error("Failed to fetch user data:", error);
-        }
+    const checkQuizzes = async () => {
+      if (user && courseId) {
+        const result = await checkAllQuizzesPassed(user._id, courseId);
+        setAllQuizzesPassed(result.allQuizzesPassed);
       }
     };
+    checkQuizzes();
+  }, [user, courseId]);
 
-    fetchUserAndSetPurchasedSessions();
-  }, [course]);
+  useEffect(() => {
+    if (location.state?.refresh) {
+      const fetchCourseAndUserData = async () => {
+        if (!courseId) return;
+        setLoading(true);
+        try {
+          const courseData = await getCourseById(courseId);
+          setCourse(courseData);
+
+          const storedAuth = localStorage.getItem("TerraAuthData");
+          if (storedAuth) {
+            const parsed = JSON.parse(storedAuth);
+            const userId = parsed.user?._id;
+            if (userId) {
+              const userData = await getUserById(userId);
+              setUser(userData);
+
+              const purchasedSessionIds = userData.enrolledSessions.map(
+                (enrolled) => enrolled.session._id
+              );
+              const purchased = courseData.sessions
+                .filter((session) => purchasedSessionIds.includes(session._id))
+                .map((session) => session._id);
+              setPurchasedSessions(purchased);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load course and user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchCourseAndUserData();
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, courseId, navigate]);
 
   const addToCart = (sessionId) => {
     if (!cart.includes(sessionId)) {
@@ -223,28 +262,10 @@ const CourseSessionsPage = () => {
     navigate("/user-dashboard");
   };
 
-  const handleViewNotes = (session) => {
-    if (purchasedSessions.includes(session._id)) {
-      if (session.notes) {
-        setViewingMaterial({ type: "notes", url: session.notes });
-      } else {
-        alert("Notes not available for this session.");
-      }
-    } else {
-      alert("Please buy access to view notes.");
-    }
-  };
 
-  const handleViewPPT = (session) => {
-    if (purchasedSessions.includes(session._id)) {
-      if (session.ppt) {
-        setViewingMaterial({ type: "ppt", url: session.ppt });
-      } else {
-        alert("PPT not available for this session.");
-      }
-    } else {
-      alert("Please buy access to view PPT.");
-    }
+
+  const handleViewMaterial = (materialUrl, type) => {
+    setViewingMaterial({ type, url: materialUrl });
   };
 
   const handleWatchFullVideo = (session) => {
@@ -345,15 +366,21 @@ console.log(course)
                   </span>
                   <span className="text-white">({course.rating} ratings)</span>
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-2 flex items-center gap-2"
-                  onClick={handleDownloadCertificate}
-                >
-                  <Download className="h-4 w-4" />
-                  Download Certificate
-                </Button>
+                <div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 flex items-center gap-2"
+                    onClick={handleDownloadCertificate}
+                    disabled={!allQuizzesPassed}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Certificate
+                  </Button>
+                  {!allQuizzesPassed && (
+                    <p className="text-xs text-gray-500 text-right">Complete all quizzes to enable certificate download.</p>
+                  )}
+                </div>
               </div>
               
             </div>
@@ -383,26 +410,72 @@ console.log(course)
             Course Sessions
           </h2>
           <div className="grid gap-4">
-            {course.sessions.map((session, index) => (
-              <SessionCard
-                key={session._id}
-                index={index}
-                addToCart={addToCart}
-                handleQuizOpen={handleQuizOpen}
-                handleViewNotes={handleViewNotes}
-                handleViewPPT={handleViewPPT}
-                handleWatchFullVideo={handleWatchFullVideo}
-                handleWatchPreview={handleWatchPreview}
-                session={session}
-                inCart={cart.includes(session._id)}
-                isAccessible={purchasedSessions.includes(session._id)}
-                isCompleted={session.isCompleted}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+            {course.sessions.map((session, index) => {
+              const userEnrolledSession = user?.enrolledSessions.find(
+                (es) => es.session._id === session._id
+              );
 
+              let remainingDays = null;
+              if (userEnrolledSession && userEnrolledSession.enrolledAt) {
+                const enrolledAt = new Date(userEnrolledSession.enrolledAt);
+                const now = new Date();
+                const diffMs = now.getTime() - enrolledAt.getTime();
+                remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
+              }
+
+              const isLocked = !userEnrolledSession || (remainingDays !== null && remainingDays <= 0);
+
+              let quizAttempt = null;
+              if (session.quiz && session.quiz._id) {
+                quizAttempt = user?.quizAttempts?.find(
+                  (qa) => qa.quizId === session.quiz._id
+                );
+              }
+
+              return (
+                <SessionCard
+                  key={session._id}
+                  session={session}
+                  index={index}
+                  inCart={cart.includes(session._id)}
+                  isAccessible={!isLocked}
+                  isCompleted={!!userEnrolledSession?.isCompleted}
+                  remainingDays={remainingDays}
+                  quizStatus={quizAttempt?.status || 'not-attempted'}
+                  attemptsMade={quizAttempt?.attempts || 0}
+                  addToCart={addToCart}
+                  handleWatchPreview={() => handleWatchPreview(session)}
+                  handleWatchFullVideo={() => handleWatchFullVideo(session)}
+                  handleViewMaterial={handleViewMaterial}
+                  handleQuizOpen={handleQuizOpen}
+                />
+              );
+})}
+</div>
+</div>
+</div>
+
+{/* Preview Modal */}
+{showPreview && (
+<div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+<div className="bg-white p-4 rounded-lg w-full max-w-2xl relative">
+<button
+onClick={() => setShowPreview(false)}
+className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
+>
+×
+</button>
+<video
+controls
+autoPlay
+className="w-full h-auto rounded"
+src={course.previewVideo}
+>
+Your browser does not support the video tag.
+</video>
+</div>
+</div>
+)}
       {/* Preview Modal */}
       {showPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
@@ -480,6 +553,15 @@ console.log(course)
           <ul className="mb-2 max-h-48 overflow-auto">
             {cart.map((sessionId) => {
               const session = course.sessions.find((s) => s._id === sessionId);
+              let quizStatus: "passed" | "not-attempted" | "failed" = 'not-attempted';
+              let attemptsMade = 0;
+              if (session.quiz && user?.quizAttempts) {
+                const quizAttempt = user.quizAttempts.find(qa => qa.quiz_id === session.quiz._id);
+                if (quizAttempt) {
+                  quizStatus = quizAttempt.status as "passed" | "not-attempted" | "failed";
+                  attemptsMade = quizAttempt.attempts || 0;
+                }
+              }
               return (
                 <li
                   key={sessionId}

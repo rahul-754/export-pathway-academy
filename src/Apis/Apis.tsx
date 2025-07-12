@@ -111,6 +111,33 @@ export const updateQuiz = async (quiz: Quiz) => {
   }
 };
 
+export const checkAllQuizzesPassed = async (userId: string, courseId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `/quiz/check-all-passed?userId=${userId}&courseId=${courseId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking all quizzes passed:", error);
+    return { allQuizzesPassed: false }; // Return a default value on error
+  }
+};
+
+export const submitQuizAttempt = async (attemptData: {
+  quizId: string;
+  userId: string;
+  score: number;
+  status: "passed" | "failed";
+}) => {
+  try {
+            const response = await axiosInstance.post(`/quiz/submit-attempt`, attemptData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting quiz attempt:", error);
+    throw error;
+  }
+};
+
 export const getSessionsByCourse = async (courseId) => {
   try {
     const response = await axiosInstance.get(`/sessions/course/${courseId}`);
@@ -192,6 +219,99 @@ export const enrollInSessions = async (userId, sessionIds) => {
     return response.data;
   } catch (error) {
     console.error("Error enrolling in sessions:", error);
+    throw error;
+  }
+};
+
+// Batch API functions
+export const getUserBatches = async (userId: string) => {
+  try {
+    const response = await axiosInstance.get(`/batches`, { params: { userId } });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user batches:", error);
+    throw error;
+  }
+};
+
+export const getBatchMembers = async (batchId: string) => {
+  try {
+    const response = await axiosInstance.get(`/batches/${batchId}/members`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching batch members:", error);
+    throw error;
+  }
+};
+
+// Add this if you have a messages API for batch discussions
+export const getBatchMessages = async (batchId) => {
+  const response = await axiosInstance.get(`/batches/${batchId}/messages`);
+  return response.data;
+};
+
+export const sendBatchMessage = async (batchId: string, message: string, userId: string) => {
+  try {
+    const response = await axiosInstance.post(`/batches/${batchId}/messages`, { message, userId });
+    return response.data;
+  } catch (error) {
+    console.error("Error sending message:", error);
+    throw error;
+  }
+};
+
+// Admin: Get all batches
+export const getAllBatchesAdmin = async () => {
+  try {
+    const response = await axiosInstance.get("/batches/all");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all batches:", error);
+    throw error;
+  }
+};
+
+// Admin: Create batch
+export const createBatch = async (batchData: any) => {
+  try {
+    const response = await axiosInstance.post("/batches", batchData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating batch:", error);
+    throw error;
+  }
+};
+
+// Admin: Update batch
+export const updateBatch = async (id: string, batchData: any) => {
+  try {
+    const response = await axiosInstance.put(`/batches/${id}`, batchData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating batch:", error);
+    throw error;
+  }
+};
+
+// Admin: Delete batch
+export const deleteBatch = async (id: string) => {
+  try {
+    const response = await axiosInstance.delete(`/batches/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting batch:", error);
+    throw error;
+  }
+};
+
+export const getAllUsers = async (page = 1, limit = 10, search = "") => {
+  try {
+    const response = await axiosInstance.get(`/users`, {
+      params: { page, limit, search },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
     throw error;
   }
 };

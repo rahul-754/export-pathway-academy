@@ -22,7 +22,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 const App = () => {
   const queryClient = useMemo(() => new QueryClient(), []);
 
-
   
   return (
     <UserProvider>
@@ -75,7 +74,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/batches"
+                path="/batches/:batchId?"
                 element={
                   <ProtectedRoute>
                     <BatchesPage />
@@ -90,6 +89,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/course/sessions" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

@@ -16,9 +16,23 @@ import {
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { useUser } from "@/hooks/useUser";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { motion, AnimatePresence } from "framer-motion";
+
+interface SessionCardProps {
+  session: any;
+  index: number;
+  inCart: boolean;
+  isAccessible: boolean;
+  isCompleted: boolean;
+  remainingDays: number | null;
+  quizStatus: 'passed' | 'failed' | 'not-attempted';
+  attemptsMade: number;
+  addToCart: (sessionId: string) => void;
+  handleWatchPreview: () => void;
+  handleWatchFullVideo: (videoUrl: string) => void;
+  handleViewMaterial: (materialUrl: string, type: string) => void;
+  handleQuizOpen: (sessionId: string) => void;
+}
 
 export default function SessionCard({
   session,
@@ -26,39 +40,17 @@ export default function SessionCard({
   inCart,
   isAccessible,
   isCompleted,
+  remainingDays,
   addToCart,
   handleWatchPreview,
   handleWatchFullVideo,
-  handleViewNotes,
-  handleViewPPT,
+  handleViewMaterial,
   handleQuizOpen,
-}) {
+  quizStatus,
+  attemptsMade,
+}: SessionCardProps) {
   const { isAuthenticated, user } = useUser();
-
   const [open, setOpen] = useState(false);
-  const handleDownloadCertificate = async () => {
-    const certificate = document.getElementById("certificate-template");
-    if (!certificate) return;
-
-    // Make it visible for rendering
-    certificate.style.display = "block";
-
-    // Render to canvas
-    const canvas = await html2canvas(certificate, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-
-    // Hide again
-    certificate.style.display = "none";
-
-    // Create PDF
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "px",
-      format: [canvas.width, canvas.height],
-    });
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-    pdf.save("certificate.pdf");
-  };
 
   return (
     <Card key={session._id} className="overflow-hidden mb-5">
@@ -76,7 +68,7 @@ export default function SessionCard({
 
             <div className="flex flex-col gap-2 w-full sm:w-auto">
               <div className="flex items-center gap-2">
-                {isAccessible && session.isCompleted && (
+                {isAccessible && isCompleted && (
                   <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 hover:bg-green-600 hover:text-white p-1 rounded-full transition-colors" />
                 )}
                 <Badge variant="outline" className="w-fit space-x-2">
@@ -90,12 +82,18 @@ export default function SessionCard({
                 Session {index + 1}
               </h2>
               <CardTitle
-                title={session.title}
                 className="text-xl sm:text-2xl lg:text-3xl max-w-[700px] text-ellipsis tracking-tighter font-semibold mb-2 line-clamp-2"
               >
                 {session.title}
               </CardTitle>
-              
+              <Button
+                variant="link"
+                onClick={() => setOpen(!open)}
+                className="p-0 h-auto text-blue-600 justify-start"
+              >
+                {open ? "Hide Details" : "View Details"}
+              </Button>
+
               {!isAccessible ? (
                 <div className="flex items-center gap-2 mb-2">
                   <Lock className="h-4 w-4 text-amber-500 font-bold" />
@@ -105,9 +103,16 @@ export default function SessionCard({
                 <div className="flex items-center gap-2 mb-2">
                   <LockOpen className="h-4 w-4 text-green-500 font-bold" />
                   <span className="mr-2 text-green-500">Unlocked</span>
+
+                  {/* ✅ Session expiry display */}
+                  {remainingDays !== null && remainingDays > 0 && (
+                    <span className="text-sm text-gray-700 ml-2">
+                      (Expires in {remainingDays} day{remainingDays > 1 ? "s" : ""})
+                    </span>
+                  )}
                 </div>
               )}
-              
+
               <div className="flex flex-wrap gap-2 sm:gap-4">
                 {isAuthenticated ? (
                   <>
@@ -134,29 +139,15 @@ export default function SessionCard({
                     Please login to access
                   </Button>
                 )}
-                
+
                 <Button
                   variant="outline"
                   size="sm"
                   className="border-blue-900 text-blue-900 font-bold hover:bg-blue-50 flex items-center"
-                  onClick={() => handleWatchPreview(session)}
+                  onClick={handleWatchPreview}
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Watch Preview
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`${
-                    open
-                      ? "border-black text-white bg-black"
-                      : "border-blue-900 text-blue-900"
-                  } font-bold flex items-center`}
-                  onClick={() => {
-                    setOpen((temp) => !temp);
-                  }}
-                >
-                  {open ? "View less" : "View more"}
                 </Button>
               </div>
             </div>
@@ -171,7 +162,7 @@ export default function SessionCard({
                   size="sm"
                   className="w-full justify-start"
                   disabled={!isAccessible || !session.videoUrl}
-                  onClick={() => handleWatchFullVideo(session)}
+                  onClick={() => handleWatchFullVideo(session.videoUrl)}
                 >
                   <Video className="h-4 w-4 mr-2" />
                   Watch Video
@@ -184,7 +175,7 @@ export default function SessionCard({
                   size="sm"
                   className="w-full justify-start"
                   disabled={!isAccessible || !session.notes}
-                  onClick={() => handleViewNotes(session)}
+                  onClick={() => handleViewMaterial(session.notes, 'notes')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   View Notes
@@ -197,7 +188,7 @@ export default function SessionCard({
                   size="sm"
                   className="w-full justify-start"
                   disabled={!isAccessible || !session.ppt}
-                  onClick={() => handleViewPPT(session)}
+                  onClick={() => handleViewMaterial(session.ppt, 'ppt')}
                 >
                   <Presentation className="h-4 w-4 mr-2" />
                   View PPT
@@ -208,27 +199,29 @@ export default function SessionCard({
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="w-full justify-start"
-                  disabled={!isAccessible || !session.quiz}
+                  disabled={
+                    !isAccessible ||
+                    !session.quiz ||
+                    quizStatus === "passed" ||
+                    attemptsMade >= 5
+                  }
                   onClick={() => handleQuizOpen(session._id)}
-                >
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Attempt Quiz
-                  {!isAccessible && (
-                    <LockIcon className="h-3 w-3 ml-auto text-blue-800 font-bold" />
-                  )}
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full justify-start"
-                  disabled={!isAccessible}
-                  onClick={handleDownloadCertificate}
+                  className={`w-full justify-start ${
+                    quizStatus === "passed"
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : ""
+                  }`}
                 >
                   <AwardIcon className="h-4 w-4 mr-2" />
-                  Download certificate
-                  {!isAccessible && (
-                    <LockIcon className="h-3 w-3 ml-auto text-black font-bold" />
+                  {quizStatus === "passed"
+                    ? "Passed"
+                    : attemptsMade >= 5
+                    ? "Max Attempts Reached"
+                    : `Attempt Quiz (${attemptsMade}/5)`}
+                  {!isAccessible && quizStatus !== "passed" && (
+                    <LockIcon
+                      className="h-3 w-3 ml-auto text-blue-800 font-bold"
+                    />
                   )}
                 </Button>
               </div>
@@ -236,56 +229,6 @@ export default function SessionCard({
           )}
         </div>
       </CardHeader>
-      {isAuthenticated && (
-        <div
-          id="certificate-template"
-          style={{
-            display: "none",
-            width: "1086px",
-            height: "768px",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: -9999,
-            backgroundImage: "url('sample 1 (4).jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            fontFamily: "serif",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "235px",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            <h3
-              style={{
-                color: "#1976d2",
-                fontSize: "26px",
-                margin: 0,
-              }}
-            >
-              {session.title || "Course Name"}
-            </h3>
-          </div>
-
-          <div
-            style={{
-              position: "absolute",
-              top: "370px",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ color: "#1976d2", fontSize: "36px" }}>
-              {user?.name || "User Name"}
-            </h2>
-          </div>
-        </div>
-      )}
 
       <AnimatePresence initial={false}>
         {open && (
@@ -298,7 +241,9 @@ export default function SessionCard({
             className="overflow-hidden"
           >
             <CardContent className="border-t py-6 sm:py-10">
-              <h3 className="font-semibold text-lg sm:text-xl mb-4 sm:mb-5">What you'll learn</h3>
+              <h3 className="font-semibold text-lg sm:text-xl mb-4 sm:mb-5">
+                What you'll learn
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                 {session.learnings.map((learning, index) => {
                   return (

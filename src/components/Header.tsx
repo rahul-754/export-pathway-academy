@@ -116,6 +116,16 @@ export default function Header() {
     logout();
     navigate("/");
   };
+
+  useEffect(() => {
+    if (isAuthenticated && user?._id) {
+      fetch(`/api/notifications/${user._id}`)
+        .then(res => res.json())
+        .then(data => setNotifications(data.notifications || []))
+        .catch(() => setNotifications([]));
+    }
+  }, [isAuthenticated, user]);
+
   return (
     <header className="bg-white border-b w-full p-4">
       <div className="flex justify-between items-center w-full max-w-[1520px] mx-auto">

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -27,9 +28,17 @@ import Quizes from "@/components/AdminDashboard/Courses/CourseCard/Quizes";
 import BatchForm from "@/components/BatchForm";
 import Courses from "@/components/AdminDashboard/Courses/Courses";
 import ProgramForm from '@/components/ProgramForm';
+import {
+  getAllBatchesAdmin,
+  createBatch,
+  updateBatch,
+  deleteBatch,
+  getBatchMembers,
+  getAllUsers,
+} from "@/Apis/Apis";
 
 interface Batch {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   batchDetails: string;
@@ -54,7 +63,7 @@ const AdminDashboard = () => {
   const [batchFormOpen, setBatchFormOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [batches, setBatches] = useState<Batch[]>([]);
-  // const [fullscreen, setFullscreen] = useState(false);
+  const [loadingBatches, setLoadingBatches] = useState(false);
   const [totalCourses, setTotalCourses] = useState<number | null>(null);
   const [programs] = useState([
     {
@@ -73,48 +82,126 @@ const AdminDashboard = () => {
     },
   ]);
 
-  const [users] = useState([
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john@example.com",
-      courses: 3,
-      certified: 2,
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      courses: 5,
-      certified: 4,
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Mike Chen",
-      email: "mike@example.com",
-      courses: 2,
-      certified: 1,
-      status: "active",
-    },
-  ]);
+  // USERS: fetch from backend with pagination and search
+  const [users, setUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userPage, setUserPage] = useState(1);
+  const [userLimit] = useState(10);
+  const [userTotal, setUserTotal] = useState(0);
+  const [userSearch, setUserSearch] = useState("");
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const [programFormOpen, setProgramFormOpen] = useState(false);
+  const [selectedBatchMembers, setSelectedBatchMembers] = useState<any[]>([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [showStudentModal, setShowStudentModal] = useState(false);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [showNotificationBox, setShowNotificationBox] = useState(false);
+  const [notificationText, setNotificationText] = useState("");
+  const [sending, setSending] = useState(false);
+  const navigate = useNavigate();
 
-  // Add mock data for demonstration if not present
-  const courses = [
-    { id: 'course1', title: 'Export Fundamentals' },
-    { id: 'course2', title: 'Advanced Export Strategies' }
-  ];
-  const membersByCourse = {
-    course1: [
-      { id: 'user1', name: 'John Smith' },
-      { id: 'user2', name: 'Sarah Johnson' }
-    ],
-    course2: [
-      { id: 'user3', name: 'Mike Chen' }
-    ]
+  // Fetch all batches on mount
+  useEffect(() => {
+    const fetchBatches = async () => {
+      setLoadingBatches(true);
+      try {
+        const data = await getAllBatchesAdmin();
+        setBatches(data);
+      } catch (e) {
+        setBatches([]);
+      }
+      setLoadingBatches(false);
+    };
+    fetchBatches();
+  }, []);
+
+  // Fetch users with pagination and search
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoadingUsers(true);
+      try {
+        const data = await getAllUsers(userPage, userLimit, userSearch);
+        if (Array.isArray(data)) {
+          setUsers(data);
+          setUserTotal(data.length);
+        } else if (Array.isArray(data.users)) {
+          setUsers(data.users);
+          setUserTotal(data.total || data.users.length);
+        } else {
+          setUsers([]);
+          setUserTotal(0);
+        }
+      } catch (e) {
+        setUsers([]);
+        setUserTotal(0);
+      }
+      setLoadingUsers(false);
+    };
+    fetchUsers();
+  }, [userPage, userLimit, userSearch]);
+
+  // Debounced search handler
+  const handleUserSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUserPage(1); // Reset to first page on new search
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setUserSearch(value);
+    }, 500); // 500ms debounce
+  };
+
+  // Handle create/update batch
+  const handleBatchSubmit = async (data: any) => {
+    try {
+      if (editingBatch) {
+        // Update existing batch
+        const updated = await updateBatch(editingBatch._id, data);
+        setBatches((prev) =>
+          prev.map((batch) => (batch._id === updated._id ? updated : batch))
+        );
+      } else {
+        // Create new batch
+        const created = await createBatch(data);
+        setBatches((prev) => [...prev, created]);
+      }
+      setBatchFormOpen(false);
+      setEditingBatch(null);
+    } catch (error) {
+      // Handle error (show toast, etc.)
+    }
+  };
+
+  const handleDeleteBatch = async (batchId: string) => {
+    if (window.confirm("Are you sure you want to delete this batch?")) {
+      try {
+        await deleteBatch(batchId);
+        setBatches((prev) => prev.filter((batch) => batch._id !== batchId));
+      } catch (error) {
+        // Handle error
+      }
+    }
+  };
+
+  const handleEditBatch = (batch: Batch) => {
+    setEditingBatch(batch);
+    setBatchFormOpen(true);
+  };
+
+  // Handle status change
+  const handleStatusChange = async (batchId: string, newStatus: Batch["status"]) => {
+    try {
+      const batch = batches.find((b) => b._id === batchId);
+      if (!batch) return;
+      const updated = await updateBatch(batchId, { ...batch, status: newStatus });
+      setBatches((prev) =>
+        prev.map((b) => (b._id === batchId ? updated : b))
+      );
+    } catch (error) {
+      // Handle error
+    }
   };
 
   const handleNewBatch = () => {
@@ -127,59 +214,46 @@ const AdminDashboard = () => {
     setEditingBatch(null);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleBatchSubmit = (data: any) => {
-    if (editingBatch) {
-      // Update existing batch
-      setBatches((prevBatches) =>
-        prevBatches.map((batch) =>
-          batch.id === editingBatch.id
-            ? { ...batch, ...data, isPaid: data.amount ? true : false }
-            : batch
-        )
-      );
-    } else {
-      // Create new batch
-      const newBatch: Batch = {
-        id: `batch-${Date.now()}`,
-        ...data,
-        enrolledCount: 0,
-        status: "upcoming",
-        isPaid: data.amount ? true : false,
-      };
-      setBatches((prevBatches) => [...prevBatches, newBatch]);
-    }
-    setBatchFormOpen(false);
-    setEditingBatch(null);
-  };
-
-  const handleDeleteBatch = (batchId: string) => {
-    if (window.confirm("Are you sure you want to delete this batch?")) {
-      setBatches((prevBatches) =>
-        prevBatches.filter((batch) => batch.id !== batchId)
-      );
-    }
-  };
-
-  const handleEditBatch = (batch: Batch) => {
-    setEditingBatch(batch);
-    setBatchFormOpen(true);
-  };
-
-  const handleStatusChange = (batchId: string, newStatus: Batch["status"]) => {
-    setBatches((prevBatches) =>
-      prevBatches.map((batch) =>
-        batch.id === batchId ? { ...batch, status: newStatus } : batch
-      )
-    );
-  };
-
   const handleNewProgram = () => setProgramFormOpen(true);
   const handleCloseProgramForm = () => setProgramFormOpen(false);
 
-  const handleCreateProgram = (programData) => {
+  const handleCreateProgram = (programData: any) => {
     // Add your logic to save the program (e.g., setPrograms([...programs, programData]))
     setProgramFormOpen(false);
+  };
+
+  // Show student modal and set users for the batch
+  const handleShowMembers = async (batchId: string) => {
+    setSelectedBatchId(batchId);
+    setShowStudentModal(true);
+    // Optionally fetch all users if needed, here we use the already loaded users
+    setAllUsers(users);
+    setSelectedUsers([]); // Reset selection
+  };
+
+  // Add selected users to batch (mock logic, adjust as needed)
+  const handleAddStudentsToBatch = () => {
+    setShowStudentModal(false);
+    setSelectedBatchId(null);
+    // You can add logic to update the batch with selected users here
+  };
+
+  const handleSendNotification = async () => {
+    if (!notificationText.trim()) return;
+    setSending(true);
+    try {
+      await fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: notificationText }),
+      });
+      setNotificationText("");
+      alert("Notification sent to all users!");
+    } catch (err) {
+      alert("Failed to send notification.");
+    }
+    setSending(false);
+    setShowNotificationBox(false);
   };
 
   return (
@@ -188,7 +262,6 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-6">
         {/* Stats Overview */}
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -213,8 +286,10 @@ const AdminDashboard = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">0</p>
+              <div className="text-2xl font-bold">{Array.isArray(users) ? users.length : 0}</div>
+              <p className="text-xs text-muted-foreground">
+                {Array.isArray(users) ? users.filter(u => u.status === "active").length : 0} active
+              </p>
             </CardContent>
           </Card>
 
@@ -226,8 +301,10 @@ const AdminDashboard = () => {
               <Trophy className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">0</p>
+              <div className="text-2xl font-bold">
+                {Array.isArray(users) ? users.reduce((acc, u) => acc + (u.certified || 0), 0) : 0}
+              </div>
+              <p className="text-xs text-muted-foreground">Total certificates</p>
             </CardContent>
           </Card>
 
@@ -239,10 +316,19 @@ const AdminDashboard = () => {
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">0</p>
+              <div className="text-2xl font-bold">
+                {batches.filter(b => b.status === "active").length}
+              </div>
+              <p className="text-xs text-muted-foreground">Active</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Notification Button - place above TabsList */}
+        <div className="flex justify-end mb-4">
+          <Button variant="default" onClick={() => setShowNotificationBox(true)}>
+            Send Notification
+          </Button>
         </div>
 
         {/* Management Tabs */}
@@ -252,7 +338,6 @@ const AdminDashboard = () => {
             <TabsTrigger value="programs">Programs</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="batches">Batches</TabsTrigger>
-            {/* <TabsTrigger value="quizes">Quizes</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="courses" className="space-y-4 overflow-y-auto">
@@ -279,7 +364,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
-
+            
             <div className="grid gap-4">
               {programs.map((program) => (
                 <Card key={program.id}>
@@ -318,38 +403,68 @@ const AdminDashboard = () => {
           <TabsContent value="users" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">User Management</h3>
-              <Button variant="outline">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Export Report
+              <div className="flex gap-2">
+                {/* <input
+                  type="text"
+                  placeholder="Search users..."
+                  className="border px-2 py-1 rounded text-sm"
+                  onChange={handleUserSearch}
+                  defaultValue={userSearch}
+                /> */}
+                <Button variant="outline">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Export Report
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-4">
+              {loadingUsers ? (
+                <p>Loading users...</p>
+              ) : (
+                Array.isArray(users) && users.map((user) => (
+                  <Card key={user._id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{user.name}</CardTitle>
+                          <CardDescription>{user.emailAddress || user.email}</CardDescription>
+                        </div>
+                        <Badge variant="outline">{user.status || user.role}</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex space-x-4 text-sm text-gray-600">
+                        <span>{user.enrolledCourses?.length || user.courses || 0} courses enrolled</span>
+                        <span>{user.certified || 0} certificates earned</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+            {/* Pagination Controls */}
+            <div className="flex justify-end items-center gap-2 mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={userPage === 1}
+                onClick={() => setUserPage((p) => Math.max(1, p - 1))}
+              >
+                Prev
+              </Button>
+              <span className="text-sm">
+                Page {userPage} of {Math.ceil(userTotal / userLimit) || 1}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={userPage >= Math.ceil(userTotal / userLimit)}
+                onClick={() => setUserPage((p) => p + 1)}
+              >
+                Next
               </Button>
             </div>
-
-            <div className="grid gap-4">
-              {users.map((user) => (
-                <Card key={user.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{user.name}</CardTitle>
-                        <CardDescription>{user.email}</CardDescription>
-                      </div>
-                      <Badge variant="outline">{user.status}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex space-x-4 text-sm text-gray-600">
-                      <span>{user.courses} courses enrolled</span>
-                      <span>{user.certified} certificates earned</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </TabsContent>
-
-          {/* <TabsContent value="quizes" className="space-y-4">
-            <Quizes setFullscreen={setFullscreen} />
-          </TabsContent> */}
 
           <TabsContent value="batches" className="space-y-4">
             <div className="flex justify-between items-center">
@@ -371,7 +486,7 @@ const AdminDashboard = () => {
                 </Card>
               ) : (
                 batches.map((batch) => (
-                  <Card key={batch.id}>
+                  <Card key={batch._id}>
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div>
@@ -409,7 +524,7 @@ const AdminDashboard = () => {
                             value={batch.status}
                             onChange={(e) =>
                               handleStatusChange(
-                                batch.id,
+                                batch._id,
                                 e.target.value as Batch["status"]
                               )
                             }
@@ -429,7 +544,7 @@ const AdminDashboard = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDeleteBatch(batch.id)}
+                            onClick={() => handleDeleteBatch(batch._id)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -438,7 +553,7 @@ const AdminDashboard = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => handleShowMembers(batch._id)}>
                           <Users className="w-4 h-4 mr-1" />
                           Manage Students
                         </Button>
@@ -446,7 +561,7 @@ const AdminDashboard = () => {
                           <BarChart3 className="w-4 h-4 mr-1" />
                           Analytics
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => navigate("/batches")}> {/* Navigate to discussions */}
                           <MessageSquare className="w-4 h-4 mr-1" />
                           Discussions
                         </Button>
@@ -464,6 +579,61 @@ const AdminDashboard = () => {
             onSubmit={handleBatchSubmit}
             batch={editingBatch}
           />
+        )}
+        {/* Student Modal */}
+        {showStudentModal && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded shadow-lg w-full max-w-2xl max-h-[70vh] overflow-y-auto relative">
+              <h2 className="text-lg font-semibold mb-4">Add Students to Batch</h2>
+              <div className="mb-4">
+                {allUsers.map((user) => (
+                  <div key={user._id} className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user._id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedUsers((prev) => [...prev, user._id]);
+                        } else {
+                          setSelectedUsers((prev) => prev.filter((id) => id !== user._id));
+                        }
+                      }}
+                      className="mr-2"
+                    />
+                    <span>{user.name} ({user.emailAddress || user.email})</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowStudentModal(false)}>Cancel</Button>
+                <Button onClick={handleAddStudentsToBatch}>Add Selected</Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Notification Modal */}
+        {showNotificationBox && (
+          <div style={{
+            position: "fixed", top: "30%", left: "50%", transform: "translate(-50%, -50%)",
+            background: "#fff", padding: "2rem", borderRadius: "8px", boxShadow: "0 2px 8px #0002", zIndex: 1000
+          }}>
+            <h3>Send Notification to All Users</h3>
+            <textarea
+              rows={4}
+              style={{ width: "100%", marginBottom: "1rem" }}
+              value={notificationText}
+              onChange={e => setNotificationText(e.target.value)}
+              placeholder="Enter your message..."
+            />
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <Button onClick={handleSendNotification} disabled={sending}>
+                {sending ? "Sending..." : "Send"}
+              </Button>
+              <Button variant="outline" onClick={() => setShowNotificationBox(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>

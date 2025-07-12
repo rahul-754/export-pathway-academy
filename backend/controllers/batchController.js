@@ -1,5 +1,6 @@
 import Batch from '../models/batchModel.js';
 import User from '../models/userModel.js';
+import BatchMessage from '../models/BatchMessage.js';
 
 // Create batch (Admin)
 export const createBatch = async (req, res) => {
@@ -76,6 +77,17 @@ export const getBatchMembers = async (req, res) => {
     const batch = await Batch.findById(req.params.id).populate('members', 'name email status');
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
     res.json(batch.members);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get all messages for a batch
+export const getBatchMessages = async (req, res) => {
+  try {
+    const batchId = req.params.id;
+    const messages = await BatchMessage.find({ batch: batchId }).sort({ timestamp: 1 });
+    res.json(messages);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
