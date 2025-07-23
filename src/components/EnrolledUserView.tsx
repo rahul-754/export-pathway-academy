@@ -53,8 +53,14 @@ interface EnrolledUserViewProps {
 const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
-  const onCourseClick = (courseId: string) => {
-    navigate(`/course/${courseId}/sessions`);
+  const onCourseClick = (course: any) => {
+    if (course.id === "683eb8cf6dfab461f47cd71c") {
+      navigate("/course/Export-Success-Mastery/BasicSessions");
+    } else if (course.id === "a9c7f83d2b214df9ab8e3475") {
+      navigate("/course/Export-Success-Mastery/AdvancedSessions");
+    } else {
+      navigate("/not-found");
+    }
   };
 
   const enrolledCourses: EnrolledCourse[] =
@@ -87,7 +93,7 @@ const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
           "https://via.placeholder.com/400x200?text=No+Image",
       };
     }) || [];
-  //console.log("Enrolled Courses:", enrolledCourses);
+  console.log("User enrolledCourses:", user.enrolledCourses);
   const upcomingPrograms: UpcomingProgram[] = [
     {
       id: 1,
@@ -207,7 +213,7 @@ const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
                 <div
                   key={course.id}
                   className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => onCourseClick(course.id)}
+                  onClick={() => onCourseClick(course)}
                 >
                   <div className="flex gap-4">
                     <img

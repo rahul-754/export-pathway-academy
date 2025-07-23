@@ -37,8 +37,14 @@ const CoursesPage = () => {
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const navigate = useNavigate();
-  const handleCourseClick = (courseId: string) => {
-    navigate(`/course/${courseId}/sessions`);
+  const handleCourseClick = (course: any) => {
+    if (course.title === "Export Success Mastery Basic") {
+      navigate("/course/Export-Success-Mastery/BasicSessions");
+    } else if (course.title === "Export Success Mastery Advanced") {
+      navigate("/course/Export-Success-Mastery/AdvancedSessions");
+    } else {
+      navigate("/not-found");
+    }
   };
   useEffect(() => {
     const fetchCourses = async () => {
@@ -157,7 +163,7 @@ const CoursesPage = () => {
                   <div className="text-lg font-bold text-blue-600">
                     {course.price}
                   </div>
-                  <Button onClick={() => handleCourseClick(course._id)}>
+                  <Button onClick={() => handleCourseClick(course)}>
                     <BookOpen className="h-4 w-4 mr-2" />
                     Enroll Now
                   </Button>

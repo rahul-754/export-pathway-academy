@@ -32,9 +32,20 @@ function loadRazorpayScript() {
 }
 
 const CourseSessionsPage = () => {
-  const { courseId } = useParams();
-  const navigate = useNavigate();
+  const params = useParams();
   const location = useLocation();
+
+  // Map static paths to course IDs
+  let courseId = "";
+  if (location.pathname === "/course/Export-Success-Mastery/BasicSessions") {
+    courseId = "683eb8cf6dfab461f47cd71c";
+  } else if (location.pathname === "/course/Export-Success-Mastery/AdvancedSessions") {
+    courseId = "a9c7f83d2b214df9ab8e3475";
+  } else if (params.courseId) {
+    courseId = params.courseId;
+  }
+
+  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [purchasedSessions, setPurchasedSessions] = useState([]);
@@ -382,19 +393,26 @@ console.log(course)
             Course Sessions
           </h2>
           <div className="grid gap-4">
-            {course.sessions.map((session, index) => {
-              const userEnrolledSession = user?.enrolledSessions.find(
+            {Array.isArray(course.sessions) && course.sessions.map((session, index) => {
+              // Find the enrolledCourse for this course
+              const enrolledCourse = user?.enrolledCourses?.find(
+                (ec) => ec.course === course._id
+              );
+
+              // Find the enrolled session for this session
+              const userEnrolledSession = user?.enrolledSessions?.find(
                 (es) => es.session._id === session._id
               );
 
+              // Use startedAt from enrolledCourse for expiry calculation
               let remainingDays = null;
               let isLocked = true;
 
-              if (userEnrolledSession && userEnrolledSession.enrolledAt) {
-                const enrolledAt = new Date(userEnrolledSession.enrolledAt);
+              if (enrolledCourse && enrolledCourse.startedAt) {
+                const enrolledAt = new Date(enrolledCourse.startedAt);
                 const now = new Date();
                 const diffMs = now - enrolledAt;
-                remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                remainingDays = Math.max(0, 30 - Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
                 isLocked = remainingDays <= 0;
               } else {
                 isLocked = true;
@@ -416,6 +434,13 @@ console.log(course)
                   isAccessible={!isLocked}
                   isCompleted={!!userEnrolledSession?.isCompleted}
                   remainingDays={remainingDays}
+                  expiryText={
+                    enrolledCourse && enrolledCourse.startedAt
+                      ? remainingDays > 0
+                        ? `Expires in ${remainingDays} day${remainingDays === 1 ? "" : "s"}`
+                        : "Expired"
+                      : ""
+                  }
                   quizStatus={quizAttempt?.status || 'not-attempted'}
                   attemptsMade={quizAttempt?.attempts || 0}
                   addToCart={addToCart}

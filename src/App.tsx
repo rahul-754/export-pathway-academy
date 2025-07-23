@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import UserDashboard from "./pages/UserDashboardPage";
 import CoursesPage from "./pages/CoursesPage";
 import ProgramsPage from "./pages/ProgramsPage";
@@ -22,22 +22,40 @@ import AdminDashboard from "./pages/AdminDashboard";
 const App = () => {
   const queryClient = useMemo(() => new QueryClient(), []);
 
-  
   return (
     <UserProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          < BrowserRouter>
+          <BrowserRouter>
             <Header />
             <Routes>
               <Route path="/" element={<NewUserView />} />
               <Route path="/courses" element={<CoursesPage />} />
+
+              {/* Only these static routes will work */}
               <Route
-                path="/course/:courseId/sessions"
+                path="/course/Export-Success-Mastery/BasicSessions"
                 element={<CourseSessionsPage />}
               />
+              <Route
+                path="/course/Export-Success-Mastery/AdvancedSessions"
+                element={<CourseSessionsPage />}
+              />
+
+              {/* Optional: Redirect old paths to new static URLs */}
+              <Route
+                path="/course/Export-Success-Mastery/sessions/basic"
+                element={<Navigate to="/course/Export-Success-Mastery/BasicSessions" replace />}
+              />
+              <Route
+                path="/course/Export-Success-Mastery/sessions/advanced"
+                element={<Navigate to="/course/Export-Success-Mastery/AdvancedSessions" replace />}
+              />
+
+              {/* Dynamic route removed! */}
+
               <Route
                 path="/user-dashboard"
                 element={
@@ -46,8 +64,6 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-
-
               <Route
                 path="/admin-dashboard"
                 element={
@@ -56,7 +72,6 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="/quiz/:sessionId"
                 element={
