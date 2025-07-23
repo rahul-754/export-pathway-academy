@@ -22,11 +22,11 @@ export default function Footer() {
               <div className="col-span-1">
                 <Link to={"/"}>
                   <img
-                    src="logo.png"
-                    alt="Terra Sourcing"
-                    width={100}
-                    height={48}
-                    className="h-12 mb-4"
+                  src="/logo.png"
+                  alt="Terra Sourcing"
+                  width={100}
+                  height={48}
+                  className="h-12 mb-4"
                   />
                 </Link>
                 <p className="text-gray-600 mb-6">

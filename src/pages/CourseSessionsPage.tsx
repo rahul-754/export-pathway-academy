@@ -337,7 +337,7 @@ console.log(course)
                 </Badge>
                 <Badge variant="outline" className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  {course.duration} minutes
+                  {(course.type === "basic" || course.title?.toLowerCase().includes("basic")) ? "10 hours" : "6 hours"}
                 </Badge>
                 <Badge variant="outline" className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
@@ -448,7 +448,23 @@ console.log(course)
                   handleWatchFullVideo={() => handleWatchFullVideo(session)}
                   handleViewMaterial={handleViewMaterial}
                   handleQuizOpen={handleQuizOpen}
-                />
+                >
+                  {/* Add this beside unlocked status */}
+                  {!isLocked && (
+                    <div className="flex items-center gap-2 ml-4">
+                      <span className="text-green-600 font-semibold">Unlocked</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownloadCertificate}
+                        disabled={!allQuizzesPassed}
+                      >
+                        <Download className="h-4 w-4" />
+                        Certificate
+                      </Button>
+                    </div>
+                  )}
+                </SessionCard>
               );
 })}
 </div>

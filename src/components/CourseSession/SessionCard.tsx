@@ -53,6 +53,9 @@ export default function SessionCard({
   const { isAuthenticated, user } = useUser();
   const [open, setOpen] = useState(false);
 
+  const durations = ["2 hours", "2 hours", "2 hours"]; // Each session is 2 hours
+  const totalCourseDuration = "10 hours"; // Basic total course duration
+
   return (
     <Card key={session._id} className="overflow-hidden mb-5">
       <CardHeader>
@@ -75,7 +78,7 @@ export default function SessionCard({
                 <Badge variant="outline" className="w-fit space-x-2">
                   <Clock className="h-5 w-5 sm:h-6 sm:w-6 font-bold text-black p-1 rounded-full transition-colors" />
                   <span className="text-sm text-black font-bold">
-                    {session.duration} Minutes
+                    {durations[index] || "2 hours"}
                   </span>
                 </Badge>
               </div>
@@ -286,6 +289,13 @@ export default function SessionCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Expired Access Message
+      {!isAccessible && (
+        <div className="text-xs text-red-500 mt-2">
+          Access expired. Please re-enroll to continue.
+        </div>
+      )} */}
     </Card>
   );
 }
