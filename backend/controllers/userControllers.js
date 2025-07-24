@@ -5,90 +5,65 @@ import Course from "../models/courseModel.js";
 import Session from "../models/sessionModel.js";
 
 export const registerUser = async (req, res) => {
-  // try {
-  //   const { name, emailAddress, password, ...rest } = req.body;
-
-  //   const existingUser = await User.findOne({ emailAddress });
-  //   if (existingUser)
-  //     return res.status(400).json({ message: "User already exists" });
-
-  //   const hashedPassword = await bcrypt.hash(password, 10);
-
-  //   const user = new User({ name, emailAddress, ...rest });
-  //   user.password = hashedPassword;
-  //   await user.save();
-
-  //   const token = jwt.sign(
-  //     { id: user._id, role: user.role },
-  //     process.env.JWT_SECRET,
-  //     {
-  //       expiresIn: "1d",
-  //     }
-  //   );
-
-  //   res.cookie("token", token, {
-  //     httpOnly: true,
-  //     secure: process.env.NODE_ENV === "production",
-  //     sameSite: "strict",
-  //     maxAge: 24 * 60 * 60 * 1000, // 1 day
-  //   });
-
-  //   const { password: _, ...userData } = user.toObject();
-
-  //   if (process.env.NODE_ENV === "development") {
-  //     res.status(201).json({
-  //       message: "User registered successfully",
-  //       user: userData,
-  //       token,
-  //     });
-  //   } else {
-  //     res
-  //       .status(201)
-  //       .json({ message: "User registered successfully", user: userData });
-  //   }
-  // }
   try {
-    const users = req.body.users; // expecting: [{ name, emailAddress, password, ... }, ...]
-  
+    let users = req.body.users;
+    // If not an array, treat as single user object
     if (!Array.isArray(users)) {
-      return res.status(400).json({ message: "Invalid data format. 'users' should be an array." });
+      if (req.body.emailAddress) {
+        users = [req.body];
+      } else {
+        return res.status(400).json({ message: "Invalid data format." });
+      }
     }
-  
+
     const createdUsers = [];
-  
+
     for (const userData of users) {
       const { name, emailAddress, password, ...rest } = userData;
-  
+
       const existingUser = await User.findOne({ emailAddress });
       if (existingUser) {
         continue; // Skip already registered users
       }
-  
-      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // When password is empty, set a dummy password and source
+      const hashedPassword = password
+        ? await bcrypt.hash(password, 10)
+        : await bcrypt.hash("google-auth", 10);
+
       const newUser = new User({
         name,
         emailAddress,
         password: hashedPassword,
+        source: password ? "local" : "google",
         ...rest,
       });
-  
+
       await newUser.save();
-      createdUsers.push({ id: newUser._id, email: newUser.emailAddress });
+      createdUsers.push(newUser);
     }
-  
+
     if (createdUsers.length === 0) {
       return res.status(400).json({ message: "No new users were created. All already exist." });
     }
-  
-    return res.status(201).json({
-      message: `${createdUsers.length} users registered successfully`,
-      users: createdUsers,
+
+    // Return the first created user for Google registration
+    const user = createdUsers[0];
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    const { password: _, ...userData } = user.toObject();
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: userData,
+      token,
     });
-  
-  }  catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error registering user", error: error.message });
+  } catch (error) {
+    res.status(500).json({ message: "Error registering user", error: error.message });
   }
 };
 
@@ -98,9 +73,16 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ emailAddress }).select("+password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(401).json({ message: "Invalid credentials" });
+    // Allow Google login if password is empty
+    if (password === "" || password === undefined) {
+      // Optionally, check if user was registered via Google (e.g., user.source === "google")
+      // If you don't have a source field, just allow login with empty password
+    } else {
+      // Normal password login
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch)
+        return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     const token = jwt.sign(
       { id: user._id, role: user.role },

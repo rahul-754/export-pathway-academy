@@ -38,9 +38,9 @@ const CoursesPage = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const navigate = useNavigate();
   const handleCourseClick = (course: any) => {
-    if (course.title === "Export Success Mastery Basic") {
+    if (course._id === "683eb8cf6dfab461f47cd71c") {
       navigate("/course/Export-Success-Mastery/BasicSessions");
-    } else if (course.title === "Export Success Mastery Advanced") {
+    } else if (course._id === "a9c7f83d2b214df9ab8e3475") {
       navigate("/course/Export-Success-Mastery/AdvancedSessions");
     } else {
       navigate("/not-found");

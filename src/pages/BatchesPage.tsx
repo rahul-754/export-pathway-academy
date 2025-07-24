@@ -158,6 +158,27 @@ const BatchesPage = () => {
     }
   }, [messages]);
 
+  // Check if user is enrolled in any courses
+  const isEnrolled = user?.enrolledCourses && user.enrolledCourses.length > 0;
+
+  if (!isEnrolled) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Card className="p-8 max-w-md mx-auto text-center">
+          <CardTitle className="mb-2 text-xl font-semibold text-gray-900">
+            No Batches Available
+          </CardTitle>
+          <CardDescription className="mb-4 text-gray-600">
+            Please enroll in a course to access batch discussions and chat rooms.
+          </CardDescription>
+          <Button onClick={() => window.location.href = "/courses"}>
+            Go to Courses
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* <UserHeader /> */}
