@@ -15,30 +15,35 @@ const NewUserView = () => {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
   const handleCourseClick = (courseId: string) => {
-    navigate(`/course/${courseId}/sessions`);
+    if (courseId === "683eb8cf6dfab461f47cd71c") {
+      navigate("/course/Export-Success-Mastery/BasicSessions");
+    } else if (courseId === "a9c7f83d2b214df9ab8e3475") {
+      navigate("/course/Export-Success-Mastery/AdvancedSessions");
+    } else {
+      navigate("/not-found");
+    }
   };
 
   useEffect(() => {
-  setLoading(true);
+    setLoading(true);
 
-  if (!user) {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    if (user.role === "admin") {
+      navigate("/admin-dashboard");
+      return;
+    }
+
+    if (user.enrolledCourses.length > 0) {
+      navigate("/user-dashboard");
+      return;
+    }
+
     setLoading(false);
-    return;
-  }
-
-  if (user.role === "admin") {
-    navigate("/admin-dashboard");
-    return;
-  }
-
-  if (user.enrolledCourses.length > 0) {
-    navigate("/user-dashboard");
-    return;
-  }
-
-  setLoading(false);
-}, [user]);
-
+  }, [user]);
 
   if (loading)
     return (
