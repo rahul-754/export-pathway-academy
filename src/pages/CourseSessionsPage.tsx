@@ -13,6 +13,7 @@ import { FaSpinner } from "react-icons/fa";
 import SessionCard from "@/components/CourseSession/SessionCard";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { Helmet } from "react-helmet-async";
 
 // Add Razorpay type to window
 declare global {
@@ -43,6 +44,12 @@ const CourseSessionsPage = () => {
     courseId = "a9c7f83d2b214df9ab8e3475";
   } else if (params.courseId) {
     courseId = params.courseId;
+  }
+
+  // Canonical URL logic
+  let canonicalUrl = "https://learn.terrasourcing.com/course/Export-Success-Mastery/BasicSessions";
+  if (location.pathname === "/course/Export-Success-Mastery/AdvancedSessions") {
+    canonicalUrl = "https://learn.terrasourcing.com/course/Export-Success-Mastery/AdvancedSessions";
   }
 
   const navigate = useNavigate();
@@ -309,6 +316,9 @@ const CourseSessionsPage = () => {
 console.log(course)
   return (
     <>
+      <Helmet>
+        <link rel="canonical" href={canonicalUrl} />
+      </Helmet>
       <div className="mx-auto min-h-screen bg-white-50">
         <div className="bg-[#94b9ff] w-full p-4 sm:p-6 md:p-10 text-black">
           <div className="max-w-[1520px] w-full mx-auto bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col lg:flex-row justify-between gap-5 items-center">
