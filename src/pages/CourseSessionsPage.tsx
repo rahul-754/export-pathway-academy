@@ -404,28 +404,34 @@ console.log(course)
           </h2>
           <div className="grid gap-4">
             {Array.isArray(course.sessions) && course.sessions.map((session, index) => {
-              // Find the enrolledCourse for this course
-              const enrolledCourse = user?.enrolledCourses?.find(
-                (ec) => ec.course === course._id
-              );
-
               // Find the enrolled session for this session
               const userEnrolledSession = user?.enrolledSessions?.find(
                 (es) => es.session._id === session._id
               );
 
-              // Use startedAt from enrolledCourse for expiry calculation
-              let remainingDays = null;
-              let isLocked = true;
+              // Check if user has access to this specific session
+              const hasSessionAccess = !!userEnrolledSession;
+              
+              // For individual session purchases, sessions should be accessible immediately
+              // Only apply expiry logic for course-level enrollments
+              const enrolledCourse = user?.enrolledCourses?.find(
+                (ec) => ec.course === course._id
+              );
 
-              if (enrolledCourse && enrolledCourse.startedAt) {
+              let remainingDays = null;
+              let isLocked = !hasSessionAccess;
+
+              // Only apply 30-day expiry for course-level enrollments, not individual sessions
+              if (enrolledCourse && enrolledCourse.startedAt && !hasSessionAccess) {
                 const enrolledAt = new Date(enrolledCourse.startedAt);
                 const now = new Date();
                 const diffMs = now - enrolledAt;
                 remainingDays = Math.max(0, 30 - Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
                 isLocked = remainingDays <= 0;
-              } else {
-                isLocked = true;
+              } else if (hasSessionAccess) {
+                // Individual session purchases have no expiry
+                isLocked = false;
+                remainingDays = null;
               }
 
               let quizAttempt = null;
@@ -445,10 +451,12 @@ console.log(course)
                   isCompleted={!!userEnrolledSession?.isCompleted}
                   remainingDays={remainingDays}
                   expiryText={
-                    enrolledCourse && enrolledCourse.startedAt
+                    enrolledCourse && enrolledCourse.startedAt && !hasSessionAccess
                       ? remainingDays > 0
                         ? `Expires in ${remainingDays} day${remainingDays === 1 ? "" : "s"}`
                         : "Expired"
+                      : hasSessionAccess
+                      ? "Purchased"
                       : ""
                   }
                   quizStatus={quizAttempt?.status || 'not-attempted'}
@@ -462,7 +470,9 @@ console.log(course)
                   {/* Add this beside unlocked status */}
                   {!isLocked && (
                     <div className="flex items-center gap-2 ml-4">
-                      <span className="text-green-600 font-semibold">Unlocked</span>
+                      <span className="text-green-600 font-semibold">
+                        {hasSessionAccess ? "Purchased" : "Unlocked"}
+                      </span>
                       <Button
                         variant="outline"
                         size="sm"
