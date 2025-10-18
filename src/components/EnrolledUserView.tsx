@@ -54,14 +54,24 @@ const EnrolledUserView = ({ user }: EnrolledUserViewProps) => {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
   const onCourseClick = (course: any) => {
-    if (course.id === "683eb8cf6dfab461f47cd71c") {
+    const id = course.id;
+    console.log("Course ID:", id);
+  
+    if (id === "683eb8cf6dfab461f47cd71c") {
       navigate("/course/Export-Success-Mastery/BasicSessions");
-    } else if (course.id === "a9c7f83d2b214df9ab8e3475") {
+    } 
+    else if (id === "a9c7f83d2b214df9ab8e3475") {
       navigate("/course/Export-Success-Mastery/AdvancedSessions");
-    } else {
+    }
+    else if (id === "68f1e4f5d32828b4221a9225") {
+      navigate("/course/Export-Success-Mastery/ExportSessions");
+    }
+    else {
       navigate("/not-found");
     }
   };
+  
+  
 
   const enrolledCourses: EnrolledCourse[] =
     user.enrolledCourses?.map((enrolled: any) => {

@@ -48,6 +48,10 @@ const App = () => {
                   path="/course/Export-Success-Mastery/AdvancedSessions"
                   element={<CourseSessionsPage />}
                 />
+                <Route
+                  path="/course/Export-Success-Mastery/ExportSessions"
+                  element={<CourseSessionsPage />}
+                />
 
                 {/* Optional: Redirect old paths to new static URLs */}
                 <Route
@@ -57,6 +61,10 @@ const App = () => {
                 <Route
                   path="/course/Export-Success-Mastery/sessions/advanced"
                   element={<Navigate to="/course/Export-Success-Mastery/AdvancedSessions" replace />}
+                />
+                <Route
+                  path="/course/Export-Success-Mastery/sessions/exportsessions"
+                  element={<Navigate to="/course/Export-Success-Mastery/ExportSessions" replace />}
                 />
 
                 {/* Dynamic route removed! */}

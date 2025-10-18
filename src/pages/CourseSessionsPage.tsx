@@ -42,7 +42,12 @@ const CourseSessionsPage = () => {
     courseId = "683eb8cf6dfab461f47cd71c";
   } else if (location.pathname === "/course/Export-Success-Mastery/AdvancedSessions") {
     courseId = "a9c7f83d2b214df9ab8e3475";
-  } else if (params.courseId) {
+  } 
+  else if (location.pathname === "/course/Export-Success-Mastery/ExportSessions") {
+    courseId = "68f1e4f5d32828b4221a9225";
+  }
+  
+  else if (params.courseId) {
     courseId = params.courseId;
   }
 
@@ -50,6 +55,9 @@ const CourseSessionsPage = () => {
   let canonicalUrl = "https://learn.terrasourcing.com/course/Export-Success-Mastery/BasicSessions";
   if (location.pathname === "/course/Export-Success-Mastery/AdvancedSessions") {
     canonicalUrl = "https://learn.terrasourcing.com/course/Export-Success-Mastery/AdvancedSessions";
+  }
+  if (location.pathname === "/course/Export-Success-Mastery/ExportSessions") {
+    canonicalUrl = "https://learn.terrasourcing.com/course/Export-Success-Mastery/ExportSessions";
   }
 
   const navigate = useNavigate();
@@ -92,6 +100,15 @@ const CourseSessionsPage = () => {
       try {
         const courseData = await getCourseById(courseId);
         setCourse(courseData);
+        if (courseData?.sessions?.length > 0) {
+          console.log("Course ID:", courseId);
+          console.log("Session IDs:");
+          courseData.sessions.forEach((session, index) => {
+            console.log(`${index + 1}. ${session._id} - ${session.title}`);
+          });
+        } else {
+          console.log("No sessions found for course:", courseId);
+        }
 
         const storedAuth = localStorage.getItem("TerraAuthData");
         if (storedAuth) {
@@ -311,9 +328,9 @@ const CourseSessionsPage = () => {
       <div className="h-[80vh] flex justify-center items-center text-2xl text-red-500">
         Course not found.
       </div>
-    );
+    );  
   }
-console.log(course)
+// console.log(course)
   return (
     <>
       <Helmet>
@@ -404,6 +421,7 @@ console.log(course)
           </h2>
           <div className="grid gap-4">
             {Array.isArray(course.sessions) && course.sessions.map((session, index) => {
+               console.log("Session ID:", session._id, "Title:", session.title);
               // Find the enrolled session for this session
               const userEnrolledSession = user?.enrolledSessions?.find(
                 (es) => es.session._id === session._id

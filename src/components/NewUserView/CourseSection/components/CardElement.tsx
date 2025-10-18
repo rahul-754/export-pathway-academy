@@ -80,12 +80,16 @@ const CardElement = ({
           </div>
         </div>
         <Button
-          className="w-full bg-blue-600 text-white !mt-7 hover:bg-blue-700 transition-colors"
-          onClick={() => onCourseClick(course._id)}
-        >
-          View Sessions & Enroll
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
+  className="w-full bg-blue-600 text-white !mt-7 hover:bg-blue-700 transition-colors"
+  onClick={() => {
+    console.log("Course ID:", course._id);
+    onCourseClick(course._id);
+  }}
+>
+  View Sessions & Enroll
+  <ArrowRight className="h-4 w-4 ml-2" />
+</Button>
+
       </div>
     </Card>
   );

@@ -42,7 +42,11 @@ const CoursesPage = () => {
       navigate("/course/Export-Success-Mastery/BasicSessions");
     } else if (course._id === "a9c7f83d2b214df9ab8e3475") {
       navigate("/course/Export-Success-Mastery/AdvancedSessions");
-    } else {
+    } 
+    else if (course._id === "68f1e4f5d32828b4221a9225") {
+      navigate("/course/Export-Success-Mastery/AdvancedSessions");
+    } 
+    else {
       navigate("/not-found");
     }
   };
